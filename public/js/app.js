@@ -473,7 +473,7 @@ function getMarks() {
         url: "/dashboard/student/get-marks",
         type: "GET",
         success: function (response) {
-            console.log(response)
+            console.log(response);
             let assignmentTableBody = "";
             let testTableBody = "";
 
@@ -488,22 +488,30 @@ function getMarks() {
             } else {
                 response.forEach(function (mark) {
                     const createdAt = new Date(mark.answer?.created_at);
-                    const day = createdAt.toLocaleDateString('en-US', { weekday: 'long' });
-                    const date = `${createdAt.getDate()}/${createdAt.getMonth() + 1}/${createdAt.getFullYear()}`;
+                    const day = createdAt.toLocaleDateString("en-US", {
+                        weekday: "long",
+                    });
+                    const date = `${createdAt.getDate()}/${
+                        createdAt.getMonth() + 1
+                    }/${createdAt.getFullYear()}`;
                     const time = `${createdAt.getHours()}:${createdAt.getMinutes()}`;
                     const rowHtml = `
                         <tr>
                             <td class="text-sm">${date}</td>
                             <td class="text-sm">${day}</td>
-                            <td class="text-sm">${mark.student?.name || 'N/A'}</td>
+                            <td class="text-sm">${
+                                mark.student?.name || "N/A"
+                            }</td>
                             <td class="text-sm">${time}</td>
-                            <td class="text-sm">${displayFile(mark.answer?.answer_file)}</td>
-                            <td class="text-sm">${mark?.max_marks || 'N/A'}</td>
-                            <td class="text-sm">${mark.obt_marks || 'N/A'}</td>
+                            <td class="text-sm">${displayFile(
+                                mark.answer?.answer_file
+                            )}</td>
+                            <td class="text-sm">${mark?.max_marks || "N/A"}</td>
+                            <td class="text-sm">${mark.obt_marks || "N/A"}</td>
                         </tr>`;
 
                     // Check if it's an assignment or a test based on the type
-                    if (mark?.answer?.assignment?.type == 'assignment') {
+                    if (mark?.answer?.assignment?.type == "assignment") {
                         assignmentTableBody += rowHtml;
                     } else {
                         testTableBody += rowHtml;
@@ -521,7 +529,7 @@ function getMarks() {
         complete: function () {
             $(".loader-table").hide();
             $(".hide-table").show();
-        }
+        },
     });
 }
 
@@ -529,34 +537,31 @@ $(document).ready(function () {
     getMarks();
 });
 
-
-
 // add course
 
-$(document).ready(function(){
-    $('.course-loading').hide()
-                $(".error").hide();
-
-})
+$(document).ready(function () {
+    $(".course-loading").hide();
+    $(".error").hide();
+});
 
 function addCourse() {
-    $('.course-loading').show()
-    $('.course-btn').attr('disabled', 'disabled');
-    $('.course-btn').addClass('btn-disabled');
-    let data = $('.course-form').serialize();
+    $(".course-loading").show();
+    $(".course-btn").attr("disabled", "disabled");
+    $(".course-btn").addClass("btn-disabled");
+    let data = $(".course-form").serialize();
     // console.log(data)
     $.ajax({
-        url: '/dashboard/staff/add-course-data',
-        type: 'POST',
-        data: $('.course-form').serialize(),
-        success:function(response){
-            $('.flash').show()
-           $(".notificationPara").html('Course Added Successfully');
+        url: "/dashboard/staff/add-course-data",
+        type: "POST",
+        data: $(".course-form").serialize(),
+        success: function (response) {
+            $(".flash").show();
+            $(".notificationPara").html("Course Added Successfully");
             $(".AllowBtn").click(function () {
                 $(".flash").fadeOut();
             });
         },
-        error:function(xhr,status,error){
+        error: function (xhr, status, error) {
             if (xhr.status == 422) {
                 let errors = xhr.responseJSON.errors;
                 $.each(errors, function (key, value) {
@@ -564,46 +569,41 @@ function addCourse() {
                         '<p class="text-danger fw-medium    m-0">' +
                         value[0] +
                         "</p>";
-                    $(
-                        'input[name="' + key + '"]'
-                    ).after(errorElement);
+                    $('input[name="' + key + '"]').after(errorElement);
                 });
             }
 
             if (xhr.status == 400) {
-                $('.error').show();
-                $('.error__title').html('Course already present!')
-                $('.error__close').click(function () {
-                    $('.error').fadeOut();
-                })
+                $(".error").show();
+                $(".error__title").html("Course already present!");
+                $(".error__close").click(function () {
+                    $(".error").fadeOut();
+                });
             }
-
         },
         complete: function () {
-            $('.course-loading').hide()
-            $('.course-btn').removeAttr('disabled')
-            $('.course-btn').removeClass('btn-disabled');
-            $('.course-form')[0].reset();
-        }
-    })
+            $(".course-loading").hide();
+            $(".course-btn").removeAttr("disabled");
+            $(".course-btn").removeClass("btn-disabled");
+            $(".course-form")[0].reset();
+        },
+    });
 }
 
-$('.course-btn').click(function (e) {
+$(".course-btn").click(function (e) {
     e.preventDefault();
-    addCourse()
-})
-
-
+    addCourse();
+});
 
 // get course data
 function getCourses() {
-    $('.courses-table').hide()
+    $(".courses-table").hide();
 
     $.ajax({
-        url: '/dashboard/staff/get-course-data',
-        type: 'GET',
+        url: "/dashboard/staff/get-course-data",
+        type: "GET",
         success: function (response) {
-            let courses = '';
+            let courses = "";
             response.forEach(function (course, index) {
                 courses += `
                     <tr>
@@ -622,112 +622,93 @@ function getCourses() {
                             </button>
                         </td>
                     </tr>
-                `
-            })
+                `;
+            });
 
-            $('.courses').html(courses)
+            $(".courses").html(courses);
         },
         error: function (xhr, status, error) {
-            console.log(error)
-            $('.error').show()
-            $('.error_title').show('An Error Occured');
+            console.log(error);
+            $(".error").show();
+            $(".error_title").show("An Error Occured");
         },
         complete: function () {
-            $('.table-loader').hide();
-            $('.courses-table').show()
-        }
-    })
+            $(".table-loader").hide();
+            $(".courses-table").show();
+        },
+    });
 }
 
-
-
-$(document).ready(function(){
-    getCourses()
-})
-
+$(document).ready(function () {
+    getCourses();
+});
 
 // get courses for teacher assignment
 
-
 function getCoursesTeacher() {
-
     $.ajax({
-        url: '/dashboard/staff/get-course-data',
-        type: 'GET',
+        url: "/dashboard/staff/get-course-data",
+        type: "GET",
         success: function (response) {
-            console.log(response)
-            let courses = '<option selected disabled>Select course</option>';
+            console.log(response);
+            let courses = "<option selected disabled>Select course</option>";
             response.forEach(function (course, index) {
                 courses += `
 
-                <option value="${course?.course_name}">${course?.course_name}</option>
-                `
-            })
+                <option value="${course?.id}">${course?.course_name}</option>
+                `;
+            });
 
-            $('[name=course_assigned]').html(courses)
+            $("[name=course_assigned]").html(courses);
         },
         error: function (xhr, status, error) {
-            console.log(error)
-            $('.error').show()
-            $('.error_title').show('An Error Occured');
+            console.log(error);
+            $(".error").show();
+            $(".error_title").show("An Error Occured");
         },
-        complete: function () {
-
-        }
-    })
+        complete: function () {},
+    });
 }
 
-
-
-$(document).ready(function(){
-    getCoursesTeacher()
-})
-
-
+$(document).ready(function () {
+    getCoursesTeacher();
+});
 
 // add instructors
 
-
-
-$(document).ready(function(){
-    $('.error').hide()
-    $('.teacher-loading').hide();
-
-})
-
-
-
-
-
+$(document).ready(function () {
+    $(".error").hide();
+    $(".teacher-loading").hide();
+});
 
 function addInstructor() {
-    $('.teacher-loading').show();
-    $('.teacher-btn').attr('disabled', 'disabled').addClass('btn-disabled');
+    $(".teacher-loading").show();
+    $(".teacher-btn").attr("disabled", "disabled").addClass("btn-disabled");
 
     // Clear previous error messages
-    $('.text-danger').remove(); // This removes all previous error messages
+    $(".text-danger").remove(); // This removes all previous error messages
 
     // Create form data to handle file upload
-    let formData = new FormData($('.teacher-form')[0]);
+    let formData = new FormData($(".teacher-form")[0]);
     let errorElement;
 
     $.ajax({
-        url: '/dashboard/staff/add-instructor',
-        type: 'POST',
+        url: "/dashboard/staff/add-instructor",
+        type: "POST",
         data: formData,
-        processData: false,  // Important to send FormData object correctly
-        contentType: false,  // Important for file upload
+        processData: false, // Important to send FormData object correctly
+        contentType: false, // Important for file upload
         success: function (response) {
-            if (response.status === 'success') {
+            if (response.status === "success") {
                 // Show success message
-                $('.flash').show();
-                $('.notificationPara').html('Instructor added successfully!');
+                $(".flash").show();
+                $(".notificationPara").html("Instructor added successfully!");
                 // Reset the form
-                $('.teacher-form')[0].reset();
+                $(".teacher-form")[0].reset();
             } else {
                 // Show general error if any other issue occurs
-                $('.error').show();
-                $('.error_title').html('Error adding instructor.');
+                $(".error").show();
+                $(".error_title").html("Error adding instructor.");
             }
         },
         error: function (xhr, status, error) {
@@ -740,74 +721,225 @@ function addInstructor() {
                     errorElement =
                         '<p class="text-danger fw-medium m-0">' +
                         value[0] +
-                        '</p>';
+                        "</p>";
                     $('input[name="' + key + '"]').after(errorElement);
                     $('select[name="' + key + '"]').after(errorElement); // in case of select fields
                 });
             } else {
                 // Show error for non-validation issues
-                $('.error').show();
-                $('.error_title').html('An Error Occurred');
+                $(".error").show();
+                $(".error_title").html("An Error Occurred");
             }
         },
         complete: function () {
             // Hide the loader and reset button states
-            $('.teacher-loading').hide();
-            $('.teacher-btn').removeAttr('disabled').removeClass('btn-disabled');
+            $(".teacher-loading").hide();
+            $(".teacher-btn")
+                .removeAttr("disabled")
+                .removeClass("btn-disabled");
 
-            $('#image-preview').hide();
-            if (response.status === 'success') {
-                // Reset the form only if the submission was successful
-                $('.teacher-form')[0].reset();
-
-            }
-        }
+            $("#image-preview").hide();
+            // Reset the form only if the submission was successful
+            $(".teacher-form")[0].reset();
+        },
     });
 }
 
-
-$('.teacher-btn').click(function (e) {
+$(".teacher-btn").click(function (e) {
     e.preventDefault();
     addInstructor();
 });
 
-
 $(document).ready(function () {
     // Image preview functionality
-    $('input[name="image"]').on('change', function (e) {
+    $('input[name="image"]').on("change", function (e) {
         let reader = new FileReader();
         reader.onload = function (e) {
-            $('#image-preview').attr('src', e.target.result).show();
-        }
+            $("#image-preview").attr("src", e.target.result).show();
+        };
         reader.readAsDataURL(e.target.files[0]);
     });
 
     // Password show/hide functionality
-   $('.toggle-password').off('click').on('click', function () {
-    let passwordInput = $(this).closest('.form-control').find('input[name="password"]');
-    let icon = $(this).find('i');
+    $(".toggle-password")
+        .off("click")
+        .on("click", function () {
+            let passwordInput = $(this)
+                .closest(".form-control")
+                .find('input[name="password"]');
+            let icon = $(this).find("i");
 
-    console.log('Before:', passwordInput.attr('type'), icon.attr('class'));
+            console.log(
+                "Before:",
+                passwordInput.attr("type"),
+                icon.attr("class")
+            );
 
-    if (passwordInput.attr('type') === 'password') {
-        passwordInput.attr('type', 'text');
-        icon.removeClass('bi-eye-slash').addClass('bi-eye');
-        console.log('Changed to text, icon to bi-eye');
-    } else {
-        passwordInput.attr('type', 'password');
-        icon.removeClass('bi-eye').addClass('bi-eye-slash');
-        console.log('Changed to password, icon to bi-eye-slash');
-    }
+            if (passwordInput.attr("type") === "password") {
+                passwordInput.attr("type", "text");
+                icon.removeClass("bi-eye-slash").addClass("bi-eye");
+                console.log("Changed to text, icon to bi-eye");
+            } else {
+                passwordInput.attr("type", "password");
+                icon.removeClass("bi-eye").addClass("bi-eye-slash");
+                console.log("Changed to password, icon to bi-eye-slash");
+            }
 
-    console.log('After:', passwordInput.attr('type'), icon.attr('class'));
+            console.log(
+                "After:",
+                passwordInput.attr("type"),
+                icon.attr("class")
+            );
+        });
 });
-
-
-});
-
 
 // hide the message
 
 $(".AllowBtn").click(function () {
-                $(".flash").fadeOut();
+    $(".flash").fadeOut();
+});
+
+// assign batched
+
+$(document).ready(function () {
+    $(".batch-loading").hide();
+    $(".teacher-skeleton").hide();
+    $(".batch-btn").attr("disabled", "disabled").addClass("btn-disabled");
+
+    // Fetch courses on page load
+    $.ajax({
+        url: "/dashboard/staff/get-courses",
+        type: "GET",
+        success: function (response) {
+            let courseOptions =
+                "<option disabled selected>Select Course</option>";
+            response.forEach(function (course) {
+                courseOptions += `<option value="${course.id}">${course.course_name}</option>`;
+            });
+            $('select[name="course_name_batch"]').html(courseOptions);
+        },
+        error: function (xhr) {
+            console.log(xhr.statusText);
+        },
+    });
+
+    // Fetch teachers based on the selected course
+    $('select[name="course_name_batch"]').change(function () {
+        const course_id = $(this).val();
+        // $(".batch-loading").show(); // Show overall loading
+        $(".teacher-skeleton").show(); // Show teacher loading specifically
+        $(".teacher-assigned").hide();
+        $.ajax({
+            url: "/dashboard/staff/get-teachers",
+            type: "POST",
+            data: {
+                course_id: course_id,
+                _token: $('input[name="_token"]').val(),
+            },
+            success: function (response) {
+                let teacherOptions =
+                    "<option disabled selected>Select Teacher</option>";
+                response.forEach(function (teacher) {
+                    teacherOptions += `<option value="${teacher.id}">${teacher.name}</option>`;
+                });
+                $('select[name="teacher_assigned"]').html(teacherOptions);
+            },
+            error: function (xhr) {
+                console.log(xhr.statusText);
+            },
+            complete: function () {
+                $(".batch-loading").hide(); // Hide overall loading
+                $(".teacher-skeleton").hide(); // Hide teacher loading
+                $(".teacher-assigned").show();
+
+                checkFormValidity();
+            },
+        });
+    });
+
+    // Check if both course and teacher are selected
+    $('select[name="teacher_assigned"]').change(function () {
+        checkFormValidity();
+    });
+
+    function checkFormValidity() {
+        const courseSelected = $('select[name="course_name_batch"]').val();
+        const teacherSelected = $('select[name="teacher_assigned"]').val();
+        const batchSelected = $('input[name="batch_number"]').val();
+        if (courseSelected && teacherSelected && batchSelected) {
+            $(".batch-btn").removeAttr("disabled").removeClass("btn-disabled");
+        } else {
+            $(".batch-btn")
+                .attr("disabled", "disabled")
+                .addClass("btn-disabled");
+        }
+    }
+
+    // Add Batch form submission
+    $(".batch-btn").click(function (e) {
+        e.preventDefault();
+
+        $(".batch-loading").show();
+        $(".batch-btn").attr("disabled", "disabled").addClass("btn-disabled");
+
+        let formData = new FormData($(".course-form")[0]);
+
+        $.ajax({
+            url: "/dashboard/staff/add-batch",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.status === "success") {
+                    $(".course-form")[0].reset(); // Reset the form
+                    $(".flash").show();
+                    $(".notificationPara").html("Batch added successfully");
+                }
+            },
+            error: function (xhr) {
+                if (xhr.status === 422) {
+                    let errors = xhr.responseJSON.errors;
+                    $.each(errors, function (key, value) {
+                        $(`input[name="${key}"]`).after(
+                            `<p class="text-danger">${value[0]}</p>`
+                        );
+                        $(`select[name="${key}"]`).after(
+                            `<p class="text-danger">${value[0]}</p>`
+                        );
+                    });
+                }
+            },
+            complete: function () {
+                $(".batch-loading").hide();
+                checkFormValidity(); // Recheck validity after submission
+            },
+        });
+    });
+});
+
+$(document).ready(function () {
+    loadBatches(1); // Load first page of batches on page load
+
+    function loadBatches(page) {
+        $.ajax({
+            url: `/dashboard/staff/batches?page=${page}`,
+            type: "GET",
+            success: function (response) {
+                // Update the table body and pagination links with the response data
+                $(".batches-view").html(response.batchesHtml); // You'll need to return HTML for the batches
+                $(".pagination").html(response.paginationHtml); // And pagination links
+            },
+            error: function (xhr) {
+                console.error(xhr.statusText);
+            },
+        });
+    }
+
+    // Handle pagination click
+    $(document).on("click", ".pagination a", function (e) {
+        e.preventDefault();
+        const page = $(this).attr("href").split("page=")[1];
+        loadBatches(page);
+    });
 });

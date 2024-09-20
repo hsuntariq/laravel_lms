@@ -7,16 +7,22 @@
             Add Batch
         </h1>
         <div class="form-group">
-            <label for="course_name">Course Name</label>
+            <label for="course_name_batch">Course Name</label>
             <select name="course_name_batch" id="" class="form-control"></select>
         </div>
         <div class="form-group">
-            <label for="course_duration">Batch number</label>
+            <label for="batch_number">Batch number</label>
             <input type="number" placeholder="e.g. 5" class="form-control batch_number" name="batch_number">
 
         </div>
-        <div class="form-group">
-            <label for="course_fee">Teacher</label>
+        <div class="form-group p-0">
+
+            <div class="teacher-skeleton  w-100 my-2 m-0">
+                <div class="skeleton "></div>
+            </div>
+        </div>
+        <div class="form-group teacher-assigned">
+            <label for="teacher_assigned">Teacher</label>
             <select name="teacher_assigned" id="" class="form-control"></select>
         </div>
         <button class="btn btn-purple batch-btn w-100 my-2">

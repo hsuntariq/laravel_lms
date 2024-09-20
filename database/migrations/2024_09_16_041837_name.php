@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('batches', function (Blueprint $table) {
-            if (!Schema::hasColumn('batches', 'name')) {
-                $table->string('name');
+            if (!Schema::hasColumn('batches', 'course_id')) {
+                $table->unsignedBigInteger('course_id');
             }
-            $table->foreign('name')->references('course_name')->on('courses');
+            $table->foreign('course_id')->references('id')->on('courses');
         });
     }
 

@@ -3,6 +3,7 @@
 use App\Charts\teacherDashboardChart;
 use App\Http\Controllers\assignmentController;
 use App\Http\Controllers\attendanceController;
+use App\Http\Controllers\batchController;
 use App\Http\Controllers\courseController;
 use App\Http\Controllers\marksController;
 use App\Http\Controllers\staffController;
@@ -93,9 +94,21 @@ Route::prefix("/dashboard/staff/")->group(function () {
 
     Route::view('/batches/assign-batches/{id}', 'staff.pages.assign-batches')->name('staff-assign-batches');
 
+
+
+
     Route::post('/add-course-data', [courseController::class, 'addCourse'])->name('add-courses-data');
 
     Route::get('/get-course-data', [courseController::class, 'getCourses'])->name('get-courses-data');
 
     Route::post('/add-instructor', [staffController::class, 'addInstructor'])->name('staff.addInstructor');
+
+    Route::get('/get-courses', [batchController::class, 'getCourses']);
+
+    Route::post('/get-teachers', [batchController::class, 'getTeachers']);
+
+    Route::post('/add-batch', [batchController::class, 'addBatch']);
+
+
+    Route::get('/batches/view-batches/{id}', [batchController::class, 'getBatches'])->name('staff-view-batches');
 });

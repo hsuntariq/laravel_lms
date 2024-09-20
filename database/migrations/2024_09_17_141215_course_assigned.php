@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('course_assigned')->nullable();
-            $table->foreign('course_assigned')->references('course_name')->on('courses');
+            $table->unsignedBigInteger('course_assigned')->nullable();
+            $table->foreign('course_assigned')->references('id')->on('courses');
         });
     }
 
