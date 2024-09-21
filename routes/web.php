@@ -88,9 +88,9 @@ Route::prefix("/dashboard/staff/")->group(function () {
 
     Route::view('/teachers/view-teachers/{id}', 'staff.pages.view-teachers')->name('staff-view-teachers');
 
-    Route::view('/batches/add-batches/{id}', 'staff.pages.add-batches')->name('staff-add-batches');
+    Route::view('/batches/add-batches', 'staff.pages.add-batches')->name('staff-add-batches');
 
-    Route::view('/batches/view-batches/{id}', 'staff.pages.view-batches')->name('staff-view-batches');
+    Route::view('/batches/view-batches/', 'staff.pages.view-batches')->name('staff-view-batches');
 
     Route::view('/batches/assign-batches/{id}', 'staff.pages.assign-batches')->name('staff-assign-batches');
 
@@ -110,5 +110,14 @@ Route::prefix("/dashboard/staff/")->group(function () {
     Route::post('/add-batch', [batchController::class, 'addBatch']);
 
 
-    Route::get('/batches/view-batches/{id}', [batchController::class, 'getBatches'])->name('staff-view-batches');
+    Route::get('/batches/view-batches', [batchController::class, 'getBatches'])->name('staff-view-batches');
+
+
+    Route::post('/update-batch/{id}', [BatchController::class, 'updateBatch'])->name('batches.update');
+
+    Route::delete('/delete-batch/{id}', [BatchController::class, 'deleteBatch'])->name('batches.delete');
+
+    Route::get('/batches/{id}/edit', [BatchController::class, 'editBatch']);
+
+    Route::post('/get-teachers-and-duration', [BatchController::class, 'getTeachersAndDuration']);
 });

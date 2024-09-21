@@ -349,7 +349,6 @@ function getSubmittedAssignments() {
         type: "GET",
         data: { batch_no: batch_no },
         success: function (response) {
-            console.log(response);
             let submittedAssignments = "";
             response?.forEach(function (assignment, index) {
                 console.log(assignment);
@@ -473,7 +472,6 @@ function getMarks() {
         url: "/dashboard/student/get-marks",
         type: "GET",
         success: function (response) {
-            console.log(response);
             let assignmentTableBody = "";
             let testTableBody = "";
 
@@ -650,7 +648,6 @@ function getCoursesTeacher() {
         url: "/dashboard/staff/get-course-data",
         type: "GET",
         success: function (response) {
-            console.log(response);
             let courses = "<option selected disabled>Select course</option>";
             response.forEach(function (course, index) {
                 courses += `
@@ -923,7 +920,7 @@ $(document).ready(function () {
 
     function loadBatches(page) {
         $.ajax({
-            url: `/dashboard/staff/batches?page=${page}`,
+            url: `/dashboard/staff/batches/view-batches/?page=${page}`,
             type: "GET",
             success: function (response) {
                 // Update the table body and pagination links with the response data
@@ -941,5 +938,142 @@ $(document).ready(function () {
         e.preventDefault();
         const page = $(this).attr("href").split("page=")[1];
         loadBatches(page);
+    });
+});
+
+// update batches
+
+$(document).on("click", ".update-btn", function () {
+    let batchId = $(this).data("id"); // Get the batch ID from button's data attribute
+    let formData = {
+        batch_no: $('input[name="batch_no"]').val(),
+        teacher: $('select[name="teacher"]').val(),
+        course: $('select[name="course"]').val(),
+        duration: $('input[name="duration"]').val(),
+        _token: $('input[name="_token"]').val(),
+    };
+
+    $.ajax({
+        url: `/dashboard/staff/update-batch/${batchId}`,
+        type: "POST",
+        data: formData,
+        success: function (response) {
+            if (response.status === "success") {
+                alert(response.message);
+                loadBatches(1); // Reload the batches after update
+            }
+        },
+        error: function (xhr) {
+            console.error("Error:", xhr.statusText);
+        },
+    });
+});
+
+// delete batch
+
+$(document).on("click", ".delete-btn", function () {
+    if (confirm("Are you sure you want to delete this batch?")) {
+        let batchId = $(this).data("id"); // Get batch ID from button's data attribute
+
+        $.ajax({
+            url: `/dashboard/staff/delete-batch/${batchId}`,
+            type: "DELETE",
+            data: {
+                _token: $('input[name="_token"]').val(),
+            },
+            success: function (response) {
+                if (response.status === "success") {
+                    alert(response.message);
+                    loadBatches(1); // Reload the batches after deletion
+                }
+            },
+            error: function (xhr) {
+                console.error("Error:", xhr.statusText);
+            },
+        });
+    }
+});
+
+// update modal data
+$(document).ready(function () {
+    // When an 'Update' button is clicked
+    $(document).on("click", ".update-btn", function () {
+        const batchId = $(this).data("id");
+
+        // Fetch the batch details and populate the modal
+        $.ajax({
+            url: `/dashboard/staff/batches/${batchId}/edit`, // Route to fetch batch details
+            type: "GET",
+            success: function (response) {
+                $("#batchNo").val(response.batch_no);
+                $("#courseAssigned").html(response.courseOptions);
+                $("#teacherAssigned").html(response.teacherOptions);
+                $("#duration").val(response.duration); // Populate duration field
+                $("#batchId").val(batchId);
+            },
+            error: function (xhr) {
+                console.error("Error fetching batch details:", xhr.statusText);
+            },
+        });
+    });
+
+    // Fetch teachers and update duration based on the selected course in the modal
+    $(document).on("change", "#courseAssigned", function () {
+        const courseId = $(this).val();
+
+        // Make AJAX call to fetch teachers and course duration
+        $.ajax({
+            url: `/dashboard/staff/get-teachers-and-duration`, // Update the route to also return course duration
+            type: "POST",
+            data: {
+                course_id: courseId,
+                _token: $('input[name="_token"]').val(),
+            },
+            success: function (response) {
+                let teacherOptions =
+                    "<option disabled selected>Select Teacher</option>";
+                response.teachers.forEach(function (teacher) {
+                    teacherOptions += `<option value="${teacher.id}">${teacher.name}</option>`;
+                });
+                $("#teacherAssigned").html(teacherOptions);
+
+                // Update the course duration field
+                $("#duration").val(response.course_duration);
+            },
+            error: function (xhr) {
+                console.error(
+                    "Error fetching teachers or duration:",
+                    xhr.statusText
+                );
+            },
+        });
+    });
+
+    // Save changes when the modal form is submitted
+    $("#saveBatchBtn").click(function () {
+        const batchId = $("#batchId").val();
+        const formData = {
+            batch_no: $("#batchNo").val(),
+            teacher: $("#teacherAssigned").val(),
+            course_id: $("#courseAssigned").val(),
+            duration: $("#duration").val(),
+            _token: $('input[name="_token"]').val(),
+        };
+
+        $.ajax({
+            url: `/dashboard/staff/update-batch/${batchId}`,
+            type: "POST",
+            data: formData,
+            success: function (response) {
+                if (response.status === "success") {
+                    alert(response.message);
+                    $("#updateBatchModal").modal("hide");
+                    loadBatches(1); // Reload the batches (adjust the page number if necessary)
+                }
+            },
+            error: function (xhr) {
+                console.error("Error updating batch:", xhr.statusText);
+            },
+        });
     });
 });

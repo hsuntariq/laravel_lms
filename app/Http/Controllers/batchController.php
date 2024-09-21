@@ -49,7 +49,7 @@ class batchController extends Controller
     public function getBatches(Request $request)
     {
         $batches = Batch::with(['teachers', 'course'])
-            ->paginate(3);
+            ->paginate(10);
 
 
         if ($request->ajax()) {
@@ -65,5 +65,104 @@ class batchController extends Controller
 
 
         return view('staff.pages.view-batches', compact('batches'));
+    }
+
+
+
+    public function updateBatch(Request $request, $id)
+    {
+        $batch = Batch::findOrFail($id);
+
+        $validatedData = $request->validate([
+            'batch_no' => 'required|integer',
+            'teacher' => 'required|exists:users,id',
+            'course_id' => 'required|exists:courses,id',
+            'duration' => 'required|numeric'
+        ]);
+
+        $batch->update([
+            'batch_no' => $validatedData['batch_no'],
+            'teacher' => $validatedData['teacher'],
+            'course_id' => $validatedData['course_id'],
+            'course_duration' => $validatedData['duration']
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Batch updated successfully',
+        ]);
+    }
+
+
+    public function deleteBatch($id)
+    {
+        $batch = Batch::findOrFail($id);
+        $batch->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Batch deleted successfully',
+        ]);
+    }
+
+
+
+
+    public function editBatch($batchId)
+    {
+        // Fetch the batch by its ID
+        $batch = Batch::with('course', 'teachers')->find($batchId);
+
+        if (!$batch) {
+            return response()->json(['status' => 'error', 'message' => 'Batch not found']);
+        }
+
+        // Fetch all courses for the course dropdown
+        $courses = Course::all();
+        $courseOptions = '<option disabled selected>Select Course</option>';
+        foreach ($courses as $course) {
+            $selected = $batch->course_id == $course->id ? 'selected' : '';
+            $courseOptions .= "<option value='{$course->id}' $selected>{$course->course_name}</option>";
+        }
+
+        // Fetch teachers for the currently selected course
+        $teachers = User::where('role', 'teacher')
+            ->where('course_assigned', $batch->course_id)
+            ->get();
+        $teacherOptions = '<option disabled selected>Select Teacher</option>';
+        foreach ($teachers as $teacher) {
+            $selected = $batch->teacher == $teacher->id ? 'selected' : '';
+            $teacherOptions .= "<option value='{$teacher->id}' $selected>{$teacher->name}</option>";
+        }
+
+        return response()->json([
+            'batch_no' => $batch->batch_no,
+            'course_id' => $batch->course_id,
+            'teacher' => $batch->teacher,
+            'duration' => $batch->course->course_duration, // Include the course duration
+            'courseOptions' => $courseOptions,
+            'teacherOptions' => $teacherOptions,
+        ]);
+    }
+
+
+
+
+    public function getTeachersAndDuration(Request $request)
+    {
+        $courseId = $request->course_id;
+
+        // Fetch teachers who are assigned to the selected course
+        $teachers = User::where('role', 'teacher')
+            ->where('course_assigned', $courseId)
+            ->get();
+
+        // Fetch the course duration
+        $course = Course::find($courseId);
+
+        return response()->json([
+            'teachers' => $teachers,
+            'course_duration' => $course->course_duration,
+        ]);
     }
 }

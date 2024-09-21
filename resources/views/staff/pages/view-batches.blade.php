@@ -3,6 +3,7 @@
         <h2 class="mb-4 display-5">Current Batches</h2>
         <div class="underline"></div>
     </div>
+    @include('staff.partials.update-batch-modal')
     <div class="table-responsive my-2">
 
         <table class="table table-striped">
@@ -26,15 +27,16 @@
                     <td>{{ optional($batch->course)->course_name ?? 'N/A' }}</td> <!-- Use optional() to prevent errors -->
                     <td>{{ $batch->course->course_duration }} months</td> <!-- Adjust according to your actual data -->
                     <td>
-                        <button class="btn btn-purple btn-sm">
+                        <button class="btn btn-purple btn-sm update-btn" data-id="{{ $batch->id }}">
                             Update
                         </button>
                     </td>
                     <td>
-                        <button class="btn btn-danger btn-sm">
+                        <button class="btn btn-danger btn-sm delete-btn" data-id="{{ $batch->id }}">
                             Delete
                         </button>
                     </td>
+
                 </tr>
                 @endforeach
             </tbody>

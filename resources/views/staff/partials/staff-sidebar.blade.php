@@ -85,14 +85,14 @@
             <li class="d-flex rounded-3 p-3 gap-3 align-items-center ">
                 <div class="bi bi-plus"></div>
                 <a class="text-decoration-none dropdown-item text-dark"
-                    href="{{ route('staff-add-batches', ['id' => 16]) }}">
+                    href="{{ route('staff-add-batches')}}">
                     Add Batch
                 </a>
             </li>
             <li class="d-flex rounded-3 p-3 gap-3 align-items-center ">
                 <div class="bi bi-eye"></div>
                 <a class="text-decoration-none text-dark dropdown-item"
-                    href="{{ route('staff-view-batches', ['id' => 16]) }}">
+                    href="{{ route('staff-view-batches') }}">
                     View Batch
                 </a>
             </li>
