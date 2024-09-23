@@ -19,7 +19,7 @@ Route::get('/', function () {
 Route::prefix('/dashboard/student')->group(function () {
     Route::view('/home/{id}', 'student.dashboard')->name('student-dashboard');
 
-    Route::view('/assignments/{batch}', 'student.pages.assignments')->name('student-assignments');
+    Route::view('/assignments', 'student.pages.assignments')->name('student-assignments');
 
     Route::view('/attendance/{id}', 'student.pages.attendance')->name('student-attendance');
 
@@ -45,15 +45,15 @@ Route::prefix('/dashboard/student')->group(function () {
 Route::prefix('/dashboard/teacher')->group(function () {
     Route::view('/home/{id}', 'teacher.pages.dashboard')->name('teacher-dashboard');
 
-    Route::view('/attendance/mark/{batch}', 'teacher.pages.attendance')->name('teacher-attendance');
+    Route::view('/attendance/mark', 'teacher.pages.attendance')->name('teacher-attendance');
 
-    Route::view('/attendance/view/{batch}', 'teacher.pages.view-attendance')->name('teacher-view-attendance');
+    Route::view('/attendance/view/', 'teacher.pages.view-attendance')->name('teacher-view-attendance');
 
-    Route::view('/assignments/{batch}', 'teacher.pages.attendance')->name('teacher-assignments');
+    Route::view('/assignments/', 'teacher.pages.attendance')->name('teacher-assignments');
 
-    Route::view('/assignments/view/{batch}', 'teacher.pages.view-assignments')->name('teacher-view-assignments');
+    Route::view('/assignments/view', 'teacher.pages.view-assignments')->name('teacher-view-assignments');
 
-    Route::view('/assignments/upload/{batch}', 'teacher.pages.upload-assignment')->name('teacher-upload-assignments');
+    Route::view('/assignments/upload', 'teacher.pages.upload-assignment')->name('teacher-upload-assignments');
 
 
     Route::view('/settings/{id}', 'teacher.pages.attendance')->name('teacher-settings');
@@ -61,9 +61,9 @@ Route::prefix('/dashboard/teacher')->group(function () {
 
     Route::get('/home/{id}', [teacherDashboardController::class, 'makeCharts'])->name('teacher-dashboard');
 
-    Route::get('/attendance/view/{batch}', [attendanceController::class, 'makeCharts2'])->name('teacher-view-attendance');
+    Route::get('/attendance/view', [attendanceController::class, 'makeCharts2'])->name('teacher-view-attendance');
 
-    Route::get('/assignments/view/{batch}', [assignmentController::class, 'makeCharts'])->name('teacher-view-assignments');
+    Route::get('/assignments/view', [assignmentController::class, 'makeCharts'])->name('teacher-view-assignments');
 
     Route::post('/upload-assignment/', [assignmentController::class, 'uploadAssignment'])->name('upload-assignment');
 

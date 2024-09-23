@@ -49,14 +49,14 @@
             <li class="d-flex rounded-3 p-3 gap-3 align-items-center ">
                 <div class="bi bi-speedometer"></div>
                 <a class="text-decoration-none dropdown-item text-dark"
-                    href="{{ route('teacher-upload-assignments', ['batch' => 16]) }}">
+                    href="{{ route('teacher-upload-assignments', []) }}">
                     Upload Assignment
                 </a>
             </li>
             <li class="d-flex rounded-3 p-3 gap-3 align-items-center ">
                 <div class="bi bi-speedometer"></div>
                 <a class="text-decoration-none text-dark dropdown-item"
-                    href="{{ route('teacher-view-assignments', ['batch' => 16]) }}">
+                    href="{{ route('teacher-view-assignments', []) }}">
                     View submitted assignments
                 </a>
             </li>
@@ -76,15 +76,14 @@
         <ul class="dropdown-menu">
             <li class="d-flex rounded-3 p-3 gap-3 align-items-center ">
                 <div class="bi bi-speedometer"></div>
-                <a class="text-decoration-none dropdown-item text-dark"
-                    href="{{ route('teacher-attendance', ['batch' => 16]) }}">
+                <a class="text-decoration-none dropdown-item text-dark" href="{{ route('teacher-attendance', []) }}">
                     Mark Attendance
                 </a>
             </li>
             <li class="d-flex rounded-3 p-3 gap-3 align-items-center ">
                 <div class="bi bi-speedometer"></div>
                 <a class="text-decoration-none text-dark dropdown-item"
-                    href="{{ route('teacher-view-attendance', ['batch' => 16]) }}">
+                    href="{{ route('teacher-view-attendance', []) }}">
                     View Attendance
                 </a>
             </li>

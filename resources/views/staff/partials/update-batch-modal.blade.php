@@ -32,8 +32,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="saveBatchBtn">Save changes</button>
+                <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-purple btn-sm" id="saveBatchBtn">Save changes</button>
             </div>
         </div>
     </div>

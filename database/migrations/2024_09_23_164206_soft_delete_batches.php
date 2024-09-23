@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('batches', function (Blueprint $table) {
-            $table->id();
-            $table->integer('batch_no');
-            $table->unsignedBigInteger('teacher');
-            $table->foreign('teacher')->references('id')->on('users');
-            $table->timestamps();
+        Schema::table('batches', function (Blueprint $table) {
+            $table->softDeletes();
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('batches');
+        Schema::table('batches', function (Blueprint $table) {
+            //
+        });
     }
 };

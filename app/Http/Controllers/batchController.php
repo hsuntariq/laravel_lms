@@ -73,23 +73,27 @@ class batchController extends Controller
     {
         $batch = Batch::findOrFail($id);
 
+        $batches = Batch::with(['teachers', 'course'])
+            ->paginate(10);
+
+
         $validatedData = $request->validate([
             'batch_no' => 'required|integer',
             'teacher' => 'required|exists:users,id',
             'course_id' => 'required|exists:courses,id',
-            'duration' => 'required|numeric'
         ]);
 
         $batch->update([
             'batch_no' => $validatedData['batch_no'],
             'teacher' => $validatedData['teacher'],
             'course_id' => $validatedData['course_id'],
-            'course_duration' => $validatedData['duration']
         ]);
 
         return response()->json([
+            'batchesHtml' => view('staff.partials.batches', compact('batches'))->render(),
+            'paginationHtml' => view('staff.partials.pagination', compact('batches'))->render(),
             'status' => 'success',
-            'message' => 'Batch updated successfully',
+            'message' => 'Batch updated successfully!'
         ]);
     }
 

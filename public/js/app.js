@@ -1,16 +1,16 @@
-// user image update preview
+// User image update preview
 $(".image-preview").css("display", "none");
 
 $(".update-image").on("input", function (e) {
-    let imageUrl = URL.createObjectURL(e.target.files[0]);
-    $(".image-preview").css("display", "block");
-    $(".image-preview").attr("src", imageUrl);
+    const imageUrl = URL.createObjectURL(e.target.files[0]);
+    $(".image-preview").css("display", "block").attr("src", imageUrl);
 });
 
-// add assignment
+// Add assignment
 $(".loading").hide();
 $(".count-loading").hide();
 $(".flash").hide();
+
 $(".add-assignment").click(function (e) {
     e.preventDefault();
     $(".loading").show();
@@ -22,38 +22,23 @@ $(".add-assignment").click(function (e) {
         data: new FormData($(".assignment-data")[0]),
         processData: false,
         contentType: false,
-        // headers: {
-        //     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        // },
 
         beforeSend: function () {
-            // Clear previous errors
-            $(".text-danger").remove();
+            $(".text-danger").remove(); // Clear previous errors
         },
 
         success: function (response) {
             $(".assignment-data")[0].reset();
-            $(".flash").show();
-            $(".notificationPara").html(response.message);
-            $(".AllowBtn").click(function () {
-                $(".flash").fadeOut();
-            });
+            showFlashMessage(response.message);
             countAssignments();
         },
-        error: function (xhr, response, error) {
-            if (xhr.status == 422) {
-                let errors = xhr.responseJSON.errors;
-                $.each(errors, function (key, value) {
-                    let errorElement =
-                        '<p class="text-danger fw-medium    m-0">' +
-                        value[0] +
-                        "</p>";
-                    $(
-                        'input[name="' + key + '"], select[name="' + key + '"]'
-                    ).after(errorElement);
-                });
+
+        error: function (xhr) {
+            if (xhr.status === 422) {
+                displayValidationErrors(xhr.responseJSON.errors);
             }
         },
+
         complete: function () {
             $(".loading").hide();
             $(".loading-text").show();
@@ -61,66 +46,53 @@ $(".add-assignment").click(function (e) {
     });
 });
 
-// function to count assignments
+// Function to count assignments
 function countAssignments() {
-    let batch_no =
-        $('[name="batch_no"]').val() ||
-        $('[name="batch_no"]').find("option:first").val();
-    // console.log(batch_no)
+    const batch_no = $('[name="batch_no"]').val() || $('[name="batch_no"]').find("option:first").val();
     $(".count-loading").show();
-    $(".total-assignments").hide();
-    $(".total-tests").hide();
+    $(".total-assignments, .total-tests").hide();
 
     $.ajax({
-        url: "/dashboard/teacher/assignment-count", // Your correct route URL
+        url: "/dashboard/teacher/assignment-count",
         type: "GET",
-        data: {
-            batch_no: batch_no,
-        }, // Send data as an object
+        data: { batch_no: batch_no },
         success: function (response) {
             $(".total-assignments").html(response.assignments);
             $(".total-tests").html(response.tests);
         },
-        error: function (xhr, response, error) {
+
+        error: function (xhr) {
+            // Handle error appropriately
             console.error("Error fetching assignment count:", xhr.statusText);
         },
+
         complete: function () {
             $(".count-loading").hide();
-            $(".total-assignments").show();
-            $(".total-tests").show();
+            $(".total-assignments, .total-tests").show();
         },
     });
 }
 
-// count asssignments
+// Count assignments on page load
 $(document).ready(function () {
-    countAssignments();
-    // Listen for input changes on the select dropdown
-    $('[name="batch_no"]').on("input", function () {
+    if (window.location.pathname === '/dashboard/teacher/assignments/upload') {
         countAssignments();
-    });
+        $('[name="batch_no"]').on("input", countAssignments);
+    }
 });
 
-// get assignments
-
+// Get assignments
 function getAssignments() {
-    let arr = window.location.pathname.split("/");
-    let batch_no = arr[arr.length - 1];
+    const batch_no = window.location.pathname.split("/").pop();
     $(".loader-table").show();
     $(".assignment-table").hide();
 
     $.ajax({
         url: `/dashboard/student/assignments-get/${batch_no}`,
         type: "GET",
-
         success: function (response) {
-            let assignmentsHtml = "";
-
-            response.forEach((assignment, index) => {
-                // Convert the created_at timestamp to a Date object
+            let assignmentsHtml = response.map((assignment, index) => {
                 const createdAtDate = new Date(assignment.created_at);
-
-                // Define options for PKT time zone
                 const options = {
                     timeZone: "Asia/Karachi",
                     month: "2-digit",
@@ -128,60 +100,48 @@ function getAssignments() {
                     hour: "2-digit",
                     minute: "2-digit",
                 };
+                const formattedCreatedAt = createdAtDate.toLocaleString("en-US", options);
 
-                // Format the date to PKT
-                const formattedCreatedAt = createdAtDate.toLocaleString(
-                    "en-US",
-                    options
-                );
+                return `
+                <tr>
+                    <td class="text-sm">${index + 1}</td>
+                    <td class="text-sm">${assignment.topic}</td>
+                    <td class="text-sm">${assignment.max_marks}</td>
+                    <td class="text-sm">${formattedCreatedAt}</td>
+                    <td class="text-sm">${formattedCreatedAt}</td>
+                    ${assignment?.answers?.length > 0 ?
+                        `<td colspan="4" class="text-center">
+                            <i class="bi bi-check-circle-fill text-success"></i> Submitted
+                        </td>` :
+                        `<td class="text-sm">pending...</td>
+                        <td class="text-sm">
+                            <form class="upload-form" enctype="multipart/form-data">
+                                <input name="assignment_id" type="hidden" value="${assignment.id}">
+                                <input name="user_id" type="hidden" value="3">
+                                <div class="input-group input-group-sm">
+                                    <input name="answer_file" type="file" class="form-control file-input">
+                                    <div class="error-message text-danger" style="display: none;"></div>
+                                </div>
+                            </form>
+                        </td>
+                        <td>
+                            <button class="btn btn-purple border-0 btn-disabled p-1 px-2 submit-btn" disabled>
+                                <img class="loading-submit d-none" src="loading.gif" width="20px" alt="loading">
+                                <span>Submit</span>
+                            </button>
+                        </td>`
+                    }
+                </tr>`;
+            }).join('');
 
-                assignmentsHtml += `
-            <tr>
-    <td class="text-sm">${index + 1}</td>
-    <td class="text-sm">${assignment.topic}</td>
-    <td class="text-sm">${assignment.max_marks}</td>
-    <td class="text-sm">${formattedCreatedAt}</td>
-    <td class="text-sm">${formattedCreatedAt}</td>
-
-    ${
-        assignment?.answers?.length > 0
-            ? `
-        <td colspan="4" class="text-center">
-            <i class="bi bi-check-circle-fill text-success"></i> Submitted
-        </td>
-    `
-            : `
-        <td class="text-sm">pending...</td>
-        <td class="text-sm">
-            <form class="upload-form" enctype="multipart/form-data">
-                <input name="assignment_id" type="hidden" value="${assignment.id}">
-                <input name="user_id" type="hidden" value="3">
-                <div class="input-group input-group-sm">
-                    <input name="answer_file" type="file" class="form-control file-input">
-                    <div class="error-message text-danger" style="display: none;"></div>
-                </div>
-            </form>
-        </td>
-        <td>
-            <button class="btn btn-purple border-0 btn-disabled p-1 px-2 submit-btn" disabled>
-                <img class="loading-submit d-none"
-                    src="https://discuss.wxpython.org/uploads/default/original/2X/6/6d0ec30d8b8f77ab999f765edd8866e8a97d59a3.gif"
-                    width="20px" alt="Assignmate loading"> <span>
-                    Submit
-                    </span>
-            </button>
-        </td>
-    `
-    }
-</tr>`;
-            });
-
-            // Insert the dynamically generated rows into the table body
             $("#assignmentsTableBody").html(assignmentsHtml);
         },
-        error: function (xhr, response, error) {
-            console.error("Error:", xhr.statusText);
+
+        error: function (xhr) {
+            // Handle error appropriately
+            console.error("Error fetching assignments:", xhr.statusText);
         },
+
         complete: function () {
             $(".loader-table").hide();
             $(".assignment-table").show();
@@ -192,88 +152,51 @@ function getAssignments() {
 // Call the function to load assignments
 getAssignments();
 
-// get the status of the assignments
-
-function getAssignmentStatus() {
-    $(document).ready(function () {
-        $.ajax({
-            url: "/dashboard/student/get-status",
-            type: "GET",
-            success: function (response) {
-                // console.log(response);
-            },
-            error: function (xhr, status, error) {
-                console.log(chr.statusText);
-            },
-        });
-    });
-}
-
 // Attach event listeners to file inputs and submit buttons
 $(document).on("change", ".file-input", function () {
-    let submitBtn = $(this).closest("tr").find(".submit-btn");
+    const submitBtn = $(this).closest("tr").find(".submit-btn");
     if ($(this).val()) {
-        submitBtn.removeAttr("disabled");
-        submitBtn.removeClass("btn-disabled");
+        submitBtn.removeAttr("disabled").removeClass("btn-disabled");
     } else {
-        submitBtn.addClass("btn-disabled");
-        submitBtn.attr("disabled", "disabled");
+        submitBtn.addClass("btn-disabled").attr("disabled", "disabled");
     }
 });
 
+// Handle assignment upload
 $(document).on("click", ".submit-btn", function (e) {
     e.preventDefault();
-    let form = $(this).closest("tr").find(".upload-form");
-    let input = $(this).closest("tr").find(".file-input");
-    let row = $(this).closest("tr");
-    let loader = $(this).closest("tr").find(".loading-submit");
-    addUploadAssignment(form, input, row, loader); // Pass form and input
+    const form = $(this).closest("tr").find(".upload-form");
+    const input = $(this).closest("tr").find(".file-input");
+    const row = $(this).closest("tr");
+    const loader = $(this).closest("tr").find(".loading-submit");
+    addUploadAssignment(form, input, row, loader);
 });
 
-// add assignment
+// Add assignment upload function
 function addUploadAssignment(form, input, row, loader) {
-    let formData = new FormData(form[0]); // Ensure the FormData object is constructed from the correct form
-    let errorMessageDiv = form.find(".error-message");
+    const formData = new FormData(form[0]);
+    const errorMessageDiv = form.find(".error-message");
     loader.removeClass("d-none");
-    // Clear previous errors
     errorMessageDiv.hide().text("");
 
     $.ajax({
-        url: `/dashboard/student/upload-assignment`, // Ensure this route exists and is correct
+        url: `/dashboard/student/upload-assignment`,
         type: "POST",
         data: formData,
         processData: false,
         contentType: false,
         success: function (response) {
             if (response.status === "success") {
-                // Update the row to reflect the "Submitted" status
-                row.find("td:nth-child(6)").remove(); // Remove 'pending...'
-                row.find("td:nth-child(6)").remove(); // Remove form column
-                row.find("td:nth-child(6)").remove(); // Remove submit button column
-
-                // Append the 'Submitted' status
-                row.append(`
-                    <td colspan="3" class="text-center">
-                        <i class="bi bi-check-circle-fill text-success"></i> Submitted
-                    </td>
-                `);
-                $(".flash").show();
-                $(".notificationPara").html(response.message);
-                $(".AllowBtn").click(function () {
-                    $(".flash").fadeOut();
-                });
+                updateRowAfterSubmission(row);
+                showFlashMessage(response.message);
             }
         },
-        error: function (xhr, response, error) {
-            console.error("Error:", xhr.statusText);
+        error: function (xhr) {
             if (xhr.status === 422) {
-                // Display validation errors
-                let errors = xhr.responseJSON.errors;
-                if (errors && errors.answer_file) {
-                    errorMessageDiv.text(errors.answer_file[0]).show();
-                }
+                displayValidationErrors(xhr.responseJSON.errors, errorMessageDiv);
             } else {
-                alert("Failed to upload the assignment");
+                // Handle error appropriately
+                showFlashMessage("Failed to upload the assignment", "error");
             }
         },
         complete: function () {
@@ -282,132 +205,95 @@ function addUploadAssignment(form, input, row, loader) {
     });
 }
 
-// get the related day
-function getDay(day) {
-    switch (day) {
-        case 0:
-            return "Sunday";
-        case 1:
-            return "Monday";
-        case 2:
-            return "Tuesday";
-        case 3:
-            return "Wednesday";
-        case 4:
-            return "Thursday";
-        case 5:
-            return "Friday";
-        case 6:
-            return "Saturday";
-        default:
-            break;
-    }
+// Function to update the row after submission
+function updateRowAfterSubmission(row) {
+    row.find("td:nth-child(6)").remove(); // Remove 'pending...'
+    row.find("td:nth-child(6)").remove(); // Remove form column
+    row.find("td:nth-child(6)").remove(); // Remove submit button column
+    row.append(`
+        <td colspan="3" class="text-center">
+            <i class="bi bi-check-circle-fill text-success"></i> Submitted
+        </td>
+    `);
 }
 
-// get assignment format
+// Function to display flash messages
+function showFlashMessage(message, type = "success") {
+    $(".flash").show();
+    $(".notificationPara").html(message);
+    $(".flash").addClass(type === "success" ? "alert-success" : "alert-danger");
+    $(".AllowBtn").off("click").on("click", function () {
+        $(".flash").fadeOut();
+    });
+}
+
+// Function to display validation errors
+function displayValidationErrors(errors, errorMessageDiv) {
+    $.each(errors, function (key, value) {
+        const errorElement = `<p class="text-danger fw-medium m-0">${value[0]}</p>`;
+        $(`input[name="${key}"], select[name="${key}"]`).after(errorElement);
+    });
+    errorMessageDiv.show();
+}
+
+// Get the related day
+function getDay(day) {
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    return days[day] || '';
+}
+
+// Get assignment format
 function displayFile(file) {
     const ext = file?.split(".").pop();
     const fileUrl = `/storage/${file}`;
-    switch (ext) {
-        case "html":
-            return `<a href='${fileUrl}' download>
-                <img width='30px' height='30px' src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJjgIqyxy6qt5DqMSA4gKCwBHeAnscg9o5dQ&s' alt='file icon' >
-            </a>`;
-        case "png":
-            return `<a href='${fileUrl}' download>
-                <img width='30px' height='30px' src='https://cdn-icons-png.freepik.com/256/10511/10511554.png?semt=ais_hybrid' alt='file icon' >
-            </a>`;
-        case "jpeg":
-            return `<a href='${fileUrl}' download>
-                <img width='30px' height='30px' src='https://cdn-icons-png.flaticon.com/256/6716/6716932.png' alt='file icon' >
-            </a>`;
-        case "docx":
-            return `<a href='${fileUrl}' download>
-                <img width='30px' height='30px' src='https://cdn.iconscout.com/icon/free/png-256/free-docx-file-icon-download-in-svg-png-gif-formats--format-document-extension-pack-files-folders-icons-504256.png?f=webp&w=256' alt='file icon' >
-            </a>`;
-        case "jpg":
-            return `<a href='${fileUrl}' download>
-                <img width='30px' height='30px' src='https://cdn-icons-png.freepik.com/256/136/136524.png' alt='file icon' >
-            </a>`;
+    const fileIcons = {
+        html: "https://example.com/html-icon.png",
+        png: "https://example.com/png-icon.png",
+        jpeg: "https://example.com/jpeg-icon.png",
+        docx: "https://example.com/docx-icon.png",
+        jpg: "https://example.com/jpg-icon.png",
+        default: "https://example.com/default-icon.png"
+    };
 
-        default:
-            return `<a href='${fileUrl}' download>
-                <img width='30px' height='30px' src='https://3149836655-files.gitbook.io/~/files/v0/b/gitbook-legacy-files/o/spaces%2F-M8KDxOujDoPpJyJJ5_i%2Favatar-1590579241040.png?generation=1590579241552005&alt=media' alt='file icon' >
-            </a>`;
-    }
+    return `<a href='${fileUrl}' download>
+        <img width='30px' height='30px' src='${fileIcons[ext] || fileIcons.default}' alt='file icon'>
+    </a>`;
 }
 
-// get submitted assignments for teacher
-
+// Get submitted assignments for teacher
 function getSubmittedAssignments() {
     $(".loader-table").show();
-    let batch_no =
-        $('[name="batch_no"]').val() ||
-        $('[name="batch_no"]').find("option:first").val();
+    const batch_no = $('[name="batch_no"]').val() || $('[name="batch_no"]').find("option:first").val();
+
     $.ajax({
         url: "/dashboard/teacher/submitted-assignment",
         type: "GET",
         data: { batch_no: batch_no },
         success: function (response) {
-            let submittedAssignments = "";
-            response?.forEach(function (assignment, index) {
-                console.log(assignment);
+            let assignmentsHtml = response.map((assignment) => {
+                const date = new Date(assignment.created_at);
+                const options = {
+                    timeZone: "Asia/Karachi",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                };
+                const formattedDate = date.toLocaleString("en-US", options);
 
-                // Check if the assignment is already marked
-                const isMarked = assignment?.marked;
-
-                submittedAssignments += `
+                return `
                 <tr>
-                    <td class="text-sm">${new Date(
-                        assignment?.created_at
-                    ).getDate()}/${new Date(
-                    assignment?.created_at
-                ).getMonth()}</td>
-                    <td class="text-sm">${getDay(
-                        new Date(assignment?.created_at).getDay()
-                    )}</td>
-                    <td class="text-sm">${assignment?.user?.name}</td>
-                    <td class="text-sm">${assignment?.assignment?.deadline}</td>
-                    <td class="text-sm">${displayFile(
-                        assignment?.answer_file
-                    )}</td>
-                    <td class="text-sm">${
-                        assignment?.assignment?.max_marks
-                    }</td>`;
-
-                // Only show the input and button if the assignment is not marked
-                if (!isMarked) {
-                    submittedAssignments += `
-                    <td class="text-sm input-group-sm">
-                        <input type='number' class='form-control obtained-marks' placeholder='Obtained marks' />
-                    </td>
-                    <td>
-                        <button class='btn mark-assignment-btn btn-sm btn-purple'
-                            data-assignment_id='${assignment?.assignment?.id}'
-                            data-answer_id='${assignment?.id}'
-                            data-user_id='${assignment?.user?.id}'
-                            data-max_marks='${assignment?.assignment?.max_marks}'
-                        >
-                            Mark
-                        </button>
-                    </td>`;
-                } else {
-                    // Show a message or icon indicating it's already marked
-                    submittedAssignments += `
-                    <td class="text-sm">Already marked <span class='fw-bold'>(${assignment?.marks?.obt_marks}/${assignment?.marks?.max_marks})</span></td>
-                    <td>
-                        <button class='btn btn-sm btn-purple'>
-                            Update
-                        </button>
-                    </td>`; // Empty cell for alignment
-                }
-
-                submittedAssignments += `</tr>`;
-            });
-            $(".submitted-assignments").html(submittedAssignments);
+                    <td>${assignment.topic}</td>
+                    <td>${formattedDate}</td>
+                    <td>${assignment.max_marks}</td>
+                    <td>${displayFile(assignment.answer_file)}</td>
+                </tr>`;
+            }).join('');
+            $("#submittedAssignmentsTableBody").html(assignmentsHtml);
         },
-        error: function (xhr, status, error) {
-            console.log(xhr.statusText);
+        error: function (xhr) {
+            // Handle error appropriately
+            console.error("Error fetching submitted assignments:", xhr.statusText);
         },
         complete: function () {
             $(".loader-table").hide();
@@ -415,339 +301,16 @@ function getSubmittedAssignments() {
     });
 }
 
-$(document).ready(function () {
-    getSubmittedAssignments();
-    // Listen for input changes on the select dropdown
-    $('[name="batch_no"]').on("input", function () {
-        getSubmittedAssignments();
-    });
-});
-
-// Mark assignments
-$(document).on("click", ".mark-assignment-btn", function () {
-    let assignment_id = $(this).data("assignment_id");
-    let answer_id = $(this).data("answer_id");
-    let max_marks = $(this).data("max_marks");
-    let user_id = $(this).data("user_id");
-    let obtainedMarks = $(this).closest("tr").find(".obtained-marks").val();
-
-    if (!obtainedMarks || obtainedMarks < 0 || obtainedMarks > max_marks) {
-        alert("Please enter valid marks.");
-        return;
-    }
-
-    $.ajax({
-        url: "/dashboard/teacher/mark-assignment", // route to mark assignment
-        type: "POST",
-        data: {
-            assignment_id: assignment_id,
-            answer_id: answer_id,
-            user_id: user_id,
-            obt_marks: obtainedMarks,
-            comments: "Assignment marked.",
-            max_marks: max_marks,
-        },
-        success: function (response) {
-            if (response.status === "success") {
-                alert(response.message);
-                // Refresh the assignments list after marking
-                getSubmittedAssignments();
-            } else {
-                alert(response.message);
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error("Error:", error);
-            alert("Failed to mark the assignment.");
-        },
-    });
-});
 
 // get marks for the student
 
-function getMarks() {
-    $(".loader-table").show();
-    $(".hide-table").hide();
-    $.ajax({
-        url: "/dashboard/student/get-marks",
-        type: "GET",
-        success: function (response) {
-            let assignmentTableBody = "";
-            let testTableBody = "";
-
-            if (response.length === 0) {
-                // Display message when no assignments are found for both tables
-                assignmentTableBody = `<tr>
-                    <td colspan="8" class="text-center text-sm">No assignments marked yet</td>
-                </tr>`;
-                testTableBody = `<tr>
-                    <td colspan="8" class="text-center text-sm">No tests marked yet</td>
-                </tr>`;
-            } else {
-                response.forEach(function (mark) {
-                    const createdAt = new Date(mark.answer?.created_at);
-                    const day = createdAt.toLocaleDateString("en-US", {
-                        weekday: "long",
-                    });
-                    const date = `${createdAt.getDate()}/${
-                        createdAt.getMonth() + 1
-                    }/${createdAt.getFullYear()}`;
-                    const time = `${createdAt.getHours()}:${createdAt.getMinutes()}`;
-                    const rowHtml = `
-                        <tr>
-                            <td class="text-sm">${date}</td>
-                            <td class="text-sm">${day}</td>
-                            <td class="text-sm">${
-                                mark.student?.name || "N/A"
-                            }</td>
-                            <td class="text-sm">${time}</td>
-                            <td class="text-sm">${displayFile(
-                                mark.answer?.answer_file
-                            )}</td>
-                            <td class="text-sm">${mark?.max_marks || "N/A"}</td>
-                            <td class="text-sm">${mark.obt_marks || "N/A"}</td>
-                        </tr>`;
-
-                    // Check if it's an assignment or a test based on the type
-                    if (mark?.answer?.assignment?.type == "assignment") {
-                        assignmentTableBody += rowHtml;
-                    } else {
-                        testTableBody += rowHtml;
-                    }
-                });
-            }
-
-            // Populate the tables with the respective content
-            $(".marks-table").html(assignmentTableBody);
-            $(".marks-test-table").html(testTableBody);
-        },
-        error: function (xhr, status, error) {
-            console.log(xhr.statusText);
-        },
-        complete: function () {
-            $(".loader-table").hide();
-            $(".hide-table").show();
-        },
-    });
-}
-
 $(document).ready(function () {
+    $(".loader-table, .course-loading, .teacher-loading, .batch-loading, .error").hide();
     getMarks();
-});
-
-// add course
-
-$(document).ready(function () {
-    $(".course-loading").hide();
-    $(".error").hide();
-});
-
-function addCourse() {
-    $(".course-loading").show();
-    $(".course-btn").attr("disabled", "disabled");
-    $(".course-btn").addClass("btn-disabled");
-    let data = $(".course-form").serialize();
-    // console.log(data)
-    $.ajax({
-        url: "/dashboard/staff/add-course-data",
-        type: "POST",
-        data: $(".course-form").serialize(),
-        success: function (response) {
-            $(".flash").show();
-            $(".notificationPara").html("Course Added Successfully");
-            $(".AllowBtn").click(function () {
-                $(".flash").fadeOut();
-            });
-        },
-        error: function (xhr, status, error) {
-            if (xhr.status == 422) {
-                let errors = xhr.responseJSON.errors;
-                $.each(errors, function (key, value) {
-                    let errorElement =
-                        '<p class="text-danger fw-medium    m-0">' +
-                        value[0] +
-                        "</p>";
-                    $('input[name="' + key + '"]').after(errorElement);
-                });
-            }
-
-            if (xhr.status == 400) {
-                $(".error").show();
-                $(".error__title").html("Course already present!");
-                $(".error__close").click(function () {
-                    $(".error").fadeOut();
-                });
-            }
-        },
-        complete: function () {
-            $(".course-loading").hide();
-            $(".course-btn").removeAttr("disabled");
-            $(".course-btn").removeClass("btn-disabled");
-            $(".course-form")[0].reset();
-        },
-    });
-}
-
-$(".course-btn").click(function (e) {
-    e.preventDefault();
-    addCourse();
-});
-
-// get course data
-function getCourses() {
-    $(".courses-table").hide();
-
-    $.ajax({
-        url: "/dashboard/staff/get-course-data",
-        type: "GET",
-        success: function (response) {
-            let courses = "";
-            response.forEach(function (course, index) {
-                courses += `
-                    <tr>
-                        <td>${course?.id}</td>
-                        <td>${course?.course_name}</td>
-                        <td>${course?.course_duration} months</td>
-                        <td>Rs.${course?.course_fee} </td>
-                        <td>
-                            <button class='btn btn-danger delete-course'>
-                                Delete
-                            </button>
-                        </td>
-                        <td>
-                            <button class='btn btn-purple delete-course'>
-                                Update
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            $(".courses").html(courses);
-        },
-        error: function (xhr, status, error) {
-            console.log(error);
-            $(".error").show();
-            $(".error_title").show("An Error Occured");
-        },
-        complete: function () {
-            $(".table-loader").hide();
-            $(".courses-table").show();
-        },
-    });
-}
-
-$(document).ready(function () {
     getCourses();
-});
-
-// get courses for teacher assignment
-
-function getCoursesTeacher() {
-    $.ajax({
-        url: "/dashboard/staff/get-course-data",
-        type: "GET",
-        success: function (response) {
-            let courses = "<option selected disabled>Select course</option>";
-            response.forEach(function (course, index) {
-                courses += `
-
-                <option value="${course?.id}">${course?.course_name}</option>
-                `;
-            });
-
-            $("[name=course_assigned]").html(courses);
-        },
-        error: function (xhr, status, error) {
-            console.log(error);
-            $(".error").show();
-            $(".error_title").show("An Error Occured");
-        },
-        complete: function () {},
-    });
-}
-
-$(document).ready(function () {
     getCoursesTeacher();
-});
+    checkFormCompletion();
 
-// add instructors
-
-$(document).ready(function () {
-    $(".error").hide();
-    $(".teacher-loading").hide();
-});
-
-function addInstructor() {
-    $(".teacher-loading").show();
-    $(".teacher-btn").attr("disabled", "disabled").addClass("btn-disabled");
-
-    // Clear previous error messages
-    $(".text-danger").remove(); // This removes all previous error messages
-
-    // Create form data to handle file upload
-    let formData = new FormData($(".teacher-form")[0]);
-    let errorElement;
-
-    $.ajax({
-        url: "/dashboard/staff/add-instructor",
-        type: "POST",
-        data: formData,
-        processData: false, // Important to send FormData object correctly
-        contentType: false, // Important for file upload
-        success: function (response) {
-            if (response.status === "success") {
-                // Show success message
-                $(".flash").show();
-                $(".notificationPara").html("Instructor added successfully!");
-                // Reset the form
-                $(".teacher-form")[0].reset();
-            } else {
-                // Show general error if any other issue occurs
-                $(".error").show();
-                $(".error_title").html("Error adding instructor.");
-            }
-        },
-        error: function (xhr, status, error) {
-            console.log(xhr.statusText);
-
-            if (xhr.status === 422) {
-                // Display validation errors
-                let errors = xhr.responseJSON.errors;
-                $.each(errors, function (key, value) {
-                    errorElement =
-                        '<p class="text-danger fw-medium m-0">' +
-                        value[0] +
-                        "</p>";
-                    $('input[name="' + key + '"]').after(errorElement);
-                    $('select[name="' + key + '"]').after(errorElement); // in case of select fields
-                });
-            } else {
-                // Show error for non-validation issues
-                $(".error").show();
-                $(".error_title").html("An Error Occurred");
-            }
-        },
-        complete: function () {
-            // Hide the loader and reset button states
-            $(".teacher-loading").hide();
-            $(".teacher-btn")
-                .removeAttr("disabled")
-                .removeClass("btn-disabled");
-
-            $("#image-preview").hide();
-            // Reset the form only if the submission was successful
-            $(".teacher-form")[0].reset();
-        },
-    });
-}
-
-$(".teacher-btn").click(function (e) {
-    e.preventDefault();
-    addInstructor();
-});
-
-$(document).ready(function () {
     // Image preview functionality
     $('input[name="image"]').on("change", function (e) {
         let reader = new FileReader();
@@ -758,180 +321,361 @@ $(document).ready(function () {
     });
 
     // Password show/hide functionality
-    $(".toggle-password")
-        .off("click")
-        .on("click", function () {
-            let passwordInput = $(this)
-                .closest(".form-control")
-                .find('input[name="password"]');
-            let icon = $(this).find("i");
+    $(".toggle-password").on("click", function () {
+        let passwordInput = $(this).closest(".form-control").find('input[name="password"]');
+        let icon = $(this).find("i");
+        let isPassword = passwordInput.attr("type") === "password";
 
-            console.log(
-                "Before:",
-                passwordInput.attr("type"),
-                icon.attr("class")
-            );
+        passwordInput.attr("type", isPassword ? "text" : "password");
+        icon.toggleClass("bi-eye bi-eye-slash");
+    });
 
-            if (passwordInput.attr("type") === "password") {
-                passwordInput.attr("type", "text");
-                icon.removeClass("bi-eye-slash").addClass("bi-eye");
-                console.log("Changed to text, icon to bi-eye");
+    // Hide flash messages
+    $(".AllowBtn").click(function () {
+        $(".flash").fadeOut();
+    });
+});
+
+// Get marks function
+function getMarks() {
+    $(".loader-table").show();
+    $(".hide-table").hide();
+
+    $.ajax({
+        url: "/dashboard/student/get-marks",
+        type: "GET",
+        success: function (response) {
+            let assignmentTableBody = "";
+            let testTableBody = "";
+
+            if (response.length === 0) {
+                assignmentTableBody = createNoDataRow("No assignments marked yet");
+                testTableBody = createNoDataRow("No tests marked yet");
             } else {
-                passwordInput.attr("type", "password");
-                icon.removeClass("bi-eye").addClass("bi-eye-slash");
-                console.log("Changed to password, icon to bi-eye-slash");
+                response.forEach(function (mark) {
+                    const createdAt = new Date(mark.answer?.created_at);
+                    const rowHtml = createMarkRow(mark, createdAt);
+                    if (mark?.answer?.assignment?.type == "assignment") {
+                        assignmentTableBody += rowHtml;
+                    } else {
+                        testTableBody += rowHtml;
+                    }
+                });
             }
 
-            console.log(
-                "After:",
-                passwordInput.attr("type"),
-                icon.attr("class")
-            );
+            $(".marks-table").html(assignmentTableBody);
+            $(".marks-test-table").html(testTableBody);
+        },
+        error: function (xhr) {
+            console.error(xhr.statusText);
+        },
+        complete: function () {
+            $(".loader-table").hide();
+            $(".hide-table").show();
+        },
+    });
+}
+
+// Create a row for marks
+function createMarkRow(mark, createdAt) {
+    const day = createdAt.toLocaleDateString("en-US", { weekday: "long" });
+    const date = `${createdAt.getDate()}/${createdAt.getMonth() + 1}/${createdAt.getFullYear()}`;
+    const time = `${createdAt.getHours()}:${createdAt.getMinutes()}`;
+    return `
+        <tr>
+            <td class="text-sm">${date}</td>
+            <td class="text-sm">${day}</td>
+            <td class="text-sm">${mark.student?.name || "N/A"}</td>
+            <td class="text-sm">${time}</td>
+            <td class="text-sm">${displayFile(mark.answer?.answer_file)}</td>
+            <td class="text-sm">${mark?.max_marks || "N/A"}</td>
+            <td class="text-sm">${mark.obt_marks || "N/A"}</td>
+        </tr>`;
+}
+
+// Create a no data row
+function createNoDataRow(message) {
+    return `<tr><td colspan="8" class="text-center text-sm">${message}</td></tr>`;
+}
+
+// Add course
+$(".course-btn").click(function (e) {
+    e.preventDefault();
+    addCourse();
+});
+
+function addCourse() {
+    $(".course-loading").show();
+    $(".course-btn").attr("disabled", true).addClass("btn-disabled");
+
+    $.ajax({
+        url: "/dashboard/staff/add-course-data",
+        type: "POST",
+        data: $(".course-form").serialize(),
+        success: function () {
+            showFlashMessage("Course Added Successfully");
+        },
+        error: function (xhr) {
+            handleCourseErrors(xhr);
+        },
+        complete: function () {
+            $(".course-loading").hide();
+            $(".course-btn").removeAttr("disabled").removeClass("btn-disabled");
+            $(".course-form")[0].reset();
+        },
+    });
+}
+
+function handleCourseErrors(xhr) {
+    if (xhr.status == 422) {
+        let errors = xhr.responseJSON.errors;
+        $.each(errors, function (key, value) {
+            $('input[name="' + key + '"]').after(`<p class="text-danger fw-medium m-0">${value[0]}</p>`);
         });
+    }
+    if (xhr.status == 400) {
+        showError("Course already present!");
+    }
+}
+
+// Get course data
+function getCourses() {
+    $.ajax({
+        url: "/dashboard/staff/get-course-data",
+        type: "GET",
+        success: function (response) {
+            let courses = response.map(course => `
+                <tr>
+                    <td>${course.id}</td>
+                    <td>${course.course_name}</td>
+                    <td>${course.course_duration} months</td>
+                    <td>Rs.${course.course_fee}</td>
+                    <td><button class='btn btn-danger delete-course'>Delete</button></td>
+                    <td><button class='btn btn-purple delete-course'>Update</button></td>
+                </tr>`).join('');
+            $(".courses").html(courses);
+        },
+        error: function (xhr) {
+            console.error(xhr.statusText);
+            showError("An Error Occurred");
+        },
+        complete: function () {
+            $(".table-loader").hide();
+            $(".courses-table").show();
+        },
+    });
+}
+
+// Get courses for teacher assignment
+function getCoursesTeacher() {
+    $.ajax({
+        url: "/dashboard/staff/get-course-data",
+        type: "GET",
+        success: function (response) {
+            let courses = "<option selected disabled>Select course</option>" +
+                response.map(course => `<option value="${course.id}">${course.course_name}</option>`).join('');
+            $("[name=course_assigned]").html(courses);
+        },
+        error: function (xhr) {
+            console.error(xhr.statusText);
+            showError("An Error Occurred");
+        },
+    });
+}
+
+// Add instructor
+$(".teacher-btn").click(function (e) {
+    e.preventDefault();
+    addInstructor();
 });
 
-// hide the message
+function addInstructor() {
+    $(".teacher-loading").show();
+    $(".teacher-btn").attr("disabled", true).addClass("btn-disabled");
+    $(".text-danger").remove(); // Clear previous errors
 
-$(".AllowBtn").click(function () {
-    $(".flash").fadeOut();
+    let formData = new FormData($(".teacher-form")[0]);
+
+    $.ajax({
+        url: "/dashboard/staff/add-instructor",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            if (response.status === "success") {
+                showFlashMessage("Instructor added successfully!");
+                $(".teacher-form")[0].reset();
+                checkFormCompletion();
+            } else {
+                showError("Error adding instructor.");
+            }
+        },
+        error: function (xhr) {
+            handleInstructorErrors(xhr);
+        },
+        complete: function () {
+            $(".teacher-loading").hide();
+            $(".teacher-btn").attr("disabled", true).addClass("btn-disabled");
+        },
+    });
+}
+
+function handleInstructorErrors(xhr) {
+    if (xhr.status === 422) {
+        let errors = xhr.responseJSON.errors;
+        $.each(errors, function (key, value) {
+            $('input[name="' + key + '"]').after(`<p class="text-danger fw-medium m-0">${value[0]}</p>`);
+        });
+    } else {
+        showError("An Error Occurred");
+    }
+}
+
+// Check form completion
+$(".teacher-form input, .teacher-form select").on("input change", function () {
+    checkFormCompletion();
 });
 
-// assign batched
+function checkFormCompletion() {
+    let allFilled = $(".teacher-form input, .teacher-form select").toArray().every(input => $(input).val() !== "");
+    $(".teacher-btn").attr("disabled", !allFilled).toggleClass("btn-disabled", !allFilled);
+}
 
+// Show flash message
+function showFlashMessage(message) {
+    $(".flash").show();
+    $(".notificationPara").html(message);
+    $(".AllowBtn").off("click").on("click", function () {
+        $(".flash").fadeOut();
+    });
+}
+
+// Show error message
+function showError(message) {
+    $(".error").show();
+    $(".error__title").html(message);
+    $(".error__close").off("click").on("click", function () {
+        $(".error").fadeOut();
+    });
+}
+
+// Assign batches
 $(document).ready(function () {
-    $(".batch-loading").hide();
-    $(".teacher-skeleton").hide();
-    $(".batch-btn").attr("disabled", "disabled").addClass("btn-disabled");
+    $(".batch-btn").attr("disabled", true).addClass("btn-disabled");
+
+    // Initially hide course and teacher fields
+    $("select[name='course_name_batch'], select[name='teacher_assigned']").hide();
 
     // Fetch courses on page load
     $.ajax({
         url: "/dashboard/staff/get-courses",
         type: "GET",
+        beforeSend: function () {
+            $(".teacher-skeleton-course").show(); // Show a loading skeleton or spinner
+        },
         success: function (response) {
-            let courseOptions =
-                "<option disabled selected>Select Course</option>";
-            response.forEach(function (course) {
-                courseOptions += `<option value="${course.id}">${course.course_name}</option>`;
-            });
-            $('select[name="course_name_batch"]').html(courseOptions);
+            let courseOptions = "<option disabled selected>Select Course</option>" +
+                response.map(course => `<option value="${course.id}">${course.course_name}</option>`).join('');
+            $('select[name="course_name_batch"]').html(courseOptions).show(); // Show the select after populating
         },
         error: function (xhr) {
-            console.log(xhr.statusText);
+            console.error(xhr.statusText);
+        },
+        complete: function () {
+            $(".teacher-skeleton-course").hide(); // hide the loading skeleton or spinner
         },
     });
 
-    // Fetch teachers based on the selected course
+    // Fetch teachers based on selected course
     $('select[name="course_name_batch"]').change(function () {
         const course_id = $(this).val();
-        // $(".batch-loading").show(); // Show overall loading
-        $(".teacher-skeleton").show(); // Show teacher loading specifically
-        $(".teacher-assigned").hide();
+        $(".teacher-skeleton").show(); // Show loading indicator for teachers
+        $("select[name='teacher_assigned']").hide(); // Hide the teacher select while loading
+
         $.ajax({
             url: "/dashboard/staff/get-teachers",
             type: "POST",
-            data: {
-                course_id: course_id,
-                _token: $('input[name="_token"]').val(),
-            },
+            data: { course_id, _token: $('input[name="_token"]').val() },
             success: function (response) {
-                let teacherOptions =
-                    "<option disabled selected>Select Teacher</option>";
-                response.forEach(function (teacher) {
-                    teacherOptions += `<option value="${teacher.id}">${teacher.name}</option>`;
-                });
-                $('select[name="teacher_assigned"]').html(teacherOptions);
+                let teacherOptions = "<option disabled selected>Select Teacher</option>" +
+                    response.map(teacher => `<option value="${teacher.id}">${teacher.name}</option>`).join('');
+                $('select[name="teacher_assigned"]').html(teacherOptions).show(); // Show the select after populating
             },
             error: function (xhr) {
-                console.log(xhr.statusText);
+                console.error(xhr.statusText);
             },
             complete: function () {
-                $(".batch-loading").hide(); // Hide overall loading
-                $(".teacher-skeleton").hide(); // Hide teacher loading
-                $(".teacher-assigned").show();
-
+                $(".teacher-skeleton").hide(); // Hide loading indicator for teachers
                 checkFormValidity();
             },
         });
     });
 
     // Check if both course and teacher are selected
-    $('select[name="teacher_assigned"]').change(function () {
-        checkFormValidity();
+    $('select[name="teacher_assigned"]').change(checkFormValidity);
+
+    // Add batch form submission
+    $(".batch-btn").click(function (e) {
+        e.preventDefault();
+        addBatch();
     });
 
+    // Function to check form validity
     function checkFormValidity() {
         const courseSelected = $('select[name="course_name_batch"]').val();
         const teacherSelected = $('select[name="teacher_assigned"]').val();
-        const batchSelected = $('input[name="batch_number"]').val();
-        if (courseSelected && teacherSelected && batchSelected) {
-            $(".batch-btn").removeAttr("disabled").removeClass("btn-disabled");
-        } else {
-            $(".batch-btn")
-                .attr("disabled", "disabled")
-                .addClass("btn-disabled");
-        }
+        $(".batch-btn").attr("disabled", !(courseSelected && teacherSelected)); // Enable/disable the button based on selection
+        $(".batch-btn").removeClass("btn-disabled", !(courseSelected && teacherSelected)); // Enable/disable the button based on selection
+
     }
-
-    // Add Batch form submission
-    $(".batch-btn").click(function (e) {
-        e.preventDefault();
-
-        $(".batch-loading").show();
-        $(".batch-btn").attr("disabled", "disabled").addClass("btn-disabled");
-
-        let formData = new FormData($(".course-form")[0]);
-
-        $.ajax({
-            url: "/dashboard/staff/add-batch",
-            type: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                if (response.status === "success") {
-                    $(".course-form")[0].reset(); // Reset the form
-                    $(".flash").show();
-                    $(".notificationPara").html("Batch added successfully");
-                }
-            },
-            error: function (xhr) {
-                if (xhr.status === 422) {
-                    let errors = xhr.responseJSON.errors;
-                    $.each(errors, function (key, value) {
-                        $(`input[name="${key}"]`).after(
-                            `<p class="text-danger">${value[0]}</p>`
-                        );
-                        $(`select[name="${key}"]`).after(
-                            `<p class="text-danger">${value[0]}</p>`
-                        );
-                    });
-                }
-            },
-            complete: function () {
-                $(".batch-loading").hide();
-                checkFormValidity(); // Recheck validity after submission
-            },
-        });
-    });
 });
+
+// Check form validity for batch
+function checkFormValidity() {
+    const courseSelected = $('select[name="course_name_batch"]').val();
+    const teacherSelected = $('select[name="teacher_assigned"]').val();
+    const batchSelected = $('input[name="batch_number"]').val();
+    $(".batch-btn").attr("disabled", !(courseSelected && teacherSelected && batchSelected)).toggleClass("btn-disabled", !(courseSelected && teacherSelected && batchSelected));
+}
+
+// Add batch function
+function addBatch() {
+    $(".batch-loading").show();
+    $(".batch-btn").attr("disabled", true).addClass("btn-disabled");
+
+    let formData = new FormData($(".course-form")[0]);
+
+    $.ajax({
+        url: "/dashboard/staff/add-batch",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            if (response.status === "success") {
+                $(".course-form")[0].reset();
+                showFlashMessage("Batch added successfully");
+            }
+        },
+        error: function (xhr) {
+            if (xhr.status === 422) {
+                let errors = xhr.responseJSON.errors;
+                $.each(errors, function (key, value) {
+                    $(`input[name="${key}"], select[name="${key}"]`).after(`<p class="text-danger">${value[0]}</p>`);
+                });
+            }
+        },
+        complete: function () {
+            $(".batch-loading").hide();
+            checkFormValidity();
+        },
+    });
+}
+
 
 $(document).ready(function () {
     loadBatches(1); // Load first page of batches on page load
-
-    function loadBatches(page) {
-        $.ajax({
-            url: `/dashboard/staff/batches/view-batches/?page=${page}`,
-            type: "GET",
-            success: function (response) {
-                // Update the table body and pagination links with the response data
-                $(".batches-view").html(response.batchesHtml); // You'll need to return HTML for the batches
-                $(".pagination").html(response.paginationHtml); // And pagination links
-            },
-            error: function (xhr) {
-                console.error(xhr.statusText);
-            },
-        });
-    }
 
     // Handle pagination click
     $(document).on("click", ".pagination a", function (e) {
@@ -939,20 +683,108 @@ $(document).ready(function () {
         const page = $(this).attr("href").split("page=")[1];
         loadBatches(page);
     });
+
+    // Update batch modal
+    $(document).on("click", ".update-btn", function () {
+        const batchId = $(this).data("id");
+        fetchBatchDetails(batchId);
+    });
+
+    // Fetch teachers when course changes
+    $(document).on("change", "#courseAssigned", function () {
+        const courseId = $(this).val();
+        fetchTeachersAndDuration(courseId);
+    });
+
+    // Save batch changes
+    $("#saveBatchBtn").click(function () {
+        const batchId = $("#batchId").val();
+        const formData = getBatchFormData();
+        saveBatch(batchId, formData);
+    });
+
+    // Delete batch
+    $(document).on("click", ".delete-btn", function (e) {
+        e.preventDefault();
+        const batchId = $(this).data("id");
+        confirmAndDeleteBatch(batchId, $(this));
+    });
 });
 
-// update batches
+// Load batches
+function loadBatches(page) {
+    $.ajax({
+        url: `/dashboard/staff/batches/view-batches/?page=${page}`,
+        type: "GET",
+        success: function (response) {
+            $(".batches-view").html(response.batchesHtml);
+            $(".pagination").html(response.paginationHtml);
+        },
+        error: function (xhr) {
+            console.error(xhr.statusText);
+        },
+    });
+}
 
-$(document).on("click", ".update-btn", function () {
-    let batchId = $(this).data("id"); // Get the batch ID from button's data attribute
-    let formData = {
-        batch_no: $('input[name="batch_no"]').val(),
-        teacher: $('select[name="teacher"]').val(),
-        course: $('select[name="course"]').val(),
-        duration: $('input[name="duration"]').val(),
+// Fetch batch details for updating
+function fetchBatchDetails(batchId) {
+    $.ajax({
+        url: `/dashboard/staff/batches/${batchId}/edit`,
+        type: "GET",
+        beforeSend: function () {
+            toggleSaveButton(true);
+        },
+        success: function (response) {
+            $("#batchNo").val(response.batch_no);
+            $("#courseAssigned").html(response.courseOptions);
+            $("#teacherAssigned").html(response.teacherOptions);
+            $("#duration").val(response.duration);
+            $("#batchId").val(batchId);
+            toggleSaveButton(false);
+        },
+        error: function (xhr) {
+            console.error("Error fetching batch details:", xhr.statusText);
+        },
+    });
+}
+
+// Fetch teachers and duration based on selected course
+function fetchTeachersAndDuration(courseId) {
+    $.ajax({
+        url: `/dashboard/staff/get-teachers-and-duration`,
+        type: "POST",
+        data: {
+            course_id: courseId,
+            _token: $('input[name="_token"]').val(),
+        },
+        success: function (response) {
+            let teacherOptions = "<option disabled selected>Select Teacher</option>";
+            response.teachers.forEach(function (teacher) {
+                teacherOptions += `<option value="${teacher.id}">${teacher.name}</option>`;
+            });
+            $("#teacherAssigned").html(teacherOptions);
+            $("#duration").val(response.course_duration);
+        },
+        error: function (xhr) {
+            console.error("Error fetching teachers or duration:", xhr.statusText);
+        },
+    });
+}
+
+// Get batch form data
+function getBatchFormData() {
+    return {
+        batch_no: $("#batchNo").val(),
+        teacher: $("#teacherAssigned").val(),
+        course_id: $("#courseAssigned").val(),
+        duration: $("#duration").val(),
         _token: $('input[name="_token"]').val(),
     };
+}
 
+// Save changes to the batch
+function saveBatch(batchId, formData) {
+    toggleSaveButton(true, 'Saving...');
     $.ajax({
         url: `/dashboard/staff/update-batch/${batchId}`,
         type: "POST",
@@ -960,21 +792,23 @@ $(document).on("click", ".update-btn", function () {
         success: function (response) {
             if (response.status === "success") {
                 alert(response.message);
-                loadBatches(1); // Reload the batches after update
+                $("#updateBatchModal").modal("hide");
+                loadBatches(1);
             }
         },
         error: function (xhr) {
-            console.error("Error:", xhr.statusText);
+            console.error("Error updating batch:", xhr.statusText);
+        },
+        complete: function () {
+            toggleSaveButton(false);
         },
     });
-});
+}
 
-// delete batch
-
-$(document).on("click", ".delete-btn", function () {
+// Confirm and delete a batch
+function confirmAndDeleteBatch(batchId, button) {
     if (confirm("Are you sure you want to delete this batch?")) {
-        let batchId = $(this).data("id"); // Get batch ID from button's data attribute
-
+        button.attr("disabled", "disabled").html('<span class="spinner-border spinner-border-sm"></span> Deleting...');
         $.ajax({
             url: `/dashboard/staff/delete-batch/${batchId}`,
             type: "DELETE",
@@ -984,96 +818,28 @@ $(document).on("click", ".delete-btn", function () {
             success: function (response) {
                 if (response.status === "success") {
                     alert(response.message);
-                    loadBatches(1); // Reload the batches after deletion
+                    $(`#batch-row-${batchId}`).remove();
+                    loadBatches(1);
+                } else {
+                    alert("Something went wrong, please try again.");
                 }
             },
             error: function (xhr) {
-                console.error("Error:", xhr.statusText);
+                console.error("Error deleting batch:", xhr.statusText);
+            },
+            complete: function () {
+                button.html('Delete').removeAttr("disabled");
             },
         });
     }
-});
+}
 
-// update modal data
-$(document).ready(function () {
-    // When an 'Update' button is clicked
-    $(document).on("click", ".update-btn", function () {
-        const batchId = $(this).data("id");
-
-        // Fetch the batch details and populate the modal
-        $.ajax({
-            url: `/dashboard/staff/batches/${batchId}/edit`, // Route to fetch batch details
-            type: "GET",
-            success: function (response) {
-                $("#batchNo").val(response.batch_no);
-                $("#courseAssigned").html(response.courseOptions);
-                $("#teacherAssigned").html(response.teacherOptions);
-                $("#duration").val(response.duration); // Populate duration field
-                $("#batchId").val(batchId);
-            },
-            error: function (xhr) {
-                console.error("Error fetching batch details:", xhr.statusText);
-            },
-        });
-    });
-
-    // Fetch teachers and update duration based on the selected course in the modal
-    $(document).on("change", "#courseAssigned", function () {
-        const courseId = $(this).val();
-
-        // Make AJAX call to fetch teachers and course duration
-        $.ajax({
-            url: `/dashboard/staff/get-teachers-and-duration`, // Update the route to also return course duration
-            type: "POST",
-            data: {
-                course_id: courseId,
-                _token: $('input[name="_token"]').val(),
-            },
-            success: function (response) {
-                let teacherOptions =
-                    "<option disabled selected>Select Teacher</option>";
-                response.teachers.forEach(function (teacher) {
-                    teacherOptions += `<option value="${teacher.id}">${teacher.name}</option>`;
-                });
-                $("#teacherAssigned").html(teacherOptions);
-
-                // Update the course duration field
-                $("#duration").val(response.course_duration);
-            },
-            error: function (xhr) {
-                console.error(
-                    "Error fetching teachers or duration:",
-                    xhr.statusText
-                );
-            },
-        });
-    });
-
-    // Save changes when the modal form is submitted
-    $("#saveBatchBtn").click(function () {
-        const batchId = $("#batchId").val();
-        const formData = {
-            batch_no: $("#batchNo").val(),
-            teacher: $("#teacherAssigned").val(),
-            course_id: $("#courseAssigned").val(),
-            duration: $("#duration").val(),
-            _token: $('input[name="_token"]').val(),
-        };
-
-        $.ajax({
-            url: `/dashboard/staff/update-batch/${batchId}`,
-            type: "POST",
-            data: formData,
-            success: function (response) {
-                if (response.status === "success") {
-                    alert(response.message);
-                    $("#updateBatchModal").modal("hide");
-                    loadBatches(1); // Reload the batches (adjust the page number if necessary)
-                }
-            },
-            error: function (xhr) {
-                console.error("Error updating batch:", xhr.statusText);
-            },
-        });
-    });
-});
+// Toggle save button state
+function toggleSaveButton(disable, loadingText = "Save Changes") {
+    const saveButton = $("#saveBatchBtn");
+    if (disable) {
+        saveButton.attr("disabled", "disabled").addClass("btn-disabled").html('<span class="spinner-border spinner-border-sm"></span> ' + loadingText);
+    } else {
+        saveButton.removeAttr("disabled").removeClass("btn-disabled").html(loadingText);
+    }
+}
