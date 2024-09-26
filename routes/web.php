@@ -94,6 +94,8 @@ Route::prefix("/dashboard/staff/")->group(function () {
 
     Route::view('/batches/assign-batches/{id}', 'staff.pages.assign-batches')->name('staff-assign-batches');
 
+    Route::view('/student/add-student', 'staff.pages.add-students')->name('staff-add-students');
+
 
 
 
@@ -120,4 +122,8 @@ Route::prefix("/dashboard/staff/")->group(function () {
     Route::get('/batches/{id}/edit', [BatchController::class, 'editBatch']);
 
     Route::post('/get-teachers-and-duration', [BatchController::class, 'getTeachersAndDuration']);
+
+    Route::post('/students', [StaffController::class, 'storeStudent'])->name('students.store');
+
+    Route::post('/get-batches', [StaffController::class, 'getBatchesStudent'])->name('staff.getBatches');
 });

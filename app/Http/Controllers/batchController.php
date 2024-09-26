@@ -26,10 +26,19 @@ class batchController extends Controller
     public function addBatch(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'course_name_batch' => 'required',
+            'course_name_batch' => 'required|exists:courses,id',
             'batch_number' => 'required|integer',
-            'teacher_assigned' => 'required',
+            'teacher_assigned' => 'required|exists:users,id',
         ]);
+
+        // Check if batch number is unique for the selected course
+        $existingBatch = Batch::where('batch_no', $request->input('batch_number'))
+            ->where('course_id', $request->input('course_name_batch'))
+            ->first();
+
+        if ($existingBatch) {
+            return response()->json(['errors' => ['batch_number' => 'Batch number already exists for this course.']], 422);
+        }
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -43,6 +52,7 @@ class batchController extends Controller
 
         return response()->json(['status' => 'success', 'message' => 'Batch added successfully!']);
     }
+
 
 
 
@@ -73,15 +83,24 @@ class batchController extends Controller
     {
         $batch = Batch::findOrFail($id);
 
-        $batches = Batch::with(['teachers', 'course'])
-            ->paginate(10);
-
-
         $validatedData = $request->validate([
             'batch_no' => 'required|integer',
             'teacher' => 'required|exists:users,id',
             'course_id' => 'required|exists:courses,id',
         ]);
+
+        // Check for uniqueness of batch number within the course context (excluding the current batch being updated)
+        $existingBatch = Batch::where('batch_no', $validatedData['batch_no'])
+            ->where('course_id', $validatedData['course_id'])
+            ->where('id', '!=', $id) // Exclude the current batch
+            ->first();
+
+        if ($existingBatch) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Batch number already exists for this course.'
+            ], 422);
+        }
 
         $batch->update([
             'batch_no' => $validatedData['batch_no'],
@@ -90,12 +109,13 @@ class batchController extends Controller
         ]);
 
         return response()->json([
+            'status' => 'success',
+            'message' => 'Batch updated successfully!',
             'batchesHtml' => view('staff.partials.batches', compact('batches'))->render(),
             'paginationHtml' => view('staff.partials.pagination', compact('batches'))->render(),
-            'status' => 'success',
-            'message' => 'Batch updated successfully!'
         ]);
     }
+
 
 
     public function deleteBatch($id)
@@ -114,14 +134,12 @@ class batchController extends Controller
 
     public function editBatch($batchId)
     {
-        // Fetch the batch by its ID
         $batch = Batch::with('course', 'teachers')->find($batchId);
 
         if (!$batch) {
             return response()->json(['status' => 'error', 'message' => 'Batch not found']);
         }
 
-        // Fetch all courses for the course dropdown
         $courses = Course::all();
         $courseOptions = '<option disabled selected>Select Course</option>';
         foreach ($courses as $course) {
@@ -129,7 +147,6 @@ class batchController extends Controller
             $courseOptions .= "<option value='{$course->id}' $selected>{$course->course_name}</option>";
         }
 
-        // Fetch teachers for the currently selected course
         $teachers = User::where('role', 'teacher')
             ->where('course_assigned', $batch->course_id)
             ->get();
@@ -143,11 +160,12 @@ class batchController extends Controller
             'batch_no' => $batch->batch_no,
             'course_id' => $batch->course_id,
             'teacher' => $batch->teacher,
-            'duration' => $batch->course->course_duration, // Include the course duration
+            'duration' => $batch->course->course_duration,
             'courseOptions' => $courseOptions,
             'teacherOptions' => $teacherOptions,
         ]);
     }
+
 
 
 

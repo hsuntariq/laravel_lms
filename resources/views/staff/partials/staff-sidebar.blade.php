@@ -74,6 +74,33 @@
     <div class="dropdown p-0 w-100">
         <button
             class="fw-medium  border-0 w-100 text-start p-3 rounded-3 dropdown-toggle {{ collect(request()->segments())->contains(function ($segment) {
+                return strpos($segment, 'student') !== false;
+            })
+                ? 'active'
+                : 'text-dark bg-transparent text-dark' }}"
+            type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-people me-2"></i> Students
+        </button>
+        <ul class="dropdown-menu">
+            <li class="d-flex rounded-3 p-3 gap-3 align-items-center ">
+                <div class="bi bi-plus"></div>
+                <a class="text-decoration-none dropdown-item text-dark"
+                    href="{{ route('staff-add-students', ['id' => 16]) }}">
+                    Add student
+                </a>
+            </li>
+            <li class="d-flex rounded-3 p-3 gap-3 align-items-center ">
+                <div class="bi bi-eye"></div>
+                <a class="text-decoration-none text-dark dropdown-item"
+                    href="{{ route('staff-add-students', ['id' => 16]) }}">
+                    View student
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="dropdown p-0 w-100">
+        <button
+            class="fw-medium  border-0 w-100 text-start p-3 rounded-3 dropdown-toggle {{ collect(request()->segments())->contains(function ($segment) {
                 return strpos($segment, 'batches') !== false;
             })
                 ? 'active'

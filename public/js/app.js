@@ -48,7 +48,9 @@ $(".add-assignment").click(function (e) {
 
 // Function to count assignments
 function countAssignments() {
-    const batch_no = $('[name="batch_no"]').val() || $('[name="batch_no"]').find("option:first").val();
+    const batch_no =
+        $('[name="batch_no"]').val() ||
+        $('[name="batch_no"]').find("option:first").val();
     $(".count-loading").show();
     $(".total-assignments, .total-tests").hide();
 
@@ -75,7 +77,7 @@ function countAssignments() {
 
 // Count assignments on page load
 $(document).ready(function () {
-    if (window.location.pathname === '/dashboard/teacher/assignments/upload') {
+    if (window.location.pathname === "/dashboard/teacher/assignments/upload") {
         countAssignments();
         $('[name="batch_no"]').on("input", countAssignments);
     }
@@ -91,29 +93,34 @@ function getAssignments() {
         url: `/dashboard/student/assignments-get/${batch_no}`,
         type: "GET",
         success: function (response) {
-            let assignmentsHtml = response.map((assignment, index) => {
-                const createdAtDate = new Date(assignment.created_at);
-                const options = {
-                    timeZone: "Asia/Karachi",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                };
-                const formattedCreatedAt = createdAtDate.toLocaleString("en-US", options);
+            let assignmentsHtml = response
+                .map((assignment, index) => {
+                    const createdAtDate = new Date(assignment.created_at);
+                    const options = {
+                        timeZone: "Asia/Karachi",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    };
+                    const formattedCreatedAt = createdAtDate.toLocaleString(
+                        "en-US",
+                        options
+                    );
 
-                return `
+                    return `
                 <tr>
                     <td class="text-sm">${index + 1}</td>
                     <td class="text-sm">${assignment.topic}</td>
                     <td class="text-sm">${assignment.max_marks}</td>
                     <td class="text-sm">${formattedCreatedAt}</td>
                     <td class="text-sm">${formattedCreatedAt}</td>
-                    ${assignment?.answers?.length > 0 ?
-                        `<td colspan="4" class="text-center">
+                    ${
+                        assignment?.answers?.length > 0
+                            ? `<td colspan="4" class="text-center">
                             <i class="bi bi-check-circle-fill text-success"></i> Submitted
-                        </td>` :
-                        `<td class="text-sm">pending...</td>
+                        </td>`
+                            : `<td class="text-sm">pending...</td>
                         <td class="text-sm">
                             <form class="upload-form" enctype="multipart/form-data">
                                 <input name="assignment_id" type="hidden" value="${assignment.id}">
@@ -132,7 +139,8 @@ function getAssignments() {
                         </td>`
                     }
                 </tr>`;
-            }).join('');
+                })
+                .join("");
 
             $("#assignmentsTableBody").html(assignmentsHtml);
         },
@@ -193,7 +201,10 @@ function addUploadAssignment(form, input, row, loader) {
         },
         error: function (xhr) {
             if (xhr.status === 422) {
-                displayValidationErrors(xhr.responseJSON.errors, errorMessageDiv);
+                displayValidationErrors(
+                    xhr.responseJSON.errors,
+                    errorMessageDiv
+                );
             } else {
                 // Handle error appropriately
                 showFlashMessage("Failed to upload the assignment", "error");
@@ -222,9 +233,11 @@ function showFlashMessage(message, type = "success") {
     $(".flash").show();
     $(".notificationPara").html(message);
     $(".flash").addClass(type === "success" ? "alert-success" : "alert-danger");
-    $(".AllowBtn").off("click").on("click", function () {
-        $(".flash").fadeOut();
-    });
+    $(".AllowBtn")
+        .off("click")
+        .on("click", function () {
+            $(".flash").fadeOut();
+        });
 }
 
 // Function to display validation errors
@@ -238,8 +251,16 @@ function displayValidationErrors(errors, errorMessageDiv) {
 
 // Get the related day
 function getDay(day) {
-    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    return days[day] || '';
+    const days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+    ];
+    return days[day] || "";
 }
 
 // Get assignment format
@@ -252,48 +273,57 @@ function displayFile(file) {
         jpeg: "https://example.com/jpeg-icon.png",
         docx: "https://example.com/docx-icon.png",
         jpg: "https://example.com/jpg-icon.png",
-        default: "https://example.com/default-icon.png"
+        default: "https://example.com/default-icon.png",
     };
 
     return `<a href='${fileUrl}' download>
-        <img width='30px' height='30px' src='${fileIcons[ext] || fileIcons.default}' alt='file icon'>
+        <img width='30px' height='30px' src='${
+            fileIcons[ext] || fileIcons.default
+        }' alt='file icon'>
     </a>`;
 }
 
 // Get submitted assignments for teacher
 function getSubmittedAssignments() {
     $(".loader-table").show();
-    const batch_no = $('[name="batch_no"]').val() || $('[name="batch_no"]').find("option:first").val();
+    const batch_no =
+        $('[name="batch_no"]').val() ||
+        $('[name="batch_no"]').find("option:first").val();
 
     $.ajax({
         url: "/dashboard/teacher/submitted-assignment",
         type: "GET",
         data: { batch_no: batch_no },
         success: function (response) {
-            let assignmentsHtml = response.map((assignment) => {
-                const date = new Date(assignment.created_at);
-                const options = {
-                    timeZone: "Asia/Karachi",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                };
-                const formattedDate = date.toLocaleString("en-US", options);
+            let assignmentsHtml = response
+                .map((assignment) => {
+                    const date = new Date(assignment.created_at);
+                    const options = {
+                        timeZone: "Asia/Karachi",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    };
+                    const formattedDate = date.toLocaleString("en-US", options);
 
-                return `
+                    return `
                 <tr>
                     <td>${assignment.topic}</td>
                     <td>${formattedDate}</td>
                     <td>${assignment.max_marks}</td>
                     <td>${displayFile(assignment.answer_file)}</td>
                 </tr>`;
-            }).join('');
+                })
+                .join("");
             $("#submittedAssignmentsTableBody").html(assignmentsHtml);
         },
         error: function (xhr) {
             // Handle error appropriately
-            console.error("Error fetching submitted assignments:", xhr.statusText);
+            console.error(
+                "Error fetching submitted assignments:",
+                xhr.statusText
+            );
         },
         complete: function () {
             $(".loader-table").hide();
@@ -301,11 +331,12 @@ function getSubmittedAssignments() {
     });
 }
 
-
 // get marks for the student
 
 $(document).ready(function () {
-    $(".loader-table, .course-loading, .teacher-loading, .batch-loading, .error").hide();
+    $(
+        ".loader-table, .course-loading, .teacher-loading, .batch-loading, .error"
+    ).hide();
     getMarks();
     getCourses();
     getCoursesTeacher();
@@ -322,7 +353,9 @@ $(document).ready(function () {
 
     // Password show/hide functionality
     $(".toggle-password").on("click", function () {
-        let passwordInput = $(this).closest(".form-control").find('input[name="password"]');
+        let passwordInput = $(this)
+            .closest(".form-control")
+            .find('input[name="password"]');
         let icon = $(this).find("i");
         let isPassword = passwordInput.attr("type") === "password";
 
@@ -349,7 +382,9 @@ function getMarks() {
             let testTableBody = "";
 
             if (response.length === 0) {
-                assignmentTableBody = createNoDataRow("No assignments marked yet");
+                assignmentTableBody = createNoDataRow(
+                    "No assignments marked yet"
+                );
                 testTableBody = createNoDataRow("No tests marked yet");
             } else {
                 response.forEach(function (mark) {
@@ -379,7 +414,9 @@ function getMarks() {
 // Create a row for marks
 function createMarkRow(mark, createdAt) {
     const day = createdAt.toLocaleDateString("en-US", { weekday: "long" });
-    const date = `${createdAt.getDate()}/${createdAt.getMonth() + 1}/${createdAt.getFullYear()}`;
+    const date = `${createdAt.getDate()}/${
+        createdAt.getMonth() + 1
+    }/${createdAt.getFullYear()}`;
     const time = `${createdAt.getHours()}:${createdAt.getMinutes()}`;
     return `
         <tr>
@@ -430,7 +467,9 @@ function handleCourseErrors(xhr) {
     if (xhr.status == 422) {
         let errors = xhr.responseJSON.errors;
         $.each(errors, function (key, value) {
-            $('input[name="' + key + '"]').after(`<p class="text-danger fw-medium m-0">${value[0]}</p>`);
+            $('input[name="' + key + '"]').after(
+                `<p class="text-danger fw-medium m-0">${value[0]}</p>`
+            );
         });
     }
     if (xhr.status == 400) {
@@ -444,7 +483,9 @@ function getCourses() {
         url: "/dashboard/staff/get-course-data",
         type: "GET",
         success: function (response) {
-            let courses = response.map(course => `
+            let courses = response
+                .map(
+                    (course) => `
                 <tr>
                     <td>${course.id}</td>
                     <td>${course.course_name}</td>
@@ -452,7 +493,9 @@ function getCourses() {
                     <td>Rs.${course.course_fee}</td>
                     <td><button class='btn btn-danger delete-course'>Delete</button></td>
                     <td><button class='btn btn-purple delete-course'>Update</button></td>
-                </tr>`).join('');
+                </tr>`
+                )
+                .join("");
             $(".courses").html(courses);
         },
         error: function (xhr) {
@@ -472,8 +515,14 @@ function getCoursesTeacher() {
         url: "/dashboard/staff/get-course-data",
         type: "GET",
         success: function (response) {
-            let courses = "<option selected disabled>Select course</option>" +
-                response.map(course => `<option value="${course.id}">${course.course_name}</option>`).join('');
+            let courses =
+                "<option selected disabled>Select course</option>" +
+                response
+                    .map(
+                        (course) =>
+                            `<option value="${course.id}">${course.course_name}</option>`
+                    )
+                    .join("");
             $("[name=course_assigned]").html(courses);
         },
         error: function (xhr) {
@@ -517,6 +566,7 @@ function addInstructor() {
         complete: function () {
             $(".teacher-loading").hide();
             $(".teacher-btn").attr("disabled", true).addClass("btn-disabled");
+            $("#image-preview").hide();
         },
     });
 }
@@ -525,7 +575,9 @@ function handleInstructorErrors(xhr) {
     if (xhr.status === 422) {
         let errors = xhr.responseJSON.errors;
         $.each(errors, function (key, value) {
-            $('input[name="' + key + '"]').after(`<p class="text-danger fw-medium m-0">${value[0]}</p>`);
+            $('input[name="' + key + '"]').after(
+                `<p class="text-danger fw-medium m-0">${value[0]}</p>`
+            );
         });
     } else {
         showError("An Error Occurred");
@@ -538,26 +590,34 @@ $(".teacher-form input, .teacher-form select").on("input change", function () {
 });
 
 function checkFormCompletion() {
-    let allFilled = $(".teacher-form input, .teacher-form select").toArray().every(input => $(input).val() !== "");
-    $(".teacher-btn").attr("disabled", !allFilled).toggleClass("btn-disabled", !allFilled);
+    let allFilled = $(".teacher-form input, .teacher-form select")
+        .toArray()
+        .every((input) => $(input).val() !== "");
+    $(".teacher-btn")
+        .attr("disabled", !allFilled)
+        .toggleClass("btn-disabled", !allFilled);
 }
 
 // Show flash message
 function showFlashMessage(message) {
     $(".flash").show();
     $(".notificationPara").html(message);
-    $(".AllowBtn").off("click").on("click", function () {
-        $(".flash").fadeOut();
-    });
+    $(".AllowBtn")
+        .off("click")
+        .on("click", function () {
+            $(".flash").fadeOut();
+        });
 }
 
 // Show error message
 function showError(message) {
     $(".error").show();
     $(".error__title").html(message);
-    $(".error__close").off("click").on("click", function () {
-        $(".error").fadeOut();
-    });
+    $(".error__close")
+        .off("click")
+        .on("click", function () {
+            $(".error").fadeOut();
+        });
 }
 
 // Assign batches
@@ -565,7 +625,9 @@ $(document).ready(function () {
     $(".batch-btn").attr("disabled", true).addClass("btn-disabled");
 
     // Initially hide course and teacher fields
-    $("select[name='course_name_batch'], select[name='teacher_assigned']").hide();
+    $(
+        "select[name='course_name_batch'], select[name='teacher_assigned']"
+    ).hide();
 
     // Fetch courses on page load
     $.ajax({
@@ -575,15 +637,21 @@ $(document).ready(function () {
             $(".teacher-skeleton-course").show(); // Show a loading skeleton or spinner
         },
         success: function (response) {
-            let courseOptions = "<option disabled selected>Select Course</option>" +
-                response.map(course => `<option value="${course.id}">${course.course_name}</option>`).join('');
+            let courseOptions =
+                "<option disabled selected>Select Course</option>" +
+                response
+                    .map(
+                        (course) =>
+                            `<option value="${course.id}">${course.course_name}</option>`
+                    )
+                    .join("");
             $('select[name="course_name_batch"]').html(courseOptions).show(); // Show the select after populating
         },
         error: function (xhr) {
             console.error(xhr.statusText);
         },
         complete: function () {
-            $(".teacher-skeleton-course").hide(); // hide the loading skeleton or spinner
+            $(".teacher-skeleton-course").hide(); // Hide the loading skeleton or spinner
         },
     });
 
@@ -598,9 +666,17 @@ $(document).ready(function () {
             type: "POST",
             data: { course_id, _token: $('input[name="_token"]').val() },
             success: function (response) {
-                let teacherOptions = "<option disabled selected>Select Teacher</option>" +
-                    response.map(teacher => `<option value="${teacher.id}">${teacher.name}</option>`).join('');
-                $('select[name="teacher_assigned"]').html(teacherOptions).show(); // Show the select after populating
+                let teacherOptions =
+                    "<option disabled selected>Select Teacher</option>" +
+                    response
+                        .map(
+                            (teacher) =>
+                                `<option value="${teacher.id}">${teacher.name}</option>`
+                        )
+                        .join("");
+                $('select[name="teacher_assigned"]')
+                    .html(teacherOptions)
+                    .show(); // Show the select after populating
             },
             error: function (xhr) {
                 console.error(xhr.statusText);
@@ -616,35 +692,36 @@ $(document).ready(function () {
     $('select[name="teacher_assigned"]').change(checkFormValidity);
 
     // Add batch form submission
-    $(".batch-btn").click(function (e) {
-        e.preventDefault();
-        addBatch();
-    });
+    $(".batch-btn")
+        .off("click")
+        .on("click", function (e) {
+            e.preventDefault();
+            addBatch();
+        });
 
     // Function to check form validity
-    function checkFormValidity() {
-        const courseSelected = $('select[name="course_name_batch"]').val();
-        const teacherSelected = $('select[name="teacher_assigned"]').val();
-        $(".batch-btn").attr("disabled", !(courseSelected && teacherSelected)); // Enable/disable the button based on selection
-        $(".batch-btn").removeClass("btn-disabled", !(courseSelected && teacherSelected)); // Enable/disable the button based on selection
-
-    }
 });
-
-// Check form validity for batch
 function checkFormValidity() {
     const courseSelected = $('select[name="course_name_batch"]').val();
     const teacherSelected = $('select[name="teacher_assigned"]').val();
     const batchSelected = $('input[name="batch_number"]').val();
-    $(".batch-btn").attr("disabled", !(courseSelected && teacherSelected && batchSelected)).toggleClass("btn-disabled", !(courseSelected && teacherSelected && batchSelected));
+    $(".batch-btn")
+        .attr("disabled", !(courseSelected && teacherSelected && batchSelected))
+        .toggleClass(
+            "btn-disabled",
+            !(courseSelected && teacherSelected && batchSelected)
+        );
 }
 
-// Add batch function
+// Add batch function with error handling
 function addBatch() {
     $(".batch-loading").show();
     $(".batch-btn").attr("disabled", true).addClass("btn-disabled");
 
     let formData = new FormData($(".course-form")[0]);
+
+    // Clear previous error messages
+    $(".text-danger").remove();
 
     $.ajax({
         url: "/dashboard/staff/add-batch",
@@ -656,23 +733,40 @@ function addBatch() {
             if (response.status === "success") {
                 $(".course-form")[0].reset();
                 showFlashMessage("Batch added successfully");
+                $('input[name = "batch_number"]').removeClass("is-invalid");
             }
         },
         error: function (xhr) {
             if (xhr.status === 422) {
                 let errors = xhr.responseJSON.errors;
-                $.each(errors, function (key, value) {
-                    $(`input[name="${key}"], select[name="${key}"]`).after(`<p class="text-danger">${value[0]}</p>`);
-                });
+
+                // Find the input or select element and append the error message
+                $(`input[name="batch_number"]`)
+                    .after(`<p class="text-danger">${errors?.batch_number}</p>`)
+                    .addClass("is-invalid"); // Add 'is-invalid' class for better UI feedback
+
+                showFlashMessage(
+                    "Please fix the errors and try again",
+                    "error"
+                );
             }
         },
         complete: function () {
             $(".batch-loading").hide();
-            checkFormValidity();
+            checkFormValidity(); // Check if the form can be submitted again
         },
     });
 }
 
+// Function to show flash messages for success or error
+function showFlashMessage(message, type = "success") {
+    $(".flash").show();
+    $(".notificationPara").html(message).fadeIn();
+
+    setTimeout(function () {
+        $(".flash").fadeOut();
+    }, 3000); // Flash message disappears after 3 seconds
+}
 
 $(document).ready(function () {
     loadBatches(1); // Load first page of batches on page load
@@ -758,7 +852,8 @@ function fetchTeachersAndDuration(courseId) {
             _token: $('input[name="_token"]').val(),
         },
         success: function (response) {
-            let teacherOptions = "<option disabled selected>Select Teacher</option>";
+            let teacherOptions =
+                "<option disabled selected>Select Teacher</option>";
             response.teachers.forEach(function (teacher) {
                 teacherOptions += `<option value="${teacher.id}">${teacher.name}</option>`;
             });
@@ -766,7 +861,10 @@ function fetchTeachersAndDuration(courseId) {
             $("#duration").val(response.course_duration);
         },
         error: function (xhr) {
-            console.error("Error fetching teachers or duration:", xhr.statusText);
+            console.error(
+                "Error fetching teachers or duration:",
+                xhr.statusText
+            );
         },
     });
 }
@@ -784,7 +882,7 @@ function getBatchFormData() {
 
 // Save changes to the batch
 function saveBatch(batchId, formData) {
-    toggleSaveButton(true, 'Saving...');
+    toggleSaveButton(true, "Saving...");
     $.ajax({
         url: `/dashboard/staff/update-batch/${batchId}`,
         type: "POST",
@@ -808,7 +906,11 @@ function saveBatch(batchId, formData) {
 // Confirm and delete a batch
 function confirmAndDeleteBatch(batchId, button) {
     if (confirm("Are you sure you want to delete this batch?")) {
-        button.attr("disabled", "disabled").html('<span class="spinner-border spinner-border-sm"></span> Deleting...');
+        button
+            .attr("disabled", "disabled")
+            .html(
+                '<span class="spinner-border spinner-border-sm"></span> Deleting...'
+            );
         $.ajax({
             url: `/dashboard/staff/delete-batch/${batchId}`,
             type: "DELETE",
@@ -828,7 +930,7 @@ function confirmAndDeleteBatch(batchId, button) {
                 console.error("Error deleting batch:", xhr.statusText);
             },
             complete: function () {
-                button.html('Delete').removeAttr("disabled");
+                button.html("Delete").removeAttr("disabled");
             },
         });
     }
@@ -838,8 +940,70 @@ function confirmAndDeleteBatch(batchId, button) {
 function toggleSaveButton(disable, loadingText = "Save Changes") {
     const saveButton = $("#saveBatchBtn");
     if (disable) {
-        saveButton.attr("disabled", "disabled").addClass("btn-disabled").html('<span class="spinner-border spinner-border-sm"></span> ' + loadingText);
+        saveButton
+            .attr("disabled", "disabled")
+            .addClass("btn-disabled")
+            .html(
+                '<span class="spinner-border spinner-border-sm"></span> ' +
+                    loadingText
+            );
     } else {
-        saveButton.removeAttr("disabled").removeClass("btn-disabled").html(loadingText);
+        saveButton
+            .removeAttr("disabled")
+            .removeClass("btn-disabled")
+            .html(loadingText);
     }
 }
+
+$(document).ready(function () {
+    // Toggle password visibility
+    $(".toggle-password").click(function () {
+        const input = $(this).siblings(".pass");
+        const icon = $(this).find("i");
+        if (input.attr("type") === "password") {
+            input.attr("type", "text");
+            icon.removeClass("bi-eye-slash").addClass("bi-eye");
+        } else {
+            input.attr("type", "password");
+            icon.removeClass("bi-eye").addClass("bi-eye-slash");
+        }
+    });
+
+    // Image preview
+    $("#image").change(function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                $("#image-preview").attr("src", e.target.result).show();
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Fetch batches based on selected course
+    $("#course_assigned").change(function () {
+        const courseId = $(this).val();
+        $("#batch_assigned").html("<option>Loading batches...</option>");
+
+        $.ajax({
+            url: "/dashboard/staff/get-batches",
+            type: "POST",
+            data: {
+                course_id: courseId,
+                _token: $('input[name="_token"]').val(),
+            },
+            success: function (response) {
+                let batchOptions =
+                    "<option disabled selected>Select Batch</option>";
+                response.batches.forEach(function (batch) {
+                    batchOptions += `<option value="${batch.id}">${batch.batch_no}</option>`;
+                });
+                $("#batch_assigned").html(batchOptions);
+            },
+            error: function (xhr) {
+                console.error(xhr.statusText);
+            },
+        });
+    });
+});

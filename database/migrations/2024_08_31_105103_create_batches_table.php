@@ -13,10 +13,13 @@ return new class extends Migration
     {
         Schema::create('batches', function (Blueprint $table) {
             $table->id();
-            $table->integer('batch_no');
+            $table->unsignedBigInteger('batch_no');
+            $table->unsignedBigInteger('course_id'); // Make course_id unsignedBigInteger
             $table->unsignedBigInteger('teacher');
             $table->foreign('teacher')->references('id')->on('users');
             $table->timestamps();
+
+            $table->unique(['batch_no', 'course_id']);
         });
     }
 
