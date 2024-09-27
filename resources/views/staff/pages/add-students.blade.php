@@ -1,7 +1,7 @@
 <x-staff-dashboard-layout>
     <x-flash />
     <x-error />
-    <form action="{{ route('students.store') }}" method="POST" enctype="multipart/form-data" class="student-form col-lg-7 col-md-10 mx-auto border-purple p-3 rounded-3 shadow">
+    <form method="POST" enctype="multipart/form-data" class="student-form col-lg-7 col-md-10 mx-auto border-purple p-3 rounded-3 shadow">
         @csrf
         <h1 class="display-6 text-center">
             Add Student
@@ -56,7 +56,9 @@
         </div>
         <input type="hidden" value="student" name="role">
         <button class="btn btn-purple student-btn w-100 my-2">
-            <img class="student-loading" src="loading.gif" width="20px" alt="Loading" style="display: none;">
+            <img class="student-loading"
+                src="https://discuss.wxpython.org/uploads/default/original/2X/6/6d0ec30d8b8f77ab999f765edd8866e8a97d59a3.gif"
+                width="20px" alt="student loading">
             Add Student
         </button>
     </form>

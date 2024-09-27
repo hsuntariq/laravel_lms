@@ -96,6 +96,8 @@ Route::prefix("/dashboard/staff/")->group(function () {
 
     Route::view('/student/add-student', 'staff.pages.add-students')->name('staff-add-students');
 
+    Route::view('/student/view-students', 'staff.pages.view-students')->name('staff-view-students');
+
 
 
 
@@ -123,7 +125,18 @@ Route::prefix("/dashboard/staff/")->group(function () {
 
     Route::post('/get-teachers-and-duration', [BatchController::class, 'getTeachersAndDuration']);
 
-    Route::post('/students', [StaffController::class, 'storeStudent'])->name('students.store');
+    Route::post('/add-student', [StaffController::class, 'storeStudent'])->name('students.store');
 
     Route::post('/get-batches', [StaffController::class, 'getBatchesStudent'])->name('staff.getBatches');
+
+    Route::get('/get-students', [staffController::class, 'getStudents'])->name('students.get');
+
+    // Route to update a student
+    Route::post('/update-student/{id}', [staffController::class, 'updateStudent'])->name('students.update');
+
+    // Route to delete a student
+    Route::delete('/delete-student/{id}', [staffController::class, 'deleteStudent'])->name('students.delete');
+
+    // Route to get a single student's details (for editing)
+    Route::get('/edit-student/{id}', [staffController::class, 'editStudent'])->name('students.edit');
 });

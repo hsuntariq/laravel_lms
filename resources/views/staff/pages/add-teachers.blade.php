@@ -52,7 +52,7 @@
         <button class="btn btn-purple teacher-btn w-100 my-2">
             <img class="teacher-loading"
                 src="https://discuss.wxpython.org/uploads/default/original/2X/6/6d0ec30d8b8f77ab999f765edd8866e8a97d59a3.gif"
-                width="20px" alt="Assignmate loading"> Add Instructor
+                width="20px" alt="teacher loading"> Add Instructor
         </button>
     </form>
 </x-staff-dashboard-layout>

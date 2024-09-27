@@ -58,9 +58,9 @@ class staffController extends Controller
     }
 
 
-    public function storeStudent(Request $request)
+    public function storeUser(Request $request)
     {
-        // Validate the incoming student data
+        // Validate the incoming User data
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
@@ -74,14 +74,14 @@ class staffController extends Controller
 
         // Handle image upload if provided
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('student_images', 'public');
+            $path = $request->file('image')->store('User_images', 'public');
             $validated['image'] = $path;
         }
 
         // Hash the password before saving to the database
         $validated['password'] = Hash::make($validated['password']);
 
-        // Create the student
+        // Create the User
         User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
@@ -91,18 +91,77 @@ class staffController extends Controller
             'image' => $validated['image'] ?? null,
             'course_assigned' => $validated['course_assigned'],
             'batch_assigned' => $validated['batch_assigned'],
-            'role' => 'student', // Role set to 'student'
+            'role' => 'User', // Role set to 'User'
         ]);
 
-        // Redirect with a success message
-        return redirect()->route('students.index')->with('success', 'Student added successfully.');
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User added successfully!',
+        ]);
     }
 
 
 
-    public function getBatchesStudent(Request $request)
+    public function getBatchesUser(Request $request)
     {
         $batches = Batch::where('course_id', $request->course_id)->get();
         return response()->json(['batches' => $batches]);
+    }
+
+
+
+    public function updateUser(Request $request, $id)
+    {
+        // Validate input
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'batch' => 'required|exists:batches,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Find the User
+        $User = User::findOrFail($id);
+
+        // Update the User's information
+        $User->update([
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'batch_id' => $request->input('batch'),
+        ]);
+
+        return response()->json(['status' => 'success', 'message' => 'User updated successfully']);
+    }
+
+    // Delete User method
+    public function deleteUser($id)
+    {
+        // Find the User
+        $User = User::findOrFail($id);
+
+        // Delete the User
+        $User->delete();
+
+        return response()->json(['status' => 'success', 'message' => 'User deleted successfully']);
+    }
+
+    // Fetch User details for editing
+    public function editUser($id)
+    {
+        $User = User::findOrFail($id);
+        return response()->json($User);
+    }
+
+
+    public function getStudents()
+    {
+        $students = User::with(relations: 'batch.course')->where('role', 'student') // Assuming a relationship between student -> batch -> course
+            ->get();
+
+        // You can return it directly as JSON for API purposes, or pass it to a view
+        return response()->json($students);
     }
 }

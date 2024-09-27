@@ -33,6 +33,11 @@ class User extends Authenticatable
 
 
 
+    public function batch()
+    {
+        return $this->belongsTo(Batch::class);
+    }
+
 
 
 

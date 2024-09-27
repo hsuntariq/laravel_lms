@@ -92,7 +92,7 @@
             <li class="d-flex rounded-3 p-3 gap-3 align-items-center ">
                 <div class="bi bi-eye"></div>
                 <a class="text-decoration-none text-dark dropdown-item"
-                    href="{{ route('staff-add-students', ['id' => 16]) }}">
+                    href="{{ route('staff-view-students', ['id' => 16]) }}">
                     View student
                 </a>
             </li>

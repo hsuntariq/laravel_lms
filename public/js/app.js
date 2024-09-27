@@ -1007,3 +1007,216 @@ $(document).ready(function () {
         });
     });
 });
+
+// add student
+$(document).ready(function () {
+    // Initially disable the submit button
+    $(".student-btn").attr("disabled", true).addClass("btn-disabled");
+    $(".student-loading").hide();
+    // Monitor the form fields for changes to enable the submit button
+    $(".student-form input, .student-form select").on(
+        "input change",
+        function () {
+            checkFormValidity();
+        }
+    );
+
+    // Add student form submission
+    $(".student-btn")
+        .off("click")
+        .on("click", function (e) {
+            e.preventDefault();
+            addStudent();
+        });
+
+    // Function to add student
+    function addStudent() {
+        $(".student-loading").text("Adding...").show(); // Show loading text
+        $(".student-btn").attr("disabled", true).addClass("btn-disabled");
+
+        let formData = new FormData($(".student-form")[0]);
+
+        $.ajax({
+            url: "/dashboard/staff/add-student",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.status === "success") {
+                    // Reset form after successful submission
+                    $(".student-form")[0].reset();
+                    removeErrors(); // Remove error messages
+                    showFlashMessage("Student added successfully", "success");
+                    $("#image-preview").hide();
+
+                    // Disable the button again after form reset
+                    checkFormValidity(); // Check validity after reset to re-disable the button
+                }
+            },
+            error: function (xhr) {
+                if (xhr.status === 422) {
+                    let errors = xhr.responseJSON.errors;
+                    $.each(errors, function (key, value) {
+                        $(`input[name="${key}"], select[name="${key}"]`).after(
+                            `<p class="text-danger">${value[0]}</p>`
+                        );
+                    });
+                }
+            },
+            complete: function () {
+                $(".student-loading").hide(); // Hide loading text
+                $(".student-btn")
+                    .attr("disabled", true)
+                    .addClass("btn-disabled");
+            },
+        });
+    }
+
+    // Function to show flash messages
+    function showFlashMessage(message, type) {
+        if (type === "success") {
+            $(".flash").show();
+            $(".notificationPara").html(message);
+            setTimeout(function () {
+                $(".flash").fadeOut("slow", function () {
+                    $(this).remove();
+                });
+            }, 2000); // Adjust time as needed
+        }
+    }
+
+    // Function to check form validity
+    function checkFormValidity() {
+        const allFieldsFilled = $(".student-form input, .student-form select")
+            .toArray()
+            .every(function (field) {
+                return $(field).val().trim() !== "";
+            });
+
+        if (allFieldsFilled) {
+            $(".student-btn")
+                .attr("disabled", false)
+                .removeClass("btn-disabled");
+        } else {
+            $(".student-btn").attr("disabled", true).addClass("btn-disabled");
+        }
+    }
+
+    // Function to remove error messages
+    function removeErrors() {
+        $(".text-danger").remove(); // Remove all error messages
+    }
+
+    // Fetch courses and teachers with loading text in bold
+    function fetchCourses() {
+        $.ajax({
+            url: "/dashboard/staff/get-courses",
+            type: "GET",
+            beforeSend: function () {
+                $("select[name='course_name']").html(
+                    "<option><b>Loading...</b></option>"
+                );
+            },
+            success: function (response) {
+                let courseOptions =
+                    "<option disabled selected>Select Course</option>" +
+                    response
+                        .map(
+                            (course) =>
+                                `<option value="${course.id}">${course.course_name}</option>`
+                        )
+                        .join("");
+                $("select[name='course_name']").html(courseOptions);
+            },
+            error: function (xhr) {
+                console.error(xhr.statusText);
+            },
+        });
+    }
+
+    // Fetch teachers after selecting a course
+    $("select[name='course_name']").change(function () {
+        const courseId = $(this).val();
+        fetchTeachers(courseId);
+    });
+
+    function fetchTeachers(courseId) {
+        $.ajax({
+            url: "/dashboard/staff/get-teachers",
+            type: "POST",
+            data: {
+                course_id: courseId,
+                _token: $('input[name="_token"]').val(),
+            },
+            beforeSend: function () {
+                $("select[name='teacher_assigned']").html(
+                    "<option><b>Loading...</b></option>"
+                );
+            },
+            success: function (response) {
+                let teacherOptions =
+                    "<option disabled selected>Select Teacher</option>" +
+                    response
+                        .map(
+                            (teacher) =>
+                                `<option value="${teacher.id}">${teacher.name}</option>`
+                        )
+                        .join("");
+                $("select[name='teacher_assigned']").html(teacherOptions);
+            },
+            error: function (xhr) {
+                console.error(xhr.statusText);
+            },
+        });
+    }
+
+    // Initial course and teacher load
+    fetchCourses();
+});
+
+// Fetch and display students
+function loadStudents() {
+    $.ajax({
+        url: "/dashboard/staff/get-students",
+        type: "GET",
+        beforeSend: function () {
+            // Show a loading spinner or message
+            $(".student-list").html(
+                "<p><strong>Loading students...</strong></p>"
+            );
+        },
+        success: function (response) {
+            if (response.length > 0) {
+                let studentHtml = response
+                    .map((student) => {
+                        return `<tr>
+                        <td>${student.name}</td>
+                        <td>${student.email}</td>
+                        <td>${student.batch.batch_name}</td>
+                        <td>${student.batch.course.course_name}</td>
+                        <td>
+                            <button class="btn btn-primary edit-student" data-id="${student.id}">Edit</button>
+                            <button class="btn btn-danger delete-student" data-id="${student.id}">Delete</button>
+                        </td>
+                    </tr>`;
+                    })
+                    .join("");
+                $(".student-list").html(studentHtml);
+            } else {
+                $(".student-list").html(
+                    "<p><strong>No students found.</strong></p>"
+                );
+            }
+        },
+        error: function (xhr) {
+            $(".student-list").html(
+                "<p><strong>Error loading students.</strong></p>"
+            );
+        },
+    });
+}
+
+$(document).ready(function () {
+    loadStudents();
+});
