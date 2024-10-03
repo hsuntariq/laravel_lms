@@ -58,9 +58,17 @@ class batchController extends Controller
 
     public function getBatches(Request $request)
     {
-        $batches = Batch::with(['teachers', 'course'])
-            ->paginate(10);
-
+        // Check if course_id is present in the request
+        if ($request->has('course_id') && $request->course_id != '') {
+            // Filter batches by course_id
+            $batches = Batch::where('course_id', $request->course_id)
+                ->with(['teachers', 'course'])
+                ->paginate(9);
+        } else {
+            // If no course_id is provided, fetch all batches
+            $batches = Batch::with(['teachers', 'course'])
+                ->paginate(9);
+        }
 
         if ($request->ajax()) {
             $batchesHtml = view('staff.partials.batches', compact('batches'))->render();
@@ -69,13 +77,15 @@ class batchController extends Controller
             return response()->json([
                 'batchesHtml' => $batchesHtml,
                 'paginationHtml' => $paginationHtml,
+                'options' => $batches, // This will include the filtered batches based on the course
+                'course_id' => $request->course_id // This will include the filtered batches based on the course
             ]);
         }
 
-
-
+        // Return the view with all batches if not an AJAX request
         return view('staff.pages.view-batches', compact('batches'));
     }
+
 
 
 

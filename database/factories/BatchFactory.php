@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Course;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,10 +19,9 @@ class BatchFactory extends Factory
     public function definition(): array
     {
         return [
-            "name" => fake()->name,
-            "batch_no" => fake()->numberBetween(0,9999),
-            "teacher" => fake()->numberBetween(1,10),
-            
+            "batch_no" => fake()->numberBetween(0, 9999),
+            "teacher" => User::where('role', 'teacher')->value('id'),
+            "course_id" => Course::inRandomOrder()->first()->id
         ];
     }
 }

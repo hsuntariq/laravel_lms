@@ -58,7 +58,7 @@ class staffController extends Controller
     }
 
 
-    public function storeUser(Request $request)
+    public function storeStudent(Request $request)
     {
         // Validate the incoming User data
         $validated = $request->validate([
@@ -91,7 +91,7 @@ class staffController extends Controller
             'image' => $validated['image'] ?? null,
             'course_assigned' => $validated['course_assigned'],
             'batch_assigned' => $validated['batch_assigned'],
-            'role' => 'User', // Role set to 'User'
+            'role' => 'student', // Role set to 'User'
         ]);
 
         return response()->json([
@@ -102,7 +102,7 @@ class staffController extends Controller
 
 
 
-    public function getBatchesUser(Request $request)
+    public function getBatchesStudent(Request $request)
     {
         $batches = Batch::where('course_id', $request->course_id)->get();
         return response()->json(['batches' => $batches]);
@@ -124,44 +124,77 @@ class staffController extends Controller
         }
 
         // Find the User
-        $User = User::findOrFail($id);
+        $user = User::findOrFail($id);
 
         // Update the User's information
-        $User->update([
+        $user->update([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
-            'batch_id' => $request->input('batch'),
+            'batch_assigned' => $request->input('batch'), // Assuming batch_assigned is the correct column
         ]);
 
         return response()->json(['status' => 'success', 'message' => 'User updated successfully']);
     }
 
-    // Delete User method
     public function deleteUser($id)
     {
         // Find the User
-        $User = User::findOrFail($id);
+        $user = User::findOrFail($id);
 
         // Delete the User
-        $User->delete();
+        $user->delete();
 
         return response()->json(['status' => 'success', 'message' => 'User deleted successfully']);
     }
 
-    // Fetch User details for editing
-    public function editUser($id)
+
+    public function editStudent($id)
     {
-        $User = User::findOrFail($id);
-        return response()->json($User);
+        // Find the user and load the necessary relationships like batch and course
+        $user = User::with(['studentBatch', 'studentCourse'])->findOrFail($id);
+
+        // Return the user details
+        return response()->json($user);
     }
 
 
-    public function getStudents()
-    {
-        $students = User::with(relations: 'batch.course')->where('role', 'student') // Assuming a relationship between student -> batch -> course
-            ->get();
 
-        // You can return it directly as JSON for API purposes, or pass it to a view
-        return response()->json($students);
+    public function getStudents(Request $request)
+    {
+        $query = User::where('role', 'student')->with(['studentBatch', 'studentCourse']);
+
+
+
+
+        // Apply course filter if provided
+        if ($request->has('course_id') && $request->course_id) {
+            $query->whereHas('studentCourse', function ($q) use ($request) {
+                $q->where('id', $request->course_id);
+            });
+        }
+
+        // Apply batch filter if provided
+        if ($request->has('batch_id') && $request->batch_id) {
+            $query->whereHas('studentBatch', function ($q) use ($request) {
+                $q->where('id', $request->batch_id);
+            });
+        }
+
+        // Paginate the results (default 8 students per page)
+        $students = $query->paginate(8);
+
+        if ($request->ajax()) {
+            // Render the student table and pagination separately for AJAX
+            $studentsHtml = view('staff.partials.students-table', compact('students'))->render();
+            $paginationHtml = view('staff.partials.student-pagination', compact('students'))->render();
+
+            return response()->json([
+                'studentsHtml' => $studentsHtml,
+                'students_pagination' => $paginationHtml,
+                "all_students" => User::where('role', 'student')->get()
+            ]);
+        }
+
+        return view('staff.pages.view-students', compact('students'));
     }
 }

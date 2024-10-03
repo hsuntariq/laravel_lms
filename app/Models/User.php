@@ -33,10 +33,16 @@ class User extends Authenticatable
 
 
 
-    public function batch()
+    public function studentBatch()
     {
-        return $this->belongsTo(Batch::class);
+        return $this->belongsTo(Batch::class, 'batch_assigned');
     }
+    public function studentCourse()
+    {
+        return $this->belongsTo(Course::class, 'course_assigned');
+    }
+
+
 
 
 

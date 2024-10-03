@@ -1,9 +1,29 @@
 <x-staff-dashboard-layout>
-    <!-- Include partial for table loader -->
-    @include('student.partials.table-loader')
+    <div class="">
+        <div class="d-flex align-items-center justify-content-between">
+            <h2 class="mb-2 display-5">View Students</h2>
+            <div class="filter d-flex w-50 align-items-centers gap-3">
+                {{-- <i class="bi bi-filter fs-3"></i> --}}
+                <select name="" class="form-control courses-select" id="">
+                    <option disabled selected>Select Course</option>
+                    {{-- populated by js --}}
+                </select>
+                <select name="" class="form-control batch-select" id="">
+                    {{-- populated by js according to the course selected --}}
+                    <option disabled selected>Select Batch</option>
+                </select>
+            </div>
+        </div>
+        <div class="underline w-25"></div>
+        <h6 class="text-purple my-3 total-students">
+
+        </h6>
+    </div>
+    <!-- Table Loader -->
+    @include('staff.partials.table-loader')
 
     <!-- Student Table -->
-    <div class="table-responsive student-table" style="height:85vh;overflow-y:scroll">
+    <div class="table-responsive student-table" style="height:85vh; overflow-y:scroll">
         <table class="table text-capitalize">
             <thead>
                 <tr>
@@ -20,38 +40,10 @@
                 <!-- Student rows will be populated by JS -->
             </tbody>
         </table>
-    </div>
-
-    <!-- Edit Student Modal (Hidden by default) -->
-    <div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editStudentModalLabel">Edit Student</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form class="student-edit-form">
-                        @csrf
-                        <input type="hidden" name="student_id" />
-                        <div class="form-group">
-                            <label for="student_name">Name</label>
-                            <input type="text" name="student_name" class="form-control" id="student_name" />
-                        </div>
-                        <div class="form-group">
-                            <label for="student_email">Email</label>
-                            <input type="email" name="student_email" class="form-control" id="student_email" />
-                        </div>
-                        <div class="form-group">
-                            <label for="batch">Batch</label>
-                            <select name="batch" class="form-control" id="batch">
-                                <!-- Populate with batches via JS -->
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary update-student-btn">Update Student</button>
-                    </form>
-                </div>
-            </div>
+        <div class="d-flex justify-content-between student-pagination">
+            {{ $students->links('pagination::bootstrap-4') }}
         </div>
     </div>
+    @include('staff.partials.edit-student')
+
 </x-staff-dashboard-layout>

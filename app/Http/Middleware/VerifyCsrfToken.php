@@ -13,6 +13,7 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         '/dashboard/student/upload-assignment',  // Add the specific route here
-        '/dashboard/teacher/mark-assignment'
+        '/dashboard/teacher/mark-assignment',
+        '/dashboard/staff/batches/add-batches',
     ];
 }

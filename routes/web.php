@@ -96,7 +96,9 @@ Route::prefix("/dashboard/staff/")->group(function () {
 
     Route::view('/student/add-student', 'staff.pages.add-students')->name('staff-add-students');
 
-    Route::view('/student/view-students', 'staff.pages.view-students')->name('staff-view-students');
+    Route::view('/get-students', 'staff.pages.view-students')->name('staff-view-students');
+
+
 
 
 
@@ -116,6 +118,8 @@ Route::prefix("/dashboard/staff/")->group(function () {
 
     Route::get('/batches/view-batches', [batchController::class, 'getBatches'])->name('staff-view-batches');
 
+    Route::get('/get-students', [staffController::class, 'getStudents'])->name('staff-view-students');
+
 
     Route::post('/update-batch/{id}', [BatchController::class, 'updateBatch'])->name('batches.update');
 
@@ -129,14 +133,22 @@ Route::prefix("/dashboard/staff/")->group(function () {
 
     Route::post('/get-batches', [StaffController::class, 'getBatchesStudent'])->name('staff.getBatches');
 
-    Route::get('/get-students', [staffController::class, 'getStudents'])->name('students.get');
+
 
     // Route to update a student
-    Route::post('/update-student/{id}', [staffController::class, 'updateStudent'])->name('students.update');
-
-    // Route to delete a student
-    Route::delete('/delete-student/{id}', [staffController::class, 'deleteStudent'])->name('students.delete');
 
     // Route to get a single student's details (for editing)
     Route::get('/edit-student/{id}', [staffController::class, 'editStudent'])->name('students.edit');
+
+
+    // Route to update user
+    Route::post('/update-student/{id}', [StaffController::class, 'updateUser'])->name('staff.updateUser');
+
+    // Route to delete user
+    Route::delete('/delete-student/{id}', [StaffController::class, 'deleteUser'])->name('staff.deleteUser');
+
+    // Route to fetch a user's details for editing
+    Route::get('/get-student/{id}', [StaffController::class, 'editUser'])->name('staff.editUser');
+
+    Route::get('/get-batches/{courseId}', [batchController::class, 'getBatches']);
 });

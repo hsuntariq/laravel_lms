@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Batch;
 use App\Models\Course;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -31,8 +32,10 @@ class UserFactory extends Factory
             "whatsapp" => fake()->numberBetween(20000, 50000),
             "image" => fake()->name,
             "gender" => fake()->randomElement(['male', 'female']),
-            // "course_assigned" => Course::inRandomOrder()->first()->course_name,
-            "role" => fake()->randomElement(['teacher', 'student', 'staff'])
+            "course_assigned" => Course::inRandomOrder()->first()->id,
+            "batch_assigned" =>
+            Batch::inRandomOrder()->first()->id,
+            "role" => 'student'
         ];
     }
 
