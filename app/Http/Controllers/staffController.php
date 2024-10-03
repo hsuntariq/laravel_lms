@@ -181,7 +181,7 @@ class staffController extends Controller
         }
 
         // Paginate the results (default 8 students per page)
-        $students = $query->paginate(8);
+        $students = $query->paginate(3);
 
         if ($request->ajax()) {
             // Render the student table and pagination separately for AJAX
@@ -191,7 +191,7 @@ class staffController extends Controller
             return response()->json([
                 'studentsHtml' => $studentsHtml,
                 'students_pagination' => $paginationHtml,
-                "all_students" => User::where('role', 'student')->get()
+                // "all_students" => User::where('role', 'student')->get()
             ]);
         }
 

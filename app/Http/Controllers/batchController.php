@@ -63,11 +63,11 @@ class batchController extends Controller
             // Filter batches by course_id
             $batches = Batch::where('course_id', $request->course_id)
                 ->with(['teachers', 'course'])
-                ->paginate(9);
+                ->paginate(3);
         } else {
             // If no course_id is provided, fetch all batches
             $batches = Batch::with(['teachers', 'course'])
-                ->paginate(9);
+                ->paginate(3);
         }
 
         if ($request->ajax()) {
@@ -76,6 +76,7 @@ class batchController extends Controller
 
             return response()->json([
                 'batchesHtml' => $batchesHtml,
+                'studentsHtml' => $batchesHtml,
                 'paginationHtml' => $paginationHtml,
                 'options' => $batches, // This will include the filtered batches based on the course
                 'course_id' => $request->course_id // This will include the filtered batches based on the course
