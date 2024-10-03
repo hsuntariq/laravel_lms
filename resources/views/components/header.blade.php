@@ -16,7 +16,9 @@
         <i class="bi bi-bell border rounded-circle d-flex justify-content-ceneter align-items-center p-2"></i>
         <div class="d-flex gap-1 align-items-center">
             <div class="bi bi-person border rounded-circle d-flex justify-content-ceneter align-items-center p-2"></div>
-            <h6 class='m-0'>Username</h6>
+            <h6 class='m-0 text-capitalize text-purple'>
+                {{ auth()->user()->name }}
+            </h6>
         </div>
         <i class="bi bi-chevron-down border rounded-circle d-flex justify-content-ceneter align-items-center p-2"></i>
 

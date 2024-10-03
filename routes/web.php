@@ -8,6 +8,7 @@ use App\Http\Controllers\courseController;
 use App\Http\Controllers\marksController;
 use App\Http\Controllers\staffController;
 use App\Http\Controllers\teacherDashboardController;
+use App\Http\Controllers\userController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -16,10 +17,10 @@ Route::get('/', function () {
 
 
 
-Route::prefix('/dashboard/student')->group(function () {
+Route::prefix('/dashboard/student')->middleware(['auth', 'student'])->group(function () {
     Route::view('/home/{id}', 'student.dashboard')->name('student-dashboard');
 
-    Route::view('/assignments', 'student.pages.assignments')->name('student-assignments');
+    Route::view('/assignments/{id}/{batch}', 'student.pages.assignments')->name('student-assignments');
 
     Route::view('/attendance/{id}', 'student.pages.attendance')->name('student-attendance');
 
@@ -33,7 +34,7 @@ Route::prefix('/dashboard/student')->group(function () {
 
     Route::get('/courses/{id}', [courseController::class, 'makeCharts'])->name('student-courses');
 
-    Route::get('/assignments-get/{batch}', [assignmentController::class, 'getAssignments'])->name('student-assignments-get');
+    Route::get('/assignments-get/{id}/{batch}', [assignmentController::class, 'getAssignments'])->name('student-assignments-get');
 
     Route::post('/upload-assignment', [assignmentController::class, 'uploadAssignmentStudent'])->name('student-upload-assignments');
 
@@ -42,7 +43,7 @@ Route::prefix('/dashboard/student')->group(function () {
     Route::get('/get-marks', [marksController::class, 'getMarks'])->name('get-student-marks');
 });
 
-Route::prefix('/dashboard/teacher')->group(function () {
+Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(function () {
     Route::view('/home/{id}', 'teacher.pages.dashboard')->name('teacher-dashboard');
 
     Route::view('/attendance/mark', 'teacher.pages.attendance')->name('teacher-attendance');
@@ -77,7 +78,7 @@ Route::prefix('/dashboard/teacher')->group(function () {
 
 
 
-Route::prefix("/dashboard/staff/")->group(function () {
+Route::prefix("/dashboard/staff/")->middleware(['auth', 'staff'])->group(function () {
     Route::view('/home/{id}', 'staff.pages.dashboard')->name('staff-dashboard');
 
     Route::view('/courses/view-courses/{id}', 'staff.pages.view-courses')->name('staff-view-courses');
@@ -151,4 +152,11 @@ Route::prefix("/dashboard/staff/")->group(function () {
     Route::get('/get-student/{id}', [StaffController::class, 'editUser'])->name('staff.editUser');
 
     Route::get('/get-batches/{courseId}', [batchController::class, 'getBatches']);
-});
+})->middleware(['auth', 'staff']);
+
+
+
+// user routes
+
+Route::post('/sign-in', [UserController::class, 'signIn'])->name('sign-in');
+Route::post('/sign-out', [UserController::class, 'signOut'])->name('sign-out');

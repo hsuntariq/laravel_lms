@@ -172,28 +172,24 @@ $(document).ready(function () {
     getAssignments();
 
     // Attach event listeners to file inputs and submit buttons
-    $(document)
-        .off("change", ".file-input")
-        .on("change", ".file-input", function () {
-            const submitBtn = $(this).closest("tr").find(".submit-btn");
-            if ($(this).val()) {
-                submitBtn.removeAttr("disabled").removeClass("btn-disabled");
-            } else {
-                submitBtn.addClass("btn-disabled").attr("disabled", "disabled");
-            }
-        });
+    $(document).on("change", ".file-input", function () {
+        const submitBtn = $(this).closest("tr").find(".submit-btn");
+        if ($(this).val()) {
+            submitBtn.removeAttr("disabled").removeClass("btn-disabled");
+        } else {
+            submitBtn.addClass("btn-disabled").attr("disabled", "disabled");
+        }
+    });
 
     // Handle assignment upload
-    $(document)
-        .off("click", ".submit-btn")
-        .on("click", ".submit-btn", function (e) {
-            e.preventDefault();
-            const form = $(this).closest("tr").find(".upload-form");
-            const input = $(this).closest("tr").find(".file-input");
-            const row = $(this).closest("tr");
-            const loader = $(this).closest("tr").find(".loading-submit");
-            addUploadAssignment(form, input, row, loader);
-        });
+    $(document).on("click", ".submit-btn", function (e) {
+        e.preventDefault();
+        const form = $(this).closest("tr").find(".upload-form");
+        const input = $(this).closest("tr").find(".file-input");
+        const row = $(this).closest("tr");
+        const loader = $(this).closest("tr").find(".loading-submit");
+        addUploadAssignment(form, input, row, loader);
+    });
 
     // Add assignment upload function
     function addUploadAssignment(form, input, row, loader) {
@@ -368,36 +364,30 @@ $(document).ready(function () {
         checkFormCompletion();
 
         // Image preview functionality
-        $(document)
-            .off("change", 'input[name="image"]')
-            .on("change", 'input[name="image"]', function (e) {
-                let reader = new FileReader();
-                reader.onload = function (e) {
-                    $("#image-preview").attr("src", e.target.result).show();
-                };
-                reader.readAsDataURL(e.target.files[0]);
-            });
+        $('input[name="image"]').on("change", function (e) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                $("#image-preview").attr("src", e.target.result).show();
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        });
 
         // Password show/hide functionality
-        $(document)
-            .off("click", ".toggle-password")
-            .on("click", ".toggle-password", function () {
-                let passwordInput = $(this)
-                    .closest(".form-control")
-                    .find('input[name="password"]');
-                let icon = $(this).find("i");
-                let isPassword = passwordInput.attr("type") === "password";
+        $(".toggle-password").on("click", function () {
+            let passwordInput = $(this)
+                .closest(".form-control")
+                .find('input[name="password"]');
+            let icon = $(this).find("i");
+            let isPassword = passwordInput.attr("type") === "password";
 
-                passwordInput.attr("type", isPassword ? "text" : "password");
-                icon.toggleClass("bi-eye bi-eye-slash");
-            });
+            passwordInput.attr("type", isPassword ? "text" : "password");
+            icon.toggleClass("bi-eye bi-eye-slash");
+        });
 
         // Hide flash messages
-        $(document)
-            .off("click", ".AllowBtn")
-            .on("click", ".AllowBtn", function () {
-                $(".flash").fadeOut();
-            });
+        $(".AllowBtn").click(function () {
+            $(".flash").fadeOut();
+        });
     });
 
     // Get marks function
@@ -467,12 +457,10 @@ $(document).ready(function () {
     }
 
     // Add course
-    $(document)
-        .off("click", ".course-btn")
-        .on("click", ".course-btn", function (e) {
-            e.preventDefault();
-            addCourse();
-        });
+    $(".course-btn").click(function (e) {
+        e.preventDefault();
+        addCourse();
+    });
 
     function addCourse() {
         $(".course-loading").show();
@@ -568,12 +556,10 @@ $(document).ready(function () {
     }
 
     // Add instructor
-    $(document)
-        .off("click", ".teacher-btn")
-        .on("click", ".teacher-btn", function (e) {
-            e.preventDefault();
-            addInstructor();
-        });
+    $(".teacher-btn").click(function (e) {
+        e.preventDefault();
+        addInstructor();
+    });
 
     function addInstructor() {
         $(".teacher-loading").show();
@@ -624,15 +610,12 @@ $(document).ready(function () {
     }
 
     // Check form completion
-    $(document)
-        .off("input change", ".teacher-form input, .teacher-form select")
-        .on(
-            "input change",
-            ".teacher-form input, .teacher-form select",
-            function () {
-                checkFormCompletion();
-            }
-        );
+    $(".teacher-form input, .teacher-form select").on(
+        "input change",
+        function () {
+            checkFormCompletion();
+        }
+    );
 
     function checkFormCompletion() {
         let allFilled = $(".teacher-form input, .teacher-form select")
@@ -703,47 +686,40 @@ $(document).ready(function () {
         });
 
         // Fetch teachers based on selected course
-        $(document)
-            .off("change", 'select[name="course_name_batch"]')
-            .on("change", 'select[name="course_name_batch"]', function () {
-                const course_id = $(this).val();
-                $(".teacher-skeleton").show(); // Show loading indicator for teachers
-                $("select[name='teacher_assigned']").hide(); // Hide the teacher select while loading
+        $('select[name="course_name_batch"]').change(function () {
+            const course_id = $(this).val();
+            $(".teacher-skeleton").show(); // Show loading indicator for teachers
+            $("select[name='teacher_assigned']").hide(); // Hide the teacher select while loading
 
-                $.ajax({
-                    url: "/dashboard/staff/get-teachers",
-                    type: "POST",
-                    data: {
-                        course_id,
-                        _token: $('input[name="_token"]').val(),
-                    },
-                    success: function (response) {
-                        let teacherOptions =
-                            "<option disabled selected>Select Teacher</option>" +
-                            response
-                                .map(
-                                    (teacher) =>
-                                        `<option value="${teacher.id}">${teacher.name}</option>`
-                                )
-                                .join("");
-                        $('select[name="teacher_assigned"]')
-                            .html(teacherOptions)
-                            .show(); // Show the select after populating
-                    },
-                    error: function (xhr) {
-                        console.error(xhr.statusText);
-                    },
-                    complete: function () {
-                        $(".teacher-skeleton").hide(); // Hide loading indicator for teachers
-                        checkFormValidity();
-                    },
-                });
+            $.ajax({
+                url: "/dashboard/staff/get-teachers",
+                type: "POST",
+                data: { course_id, _token: $('input[name="_token"]').val() },
+                success: function (response) {
+                    let teacherOptions =
+                        "<option disabled selected>Select Teacher</option>" +
+                        response
+                            .map(
+                                (teacher) =>
+                                    `<option value="${teacher.id}">${teacher.name}</option>`
+                            )
+                            .join("");
+                    $('select[name="teacher_assigned"]')
+                        .html(teacherOptions)
+                        .show(); // Show the select after populating
+                },
+                error: function (xhr) {
+                    console.error(xhr.statusText);
+                },
+                complete: function () {
+                    $(".teacher-skeleton").hide(); // Hide loading indicator for teachers
+                    checkFormValidity();
+                },
             });
+        });
 
         // Check if both course and teacher are selected
-        $(document)
-            .off("change", 'select[name="teacher_assigned"]')
-            .on("change", 'select[name="teacher_assigned"]', checkFormValidity);
+        $('select[name="teacher_assigned"]').change(checkFormValidity);
 
         // Add batch form submission
         $(".batch-btn")
@@ -831,38 +807,34 @@ $(document).ready(function () {
         loadBatches(1); // Load first page of batches on page load
 
         // Handle pagination click
-        $(document)
-            .off("click", ".batch-pagination .pagination a")
-            .on("click", ".batch-pagination .pagination a", function (e) {
+        $(document).on(
+            "click",
+            ".batch-pagination .pagination a",
+            function (e) {
                 e.preventDefault();
                 const page = $(this).attr("href").split("page=")[1];
                 loadBatches(page);
-            });
+            }
+        );
 
         // Update batch modal
-        $(document)
-            .off("click", ".update-btn")
-            .on("click", ".update-btn", function () {
-                const batchId = $(this).data("id");
-                fetchBatchDetails(batchId);
-            });
+        $(document).on("click", ".update-btn", function () {
+            const batchId = $(this).data("id");
+            fetchBatchDetails(batchId);
+        });
 
         // Fetch teachers when course changes
-        $(document)
-            .off("change", "#courseAssigned")
-            .on("change", "#courseAssigned", function () {
-                const courseId = $(this).val();
-                fetchTeachersAndDuration(courseId);
-            });
+        $(document).on("change", "#courseAssigned", function () {
+            const courseId = $(this).val();
+            fetchTeachersAndDuration(courseId);
+        });
 
         // Save batch changes
-        $(document)
-            .off("click", "#saveBatchBtn")
-            .on("click", "#saveBatchBtn", function () {
-                const batchId = $("#batchId").val();
-                const formData = getBatchFormData();
-                saveBatch(batchId, formData);
-            });
+        $("#saveBatchBtn").click(function () {
+            const batchId = $("#batchId").val();
+            const formData = getBatchFormData();
+            saveBatch(batchId, formData);
+        });
 
         // Delete batch
         $(document).on("click", ".delete-btn", function (e) {
@@ -1037,48 +1009,42 @@ $(document).ready(function () {
         });
 
         // Image preview
-        $(document)
-            .off("change", "#image")
-            .on("change", "#image", function () {
-                const file = this.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        $("#image-preview").attr("src", e.target.result).show();
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
+        $("#image").change(function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    $("#image-preview").attr("src", e.target.result).show();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 
         // Fetch batches based on selected course
-        $(document)
-            .off("change", "#course_assigned")
-            .on("change", "#course_assigned", function () {
-                const courseId = $(this).val();
-                $("#batch_assigned").html(
-                    "<option>Loading batches...</option>"
-                );
+        $("#course_assigned").change(function () {
+            const courseId = $(this).val();
+            $("#batch_assigned").html("<option>Loading batches...</option>");
 
-                $.ajax({
-                    url: "/dashboard/staff/get-batches",
-                    type: "POST",
-                    data: {
-                        course_id: courseId,
-                        _token: $('input[name="_token"]').val(),
-                    },
-                    success: function (response) {
-                        let batchOptions =
-                            "<option disabled selected>Loading batches...</option>";
-                        response.batches.forEach(function (batch) {
-                            batchOptions += `<option value="${batch.id}">${batch.batch_no}</option>`;
-                        });
-                        $("#batch_assigned").html(batchOptions);
-                    },
-                    error: function (xhr) {
-                        console.error(xhr.statusText);
-                    },
-                });
+            $.ajax({
+                url: "/dashboard/staff/get-batches",
+                type: "POST",
+                data: {
+                    course_id: courseId,
+                    _token: $('input[name="_token"]').val(),
+                },
+                success: function (response) {
+                    let batchOptions =
+                        "<option disabled selected>Loading batches...</option>";
+                    response.batches.forEach(function (batch) {
+                        batchOptions += `<option value="${batch.id}">${batch.batch_no}</option>`;
+                    });
+                    $("#batch_assigned").html(batchOptions);
+                },
+                error: function (xhr) {
+                    console.error(xhr.statusText);
+                },
             });
+        });
     });
 
     // add student
@@ -1087,15 +1053,12 @@ $(document).ready(function () {
         $(".student-btn").attr("disabled", true).addClass("btn-disabled");
         $(".student-loading").hide();
         // Monitor the form fields for changes to enable the submit button
-        $(document)
-            .off("input change", ".student-form input, .student-form select")
-            .on(
-                "input change",
-                ".student-form input, .student-form select",
-                function () {
-                    checkFormValidity();
-                }
-            );
+        $(".student-form input, .student-form select").on(
+            "input change",
+            function () {
+                checkFormValidity();
+            }
+        );
 
         // Add student form submission
         $(".student-btn")
@@ -1216,12 +1179,10 @@ $(document).ready(function () {
     }
 
     // Fetch teachers after selecting a course
-    $(document)
-        .off("change", "select[name='course_name']")
-        .on("change", "select[name='course_name']", function () {
-            const courseId = $(this).val();
-            fetchTeachers(courseId);
-        });
+    $("select[name='course_name']").change(function () {
+        const courseId = $(this).val();
+        fetchTeachers(courseId);
+    });
 
     function fetchTeachers(courseId) {
         $.ajax({
@@ -1257,166 +1218,152 @@ $(document).ready(function () {
     fetchCourses();
 });
 
+function loadStudents(page = 1) {
+    let courseId = $(".courses-select").val() || "";
+    let batchId = $(".batch-select").val() || "";
+
+    // Show loading spinner and hide the student table
+    $(".staff-loader").show();
+    $(".student-table").hide();
+
+    $.ajax({
+        url: `/dashboard/staff/get-students`,
+        type: "GET",
+        data: {
+            page: page,
+            course_id: courseId, // Send selected course to server
+            batch_id: batchId, // Send selected batch to server
+        },
+        success: function (response) {
+            // Check if there are any students to display
+            console.log(response);
+            if (response.studentsHtml) {
+                $(".students").html(response.studentsHtml); // Update student table with the fetched data
+            } else {
+                // Show 'No Students' message if no data found
+                $(".students").html(
+                    `<tr>
+                            <th class='text-center' colspan="7"> No Students in this batch</th>
+                        </tr>`
+                );
+            }
+            $(".pagination").html(response.students_pagination); // Update pagination with the response
+        },
+        complete: function () {
+            // Hide the loader and show the student table after the request is complete
+            $(".staff-loader").hide();
+            $(".student-table").show();
+        },
+        error: function (xhr) {
+            console.error(xhr.statusText);
+            alert("Error loading students. Please try again.");
+            // Handle error if needed (e.g., show error message or retry option)
+        },
+    });
+}
+
 // Fetch and display students
 $(document).ready(function () {
-    console.log("document readt");
     // Initial load of students on page load
     loadStudents(1);
 
     // Function to load students based on filters (course, batch, and pagination)
-    function loadStudents(page = 1) {
-        let courseId = $(".courses-select").val() || "";
-        let batchId = $(".batch-select").val() || "";
+    // Load batches when course is selected
+    $(document).on("change", ".courses-select", function () {
+        let courseId = $(this).val();
+        // if (!courseId) return; // Prevent AJAX call if no course is selected
 
-        // Show loading spinner and hide the student table
+        // Show loader while fetching batches and students
         $(".staff-loader").show();
         $(".student-table").hide();
 
+        // Fetch batches for the selected course
         $.ajax({
-            url: `/dashboard/staff/get-students`,
+            url: `/dashboard/staff/get-batches/${courseId}`,
             type: "GET",
             data: {
-                page: page,
                 course_id: courseId,
-                batch_id: batchId,
+            },
+            beforeSend: function () {
+                $(".batch-select").html(
+                    "<option disabled selected>Loading batches...</option>"
+                );
             },
             success: function (response) {
+                let batchOptions =
+                    "<option disabled selected>Select Batch</option>";
+                // Populate batch dropdown based on the selected course
+                response.options.data.forEach(function (batch) {
+                    batchOptions += `<option value="${batch.id}">${batch.batch_no}</option>`;
+                });
+                $(".batch-select").html(batchOptions); // Update the batch select options
                 console.log(response);
-
-                // Ensure the response contains the necessary properties
-                if (
-                    response &&
-                    response.studentsHtml &&
-                    response.students_pagination
-                ) {
-                    $(".students").html(response.studentsHtml); // Populate the table
-                    $(".pagination").html(response.students_pagination); // Populate pagination
-                } else {
-                    // Handle cases where the response format is unexpected
-                    $(".students").html(
-                        `<tr>
-                                <th class='text-center' colspan="7"> No Students in this batch</th>
-                            </tr>`
-                    );
-                    console.error("Unexpected response format:", response);
-                }
+                $(".total-students").html(
+                    `Total Students(${response.options.data.length})`
+                );
             },
             complete: function () {
-                // Hide the loader and show the student table after the request completes
+                // Hide the loader and show the student table after fetching batches
                 $(".staff-loader").hide();
                 $(".student-table").show();
             },
             error: function (xhr) {
-                console.error("Error loading students:", xhr.statusText);
-                alert("Error loading students. Please try again.");
+                console.error("Error loading batches", xhr.statusText);
+                alert("Error loading batches. Please try again.");
             },
         });
-    }
 
-    // Load batches when a course is selected
-    $(document)
-        .off("change", ".courses-select")
-        .on("change", ".courses-select", function () {
-            let courseId = $(this).val();
-
-            $(".staff-loader").show();
-            $(".student-table").hide();
-
-            // Fetch batches for the selected course
-            $.ajax({
-                url: `/dashboard/staff/get-batches/${courseId}`,
-                type: "GET",
-                beforeSend: function () {
-                    $(".batch-select").html(
-                        "<option disabled selected>Loading batches...</option>"
-                    );
-                },
-                success: function (response) {
-                    console.log(response);
-
-                    if (response.studentsHtml) {
-                        $(".students").html(response.studentsHtml); // Populate the table
-                    } else {
-                        $(".students").html(
-                            `<tr>
-                    <th class='text-center' colspan="7"> No Students in this batch</th>
-                </tr>`
-                        );
-                    }
-
-                    if (response.students_pagination) {
-                        $(".pagination").html(response.students_pagination); // Populate pagination
-                    } else {
-                        $(".pagination").html(""); // Clear pagination if not available
-                    }
-                },
-                complete: function () {
-                    $(".staff-loader").hide();
-                    $(".student-table").show();
-                },
-                error: function (xhr) {
-                    console.error("Error loading batches:", xhr.statusText);
-                    alert("Error loading batches. Please try again.");
-                },
-            });
-
-            // Reset batch selection and load students after changing the course
-            $(".batch-select").html(
-                "<option disabled selected>Loading batches...</option>"
-            );
-            loadStudents(1); // Reload students after selecting a new course
-        });
+        // Reset batch selection and load students after changing the course
+        $(".batch-select").html(
+            "<option disabled selected>Loading batches...</option>"
+        );
+        loadStudents(1); // Reload students after selecting a new course
+    });
 
     // Load students when a batch is selected
-    $(document)
-        .off("change", ".batch-select")
-        .on("change", ".batch-select", function () {
-            loadStudents(1); // Reload students after changing the batch
-        });
+    $(document).on("change", ".batch-select", function () {
+        loadStudents(1); // Reload students after changing the batch
+    });
 
     // Event handler for pagination click
-    $(document)
-        .off("click", ".student-pagination .pagination a")
-        .on("click", ".student-pagination .pagination a", function (e) {
-            e.preventDefault();
-            let page = $(this).attr("href").split("page=")[1];
-            loadStudents(page); // Load students for the selected page in pagination
-        });
+    $(document).on("click", ".student-pagination .pagination a", function (e) {
+        e.preventDefault();
+        let page = $(this).attr("href").split("page=")[1];
+        loadStudents(page); // Load students for the selected page in pagination
+    });
 });
 
 // Event handler for deleting a student
-$(document)
-    .off("click", ".delete-student")
-    .on("click", ".delete-student", function (e) {
-        e.preventDefault();
-        let studentId = $(this).data("id");
-        $(this).attr("disabled", true).text("Deleting...");
+$(document).on("click", ".delete-student", function (e) {
+    e.preventDefault();
+    let studentId = $(this).data("id");
+    $(this).attr("disabled", true).text("Deleting...");
 
-        if (confirm("Are you sure you want to delete this student?")) {
-            $.ajax({
-                url: "/dashboard/staff/delete-student/" + studentId,
-                type: "DELETE",
-                data: {
-                    _token: $('meta[name="csrf-token"]').attr("content"), // CSRF token
-                },
-                beforeSend: function () {
-                    // Show a loading message or spinner if necessary
-                    $(`.delete-student[data-id="${studentId}"]`)
-                        .attr("disabled", true)
-                        .text("Deleting...");
-                },
-                success: function (response) {
-                    $(".flash").show();
-                    $(".notificationPara").html("Deleted Successfully!");
-                    loadStudents(1); // Reload students after delete
-                },
+    if (confirm("Are you sure you want to delete this student?")) {
+        $.ajax({
+            url: "/dashboard/staff/delete-student/" + studentId,
+            type: "DELETE",
+            data: {
+                _token: $('meta[name="csrf-token"]').attr("content"), // CSRF token
+            },
+            beforeSend: function () {
+                // Show a loading message or spinner if necessary
+                $(`.delete-student[data-id="${studentId}"]`)
+                    .attr("disabled", true)
+                    .text("Deleting...");
+            },
+            success: function (response) {
+                $(".flash").show();
+                $(".notificationPara").html("Deleted Successfully!");
+                loadStudents(1); // Reload students after delete
+            },
 
-                error: function (xhr) {
-                    showFlashMessage("Error deleting student.", "danger");
-                },
-            });
-        }
-    });
+            error: function (xhr) {
+                showFlashMessage("Error deleting student.", "danger");
+            },
+        });
+    }
+});
 
 // Flash message function
 function showFlashMessage(message, type) {
@@ -1437,6 +1384,7 @@ function loadStudentForEdit(studentId) {
             // $(".modal-body").html(`<p>Loading student details...</p>`);
         },
         success: function (student) {
+            console.log(student);
             // Populate the form fields with the student's data
             $('input[name="student_id"]').val(student.id);
             $('input[name="student_name"]').val(student.name);
@@ -1535,44 +1483,35 @@ $(document).ready(function () {
     fetchCourses();
 
     // Load student details into the edit modal
-    $(document)
-        .off("click", ".edit-student")
-        .on("click", ".edit-student", function (e) {
-            e.preventDefault();
-            let studentId = $(this).data("id");
+    $(document).on("click", ".edit-student", function (e) {
+        e.preventDefault();
+        let studentId = $(this).data("id");
 
-            $.ajax({
-                url: `/dashboard/staff/edit-student/${studentId}`,
-                type: "GET",
-                beforeSend: function () {
-                    // Show the modal and reset the form
-                    $("#editStudentModal").modal("show");
-                    $("#edit_course").html(
-                        "<option>Loading courses...</option>"
-                    );
-                    $("#edit_batch").html(
-                        "<option>Loading batches...</option>"
-                    );
-                },
-                success: function (response) {
-                    // Populate the form fields with the student's current data
-                    $("#edit_student_id").val(response.id);
-                    $("#edit_student_name").val(response.name);
-                    $("#edit_student_email").val(response.email);
-                    $("#edit_student_whatsapp").val(response.whatsapp);
-                    $("#edit_student_gender").val(response.gender);
+        $.ajax({
+            url: `/dashboard/staff/edit-student/${studentId}`,
+            type: "GET",
+            beforeSend: function () {
+                // Show the modal and reset the form
+                $("#editStudentModal").modal("show");
+                $("#edit_course").html("<option>Loading courses...</option>");
+                $("#edit_batch").html("<option>Loading batches...</option>");
+            },
+            success: function (response) {
+                // Populate the form fields with the student's current data
+                $("#edit_student_id").val(response.id);
+                $("#edit_student_name").val(response.name);
+                $("#edit_student_email").val(response.email);
+                $("#edit_student_whatsapp").val(response.whatsapp);
+                $("#edit_student_gender").val(response.gender);
 
-                    // Load courses into the dropdown
-                    fetchCourses(
-                        response.course_assigned,
-                        response.batch_assigned
-                    );
-                },
-                error: function () {
-                    alert("Error loading student details");
-                },
-            });
+                // Load courses into the dropdown
+                fetchCourses(response.course_assigned, response.batch_assigned);
+            },
+            error: function () {
+                alert("Error loading student details");
+            },
         });
+    });
 
     // Fetch courses and populate the dropdown
     function fetchCourses(selectedCourseId = null, selectedBatchId = null) {
@@ -1595,11 +1534,9 @@ $(document).ready(function () {
                 $("#edit_course").html(coursesHtml);
                 $(".courses-select").html(coursesHtml);
                 // Fetch batches based on the selected course
-                $(document)
-                    .off("change", "#edit_course")
-                    .on("change", "#edit_course", function () {
-                        fetchBatches(selectedCourseId, selectedBatchId);
-                    });
+                $("#edit_course").on("change", function () {
+                    fetchBatches(selectedCourseId, selectedBatchId);
+                });
             },
             error: function () {
                 $("#edit_course").html(
@@ -1619,6 +1556,7 @@ $(document).ready(function () {
                 _token: $('input[name="_token"]').val(), // Include CSRF token
             },
             success: function (response) {
+                console.log(response);
                 let batchesHtml =
                     "<option disabled selected>Loading batches...</option>";
                 response.batches.forEach((batch) => {
@@ -1635,11 +1573,9 @@ $(document).ready(function () {
     }
 
     // Enable/disable update button based on form validity
-    $(document)
-        .off("change keyup", "input, select")
-        .on("change keyup", "input, select", function () {
-            checkFormValidity();
-        });
+    $("input, select").on("change keyup", function () {
+        checkFormValidity();
+    });
 
     function checkFormValidity() {
         const name = $("#edit_student_name").val();
@@ -1689,3 +1625,150 @@ $(document).ready(function () {
         });
     });
 });
+
+// Sign Up User
+function signUpUser(username, email, password) {
+    $.ajax({
+        url: "/sign-up",
+        type: "POST",
+        dataType: "json",
+        data: {
+            username: username,
+            email: email,
+            password: password,
+            _token: $('meta[name="csrf-token"]').attr("content"), // CSRF token
+        },
+        success: function (response) {
+            alert(response.message);
+            // Handle success (e.g., redirect to home or dashboard)
+        },
+        error: function (xhr) {
+            alert(xhr.responseJSON.message || "Error occurred during sign up.");
+        },
+    });
+}
+
+// Sign In User
+function signInUser(email, password) {
+    $(".sign-in-btn").attr("disabled", true);
+    $(".sign-in-btn").addClass("btn-disabled");
+    $(".sign-in-btn").html(`<img class="batch-loading"
+                src="https://discuss.wxpython.org/uploads/default/original/2X/6/6d0ec30d8b8f77ab999f765edd8866e8a97d59a3.gif"
+                width="20px" alt="Signing In loading"> Signing in...`);
+
+    $.ajax({
+        url: "/sign-in",
+        type: "POST",
+        dataType: "json",
+        beforeSend: function () {
+            $(".text-danger").remove();
+            $(".error-message").removeClass("is-invalid");
+        },
+        data: {
+            email: email,
+            password: password,
+            _token: $('meta[name="csrf-token"]').attr("content"), // CSRF token
+        },
+        success: function (response) {
+            // alert(response.message);
+            // Handle success (e.g., redirect to dashboard)
+            if (response.role == "student") {
+                window.location.assign(
+                    `/dashboard/student/home/${response?.user?.id}`
+                );
+            } else if (response.role == "teacher") {
+                window.location.assign(
+                    `/dashboard/teacher/home/${response?.user?.id}`
+                );
+            } else if (response.role == "staff") {
+                window.location.assign(
+                    `/dashboard/staff/home/${response?.user?.id}`
+                );
+            }
+        },
+        error: function (xhr) {
+            if (xhr.status === 422) {
+                let errors = xhr.responseJSON.errors;
+                let index = 0;
+                $.each(errors, function (key, messages) {
+                    messages.forEach(function (message) {
+                        $(`input[name="${key}"]`)
+                            .closest(".d-flex")
+                            .after(
+                                `<p class='text-danger p-0 m-0 fw-semibold'>
+                                ${message}
+                            </p>`
+                            );
+                    });
+                    index++;
+                });
+                $(".error-message").addClass("is-invalid");
+            } else {
+                $(".invalid").text(
+                    xhr.responseJSON.message || "Invalid Credentials"
+                );
+                $(".error-message").addClass("is-invalid");
+                $(".invalid").addClass("text-danger");
+            }
+        },
+        complete: function () {
+            $(".sign-in-btn").attr("disabled", false);
+            $(".sign-in-btn").removeClass("btn-disabled");
+            $(".sign-in-btn").text("Sign In");
+        },
+    });
+}
+
+// Sign Out User
+function signOutUser() {
+    $.ajax({
+        url: "/sign-out",
+        type: "POST",
+        dataType: "json",
+        data: {
+            _token: $('meta[name="csrf-token"]').attr("content"), // CSRF token
+        },
+        success: function (response) {
+            alert(response.message);
+            // Handle logout (e.g., redirect to login)
+        },
+        error: function (xhr) {
+            alert("Error occurred during sign out.");
+        },
+    });
+}
+
+// Add New Admin
+function addNewAdmin(username, email, password, role) {
+    $.ajax({
+        url: "/add-admin",
+        type: "POST",
+        dataType: "json",
+        data: {
+            username: username,
+            email: email,
+            password: password,
+            role: role,
+            _token: $('meta[name="csrf-token"]').attr("content"), // CSRF token
+        },
+        success: function (response) {
+            alert(response.message);
+            // Handle admin addition (e.g., update admin list)
+        },
+        error: function (xhr) {
+            alert(
+                xhr.responseJSON.message || "Error occurred while adding admin."
+            );
+        },
+    });
+}
+
+// Bind the sign-up form submission
+$(".sign-in-form").on("submit", function (e) {
+    e.preventDefault();
+    let email = $(".email").val();
+    let password = $(".password").val();
+    signInUser(email, password);
+});
+
+// Similarly, you can bind other functions to their respective forms or buttons.

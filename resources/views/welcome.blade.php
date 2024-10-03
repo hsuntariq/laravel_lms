@@ -20,27 +20,31 @@
                     @csrf
                     <h2>Sign In</h2>
                     <div class="form-group">
-                        <div class="d-flex form-control my-2">
+                        <div class="d-flex form-control my-2 error-message">
                             <div class="bi text-purple bi-person"></div>
-                            <input type="text" placeholder="Enter username or email or phone number..."
-                                class="w-100 border-0 outline-none text-purple">
+                            <input type="text" name="email"
+                                placeholder="Enter username or email or phone number..."
+                                class="w-100 border-0 outline-none text-purple email">
                         </div>
-                        <div class="d-flex form-control my-2">
+                        <div class="d-flex form-control my-2 error-message">
                             <div class="bi text-purple bi-lock"></div>
 
-                            <input type="password" placeholder="Enter Password..."
-                                class="w-100 border-0 outline-none text-purple">
+                            <input type="password" name="password" placeholder="Enter Password..."
+                                class="w-100 border-0 outline-none text-purple password">
                             <span>
                                 <div class="bi text-purple bi-eye"></div>
                             </span>
                         </div>
-                        <a href="" class="text-purple text-decoration-none my-2 fw-semibold">
+                        <h6 class="invalid"></h6>
+                        <a href="" class="text-purple  text-decoration-none my-2 fw-semibold">
                             Forgot your password?
                         </a><br>
-                        <button class="btn my-2 btn-purple">
+                        <button class="btn sign-in-btn my-2 btn-purple">
                             Sign In
                         </button>
                     </div>
+
+
                 </form>
             </div>
             <div class="col-lg-6">

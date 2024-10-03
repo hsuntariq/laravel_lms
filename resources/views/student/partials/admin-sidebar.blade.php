@@ -12,7 +12,7 @@
             })
                 ? 'text-white'
                 : 'text-dark' }}"
-                href="{{ route('student-dashboard', ['id' => 1]) }}">
+                href="{{ route('student-dashboard', ['id' => auth()->user()->id]) }}">
                 Dashboard
             </a>
         </h6>
@@ -30,7 +30,7 @@
             })
                 ? 'text-white'
                 : 'text-dark' }}"
-                href="{{ route('student-courses', ['id' => 1]) }}">
+                href="{{ route('student-courses', ['id' => auth()->user()->id]) }}">
                 Courses
             </a>
         </h6>
@@ -48,7 +48,7 @@
             })
                 ? 'text-white'
                 : 'text-dark' }}"
-                href="{{ route('student-assignments', ['batch' => 5]) }}">
+                href="{{ route('student-assignments', ['id' => auth()->user()->id, 'batch' => auth()->user()->batch_assigned]) }}">
                 Assignments
             </a>
         </h6>
@@ -66,7 +66,7 @@
             })
                 ? 'text-white'
                 : 'text-dark' }}"
-                href="{{ route('student-marks', ['id' => 5]) }}">
+                href="{{ route('student-marks', ['id' => auth()->user()->id]) }}">
                 Marks
             </a>
         </h6>
@@ -84,7 +84,7 @@
             })
                 ? 'text-white'
                 : 'text-dark' }}"
-                href="{{ route('student-attendance', ['id' => 1]) }}">
+                href="{{ route('student-attendance', ['id' => auth()->user()->id]) }}">
                 Attendance
             </a>
         </h6>
@@ -102,7 +102,7 @@
             })
                 ? 'text-white'
                 : 'text-dark' }}"
-                href="{{ route('student-settings', ['id' => 1]) }}">
+                href="{{ route('student-settings', ['id' => auth()->user()->id]) }}">
                 Settings
             </a>
         </h6>
