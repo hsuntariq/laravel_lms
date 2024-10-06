@@ -1197,13 +1197,9 @@ $(document).ready(function () {
     fetchCourses();
 });
 
-// Fetch and display students
-$(document).ready(function () {
-    // Initial load of students on page load
-    loadStudents(1);
 
-    // Function to load students based on filters (course, batch, and pagination)
-    function loadStudents(page = 1) {
+
+function loadStudents(page = 1) {
         let courseId = $(".courses-select").val() || '';
         let batchId = $(".batch-select").val() || '';
 
@@ -1221,6 +1217,7 @@ $(document).ready(function () {
             },
             success: function (response) {
                 // Check if there are any students to display
+                console.log(response)
                 if (response.studentsHtml) {
                     $(".students").html(response.studentsHtml);   // Update student table with the fetched data
                 } else {
@@ -1247,6 +1244,13 @@ $(document).ready(function () {
         });
     }
 
+
+// Fetch and display students
+$(document).ready(function () {
+    // Initial load of students on page load
+    loadStudents(1);
+
+    // Function to load students based on filters (course, batch, and pagination)
     // Load batches when course is selected
     $(document).on("change", ".courses-select", function () {
         let courseId = $(this).val();
@@ -1597,3 +1601,152 @@ $(document).ready(function () {
         });
     });
 });
+
+
+
+
+
+// Sign Up User
+function signUpUser(username, email, password) {
+    $.ajax({
+        url: '/sign-up',
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            username: username,
+            email: email,
+            password: password,
+            _token: $('meta[name="csrf-token"]').attr('content') // CSRF token
+        },
+        success: function(response) {
+            alert(response.message);
+            // Handle success (e.g., redirect to home or dashboard)
+        },
+        error: function(xhr) {
+            alert(xhr.responseJSON.message || 'Error occurred during sign up.');
+        }
+    });
+}
+
+// Sign In User
+function signInUser(email, password) {
+     $('.sign-in-btn').attr('disabled',true)
+    $('.sign-in-btn').addClass('btn-disabled')
+    $('.sign-in-btn').html(`<img class="batch-loading"
+                src="https://discuss.wxpython.org/uploads/default/original/2X/6/6d0ec30d8b8f77ab999f765edd8866e8a97d59a3.gif"
+                width="20px" alt="Signing In loading"> Signing in...`)
+
+    $.ajax({
+        url: '/sign-in',
+        type: 'POST',
+        dataType: 'json',
+        beforeSend: function () {
+            $('.text-danger').remove()
+            $('.error-message').removeClass('is-invalid')
+        },
+        data: {
+            email: email,
+            password: password,
+            _token: $('meta[name="csrf-token"]').attr('content') // CSRF token
+        },
+        success: function(response) {
+            // alert(response.message);
+            // Handle success (e.g., redirect to dashboard)
+            if (response.role == 'student') {
+                window.location.assign(`/dashboard/student/home/${response?.user?.id}`)
+            } else if (response.role == 'teacher') {
+                window.location.assign(`/dashboard/teacher/home/${response?.user?.id}`)
+            }else if (response.role == 'staff') {
+                window.location.assign(`/dashboard/staff/home/${response?.user?.id}`)
+            }
+
+        },
+        error: function(xhr) {
+            if (xhr.status === 422) {
+                let errors = xhr.responseJSON.errors;
+                let index = 0
+                $.each(errors, function(key, messages) {
+
+                    messages.forEach(function(message) {
+                        $(`input[name="${key}"]`).closest('.d-flex').after(
+                            `<p class='text-danger p-0 m-0 fw-semibold'>
+                                ${message}
+                            </p>`
+                        )
+                    });
+                    index++
+                });
+                $('.error-message').addClass('is-invalid')
+
+
+            } else {
+                $('.invalid').text(xhr.responseJSON.message || 'Invalid Credentials')
+                $('.error-message').addClass('is-invalid')
+                $('.invalid').addClass('text-danger')
+            }
+        },
+         complete: function () {
+            $('.sign-in-btn').attr('disabled',false)
+            $('.sign-in-btn').removeClass('btn-disabled')
+            $('.sign-in-btn').text('Sign In')
+
+        }
+    });
+}
+
+// Sign Out User
+function signOutUser() {
+
+    $.ajax({
+        url: '/sign-out',
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content') // CSRF token
+        },
+        success: function(response) {
+            alert(response.message);
+            // Handle logout (e.g., redirect to login)
+        },
+        error: function(xhr) {
+            alert('Error occurred during sign out.');
+        },
+
+    });
+}
+
+// Add New Admin
+function addNewAdmin(username, email, password, role) {
+    $.ajax({
+        url: '/add-admin',
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            username: username,
+            email: email,
+            password: password,
+            role: role,
+            _token: $('meta[name="csrf-token"]').attr('content') // CSRF token
+        },
+        success: function(response) {
+            alert(response.message);
+            // Handle admin addition (e.g., update admin list)
+        },
+        error: function(xhr) {
+            alert(xhr.responseJSON.message || 'Error occurred while adding admin.');
+        }
+    });
+}
+
+
+
+
+// Bind the sign-up form submission
+$('.sign-in-form').on('submit', function(e) {
+    e.preventDefault();
+    let email = $('.email').val();
+    let password = $('.password').val();
+    signInUser(email, password);
+});
+
+// Similarly, you can bind other functions to their respective forms or buttons.

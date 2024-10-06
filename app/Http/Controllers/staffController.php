@@ -191,7 +191,7 @@ class staffController extends Controller
             return response()->json([
                 'studentsHtml' => $studentsHtml,
                 'students_pagination' => $paginationHtml,
-                "all_students" => User::where('role', 'student')->get()
+                // "all_students" => User::where('role', 'student')->get()
             ]);
         }
 
