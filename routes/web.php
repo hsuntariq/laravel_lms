@@ -7,6 +7,7 @@ use App\Http\Controllers\batchController;
 use App\Http\Controllers\courseController;
 use App\Http\Controllers\marksController;
 use App\Http\Controllers\staffController;
+use App\Http\Controllers\studentController;
 use App\Http\Controllers\teacherDashboardController;
 use App\Http\Controllers\userController;
 use Illuminate\Support\Facades\Route;
@@ -41,6 +42,10 @@ Route::prefix('/dashboard/student')->middleware(['auth', 'student'])->group(func
     Route::get('/get-status', [assignmentController::class, 'getAssignmentStatus'])->name('get-assignment-status');
 
     Route::get('/get-marks', [marksController::class, 'getMarks'])->name('get-student-marks');
+
+
+
+    Route::get('get-data-count', [studentController::class, 'countData'])->name('count-stuudent-data');
 });
 
 Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(function () {

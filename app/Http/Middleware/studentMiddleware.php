@@ -16,8 +16,7 @@ class studentMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $id = $request->route('id');
-        $batch = $request->route('batch');
-        if (auth()->user()->role == 'student' && (auth()->user()->id == $id || auth()->user()->batch_assigned == $batch)) {
+        if (auth()->user()->role == 'student' && (auth()->user()->id == $id)) {
             return $next($request);
         } else {
             abort(401);

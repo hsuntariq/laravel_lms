@@ -1771,4 +1771,37 @@ $(".sign-in-form").on("submit", function (e) {
     signInUser(email, password);
 });
 
-// Similarly, you can bind other functions to their respective forms or buttons.
+// count the student assignment and test data
+
+function fetchStudentCounts() {
+    $.ajax({
+        url: "/dashboard/student/get-data-count", // The route defined in web.php
+        type: "GET",
+        success: function (response) {
+            // Extract counts from the response
+            const assignmentCount = response.assignments;
+            const testCount = response.tests;
+            console.log(response);
+            // Update UI elements (assume IDs for displaying counts exist)
+            $("#assignmentCount").text(assignmentCount);
+            $("#testCount").text(testCount);
+        },
+        error: function (xhr, status, error) {
+            // Handle errors
+            console.error(
+                "An error occurred while fetching the counts:",
+                error
+            );
+        },
+    });
+}
+
+$(document).ready(function () {
+    if (
+        window.location.pathname.split("/")[2] == "student" &&
+        window.location.pathname.split("/")[1] == "dashboard" &&
+        window.location.pathname.split("/")[3] == "home"
+    ) {
+        fetchStudentCounts();
+    }
+});
