@@ -1641,7 +1641,7 @@ function signInUser(email, password) {
         type: 'POST',
         dataType: 'json',
         beforeSend: function () {
-            $('.text-danger').remove()
+            $('.text-danger').fadeOut()
             $('.error-message').removeClass('is-invalid')
         },
         data: {
@@ -1680,6 +1680,7 @@ function signInUser(email, password) {
 
 
             } else {
+            $('.text-danger').fadeOut()
                 $('.invalid').text(xhr.responseJSON.message || 'Invalid Credentials')
                 $('.error-message').addClass('is-invalid')
                 $('.invalid').addClass('text-danger')
