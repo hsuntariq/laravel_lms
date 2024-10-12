@@ -109,7 +109,7 @@
                     Tests
                 </p>
                 <p style="color:#8338EB" class="m-0 fw-medium">
-                    of 73 completed
+                    <!-- of 73 completed -->
                 </p>
             </section>
         </section>

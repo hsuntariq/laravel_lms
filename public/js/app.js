@@ -5,7 +5,6 @@ $(".update-image").on("input", function (e) {
     $(".image-preview").css("display", "block").attr("src", imageUrl);
 });
 
-
 $(document).ready(function () {
     $.ajaxSetup({
         headers: {
@@ -13,50 +12,47 @@ $(document).ready(function () {
         },
     });
 
+    // Add assignment
+    $(".loading").hide();
+    $(".count-loading").hide();
+    $(".flash").hide();
 
+    $(".add-assignment").click(function (e) {
+        e.preventDefault();
+        $(".loading").show();
+        $(".loading-text").hide();
 
-// Add assignment
-$(".loading").hide();
-$(".count-loading").hide();
-$(".flash").hide();
+        $.ajax({
+            url: "/dashboard/teacher/upload-assignment",
+            type: "POST",
+            data: new FormData($(".assignment-data")[0]),
+            processData: false,
+            contentType: false,
 
-$(".add-assignment").click(function (e) {
-    e.preventDefault();
-    $(".loading").show();
-    $(".loading-text").hide();
+            beforeSend: function () {
+                $(".text-danger").remove(); // Clear previous errors
+            },
 
-    $.ajax({
-        url: "/dashboard/teacher/upload-assignment",
-        type: "POST",
-        data: new FormData($(".assignment-data")[0]),
-        processData: false,
-        contentType: false,
+            success: function (response) {
+                $(".assignment-data")[0].reset();
+                showFlashMessage(response.message);
+                countAssignments();
+                $(".loading").hide();
+                $(".loading-text").show();
+            },
 
-        beforeSend: function () {
-            $(".text-danger").remove(); // Clear previous errors
-        },
+            error: function (xhr) {
+                if (xhr.status === 422) {
+                    displayValidationErrors(xhr.responseJSON.errors);
+                }
+            },
 
-        success: function (response) {
-            $(".assignment-data")[0].reset();
-            showFlashMessage(response.message);
-            countAssignments();
-            $(".loading").hide();
-            $(".loading-text").show();
-        },
-
-        error: function (xhr) {
-            if (xhr.status === 422) {
-                displayValidationErrors(xhr.responseJSON.errors);
-            }
-        },
-
-        complete: function () {
-            $(".loading").hide();
-            $(".loading-text").show();
-        },
+            complete: function () {
+                $(".loading").hide();
+                $(".loading-text").show();
+            },
+        });
     });
-});
-
 
     // Function to count assignments
     function countAssignments() {
@@ -103,8 +99,8 @@ $(".add-assignment").click(function (e) {
     // Get assignments
     function getAssignments() {
         const user_id = window.location.pathname.split("/").pop();
-        console.log(window.location.pathname.split('/'))
-        console.log(user_id)
+        console.log(window.location.pathname.split("/"));
+        console.log(user_id);
         $(".loader-table").show();
         $(".assignment-table").hide();
 
@@ -179,13 +175,13 @@ $(".add-assignment").click(function (e) {
     // Call the function to load assignments
     $(document).ready(function () {
         if (
-            window.location.pathname.split("/")[1] == 'dashboard' &&
-            window.location.pathname.split("/")[2] == 'student' &&
-            window.location.pathname.split("/")[3] == 'assignments'
+            window.location.pathname.split("/")[1] == "dashboard" &&
+            window.location.pathname.split("/")[2] == "student" &&
+            window.location.pathname.split("/")[3] == "assignments"
         ) {
             getAssignments();
         }
-    })
+    });
 
     // Attach event listeners to file inputs and submit buttons
     $(document).on("change", ".file-input", function () {
@@ -375,7 +371,7 @@ $(".add-assignment").click(function (e) {
             ".loader-table, .course-loading, .teacher-loading, .batch-loading, .error"
         ).hide();
         getMarks();
-        if (window.location.pathname.split('/').includes('staff')) {
+        if (window.location.pathname.split("/").includes("staff")) {
             getCourses();
             getCoursesTeacher();
             checkFormCompletion();
@@ -668,103 +664,100 @@ $(".add-assignment").click(function (e) {
 
     // Assign batches
     $(document).ready(function () {
-        if (window.location.pathname.split('/').includes('staff')) {
+        if (window.location.pathname.split("/").includes("staff")) {
+            $(".batch-btn").attr("disabled", true).addClass("btn-disabled");
 
-        $(".batch-btn").attr("disabled", true).addClass("btn-disabled");
+            // Initially hide course and teacher fields
+            $(
+                "select[name='course_name_batch'], select[name='teacher_assigned']"
+            ).hide();
 
-        // Initially hide course and teacher fields
-        $(
-            "select[name='course_name_batch'], select[name='teacher_assigned']"
-        ).hide();
-
-        // Fetch courses on page load
-        $.ajax({
-            url: "/dashboard/staff/get-courses",
-            type: "GET",
-            beforeSend: function () {
-                $(".teacher-skeleton-course").show(); // Show a loading skeleton or spinner
-            },
-            success: function (response) {
-                let courseOptions =
-                    "<option disabled selected>Select Course</option>" +
-                    response
-                        .map(
-                            (course) =>
-                                `<option value="${course.id}">${course.course_name}</option>`
-                        )
-                        .join("");
-                $('select[name="course_name_batch"]')
-                    .html(courseOptions)
-                    .show(); // Show the select after populating
-            },
-            error: function (xhr) {
-                console.error(xhr.statusText);
-            },
-            complete: function () {
-                $(".teacher-skeleton-course").hide(); // Hide the loading skeleton or spinner
-            },
-        });
-
-        // Fetch teachers based on selected course
-        $('select[name="course_name_batch"]').change(function () {
-            const course_id = $(this).val();
-            $(".teacher-skeleton").show(); // Show loading indicator for teachers
-            $("select[name='teacher_assigned']").hide(); // Hide the teacher select while loading
-
+            // Fetch courses on page load
             $.ajax({
-                url: "/dashboard/staff/get-teachers",
-                type: "POST",
-                data: { course_id, _token: $('input[name="_token"]').val() },
+                url: "/dashboard/staff/get-courses",
+                type: "GET",
+                beforeSend: function () {
+                    $(".teacher-skeleton-course").show(); // Show a loading skeleton or spinner
+                },
                 success: function (response) {
-                    let teacherOptions =
-                        "<option disabled selected>Select Teacher</option>" +
+                    let courseOptions =
+                        "<option disabled selected>Select Course</option>" +
                         response
                             .map(
-                                (teacher) =>
-                                    `<option value="${teacher.id}">${teacher.name}</option>`
+                                (course) =>
+                                    `<option value="${course.id}">${course.course_name}</option>`
                             )
                             .join("");
-                    $('select[name="teacher_assigned"]')
-                        .html(teacherOptions)
+                    $('select[name="course_name_batch"]')
+                        .html(courseOptions)
                         .show(); // Show the select after populating
                 },
                 error: function (xhr) {
                     console.error(xhr.statusText);
                 },
                 complete: function () {
-                    $(".teacher-skeleton").hide(); // Hide loading indicator for teachers
-                    checkFormValidity();
+                    $(".teacher-skeleton-course").hide(); // Hide the loading skeleton or spinner
                 },
             });
-        });
 
-        // Check if both course and teacher are selected
-        $('select[name="teacher_assigned"]').change(checkFormValidity);
+            // Fetch teachers based on selected course
+            $('select[name="course_name_batch"]').change(function () {
+                const course_id = $(this).val();
+                $(".teacher-skeleton").show(); // Show loading indicator for teachers
+                $("select[name='teacher_assigned']").hide(); // Hide the teacher select while loading
 
-        // Add batch form submission
-        $(".batch-btn")
-            .off("click")
-            .on("click", function (e) {
-                e.preventDefault();
-                addBatch();
+                $.ajax({
+                    url: "/dashboard/staff/get-teachers",
+                    type: "POST",
+                    data: {
+                        course_id,
+                        _token: $('input[name="_token"]').val(),
+                    },
+                    success: function (response) {
+                        let teacherOptions =
+                            "<option disabled selected>Select Teacher</option>" +
+                            response
+                                .map(
+                                    (teacher) =>
+                                        `<option value="${teacher.id}">${teacher.name}</option>`
+                                )
+                                .join("");
+                        $('select[name="teacher_assigned"]')
+                            .html(teacherOptions)
+                            .show(); // Show the select after populating
+                    },
+                    error: function (xhr) {
+                        console.error(xhr.statusText);
+                    },
+                    complete: function () {
+                        $(".teacher-skeleton").hide(); // Hide loading indicator for teachers
+                        checkFormValidityBatch();
+                    },
+                });
             });
-        }
 
-        // Function to check form validity
+            // Check if both course and teacher are selected
+            $('select[name="teacher_assigned"]').change(checkFormValidityBatch);
+
+            // Add batch form submission
+            $(".batch-btn")
+                .off("click")
+                .on("click", function (e) {
+                    e.preventDefault();
+                    addBatch();
+                });
+        }
     });
-    function checkFormValidity() {
+    // Function to check form validity
+    function checkFormValidityBatch() {
         const courseSelected = $('select[name="course_name_batch"]').val();
         const teacherSelected = $('select[name="teacher_assigned"]').val();
         const batchSelected = $('input[name="batch_number"]').val();
+
+        const isValid = courseSelected && teacherSelected && batchSelected;
         $(".batch-btn")
-            .attr(
-                "disabled",
-                !(courseSelected && teacherSelected && batchSelected)
-            )
-            .toggleClass(
-                "btn-disabled",
-                !(courseSelected && teacherSelected && batchSelected)
-            );
+            .attr("disabled", !isValid)
+            .toggleClass("btn-disabled", !isValid);
     }
 
     // Add batch function with error handling
@@ -809,7 +802,7 @@ $(".add-assignment").click(function (e) {
             },
             complete: function () {
                 $(".batch-loading").hide();
-                checkFormValidity(); // Check if the form can be submitted again
+                checkFormValidityBatch(); // Check if the form can be submitted again
             },
         });
     }
@@ -825,7 +818,7 @@ $(".add-assignment").click(function (e) {
     }
 
     $(document).ready(function () {
-        if (window.location.pathname.split('/').includes('staff')) {
+        if (window.location.pathname.split("/").includes("staff")) {
             loadBatches(1); // Load first page of batches on page load
         }
 
@@ -1240,10 +1233,10 @@ $(".add-assignment").click(function (e) {
     // Initial course and teacher load
 
     $(document).ready(function () {
-        if (window.location.pathname.split('/').includes('staff')) {
+        if (window.location.pathname.split("/").includes("staff")) {
             fetchCourses();
         }
-    })
+    });
 });
 
 function loadStudents(page = 1) {
@@ -1264,7 +1257,6 @@ function loadStudents(page = 1) {
         },
         success: function (response) {
             // Check if there are any students to display
-            console.log(response);
             if (response.studentsHtml) {
                 $(".students").html(response.studentsHtml); // Update student table with the fetched data
             } else {
@@ -1293,7 +1285,7 @@ function loadStudents(page = 1) {
 // Fetch and display students
 $(document).ready(function () {
     // Initial load of students on page load
-    if (window.location.pathname.split('/').includes('staff')) {
+    if (window.location.pathname.split("/").includes("staff")) {
         loadStudents(1);
     }
 
@@ -1510,8 +1502,8 @@ function showFlashMessage(message, type) {
 }
 
 $(document).ready(function () {
-    if (window.location.pathname.split('/').includes('staff')) {
-            fetchCourses();
+    if (window.location.pathname.split("/").includes("staff")) {
+        fetchCourses();
     }
 
     // Load student details into the edit modal
@@ -1807,12 +1799,12 @@ $(".sign-in-form").on("submit", function (e) {
 // count the student assignment and test data
 
 function fetchStudentCounts(id) {
-    $('.loading-count').show()
+    $(".loading-count").show();
     $.ajax({
         url: `/dashboard/student/get-data-count/${id}`, // The route defined in web.php
         type: "GET",
         success: function (response) {
-            $('.loading-count').hide()
+            $(".loading-count").hide();
             // Extract counts from the response
             const assignmentCount = response.assignments;
             const testCount = response.tests;
@@ -1836,38 +1828,37 @@ $(document).ready(function () {
         window.location.pathname.split("/")[2] == "student" &&
         window.location.pathname.split("/")[3] == "home"
     ) {
-        let id = window?.location.pathname.split('/').pop()
+        let id = window?.location.pathname.split("/").pop();
         fetchStudentCounts(id);
     }
 });
 
-
-
 $(document).ready(function () {
-    let user_id = window.location.pathname.split('/').pop();
-    if (window.location.pathname.split('/').includes('teacher')) {
+    let user_id = window.location.pathname.split("/").pop();
+    if (window.location.pathname.split("/").includes("teacher")) {
         $.ajax({
             url: `/dashboard/teacher/get-relevent-batches/${user_id}`,
-            type: 'GET',
-            beforeSend: function(){
+            type: "GET",
+            beforeSend: function () {
                 $('select[name="batch_no"]').html(`
                     <option disabled selected>Loading Batches...</option>
-                    `)
+                    `);
             },
             success: function (response) {
-                let batchOptions = "<option selected disabled>Select Batch</option>" +
-                   response
+                console.log(response);
+                let batchOptions =
+                    "<option selected disabled>Select Batch</option>" +
+                    response
                         .map(
                             (item) =>
                                 `<option value="${item?.batch_no}">Batch ${item.batch_no}</option>`
                         )
                         .join("");
-                console.log(batchOptions)
-                $('select[name="batch_no"]').html(batchOptions)
+                $('select[name="batch_no"]').html(batchOptions);
             },
             error: function (xhr) {
-                console.log(xhr.statusText)
-            }
-        })
+                console.log(xhr.statusText);
+            },
+        });
     }
-})
+});

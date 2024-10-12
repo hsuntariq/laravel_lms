@@ -2,8 +2,11 @@
     <h5 class="text-capitalize">
         {{ request()->segment(3) }}
     </h5>
-    <form action="">
-        <select name="batch_no" id="" class="form-select border-0 text-purple fw-medium bg-transparent">
+    <form action="" class="d-flex gap-3">
+        <select name="course_name_teacher" id="" class="form-select border-purple text-purple fw-medium bg-transparent">
+
+        </select>
+        <select name="batch_no" id="" class="form-select border-purple text-purple fw-medium bg-transparent">
 
         </select>
     </form>
