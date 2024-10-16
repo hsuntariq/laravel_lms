@@ -82,9 +82,9 @@ class assignmentController extends Controller
 
 
 
-    public function getAssignments($batch_no)
+    public function getAssignments()
     {
-
+        $batch_no = auth()->user()->batch_assigned;
         $assignments = Assignment::where('batch_no', $batch_no)->get();
         $assignments->each(function ($assignment) {
             $assignment->answers = $assignment->answer; // Load the related answers
@@ -101,7 +101,7 @@ class assignmentController extends Controller
         $validator = Validator::make($request->all(), [
             'assignment_id' => ['required'],
             'user_id' => ['required'],
-            'answer_file' => ['required', 'file', 'mimes:html,mp4,jpeg,jpg,png', 'max:10240'], // File validation, max size 10MB
+            'answer_file' => ['required', 'max:10240'], // File validation, max size 10MB
         ]);
 
         if ($validator->fails()) {
@@ -161,7 +161,7 @@ class assignmentController extends Controller
             ->whereHas('assignment', function ($query) use ($batch_no) {
                 $query->where('batch_no', $batch_no);
             })
-            ->with(['assignment', 'user','marks'])
+            ->with(['assignment', 'user', 'marks'])
             ->get();
 
         return response()->json($assignments);

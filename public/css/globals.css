@@ -137,6 +137,10 @@ body {
     border: none !important;
 }
 
+.loading-count{
+    display: none;
+}
+
 .notificationCard {
     width: 220px;
     height: 280px;

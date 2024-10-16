@@ -5,6 +5,16 @@ $(".update-image").on("input", function (e) {
     $(".image-preview").css("display", "block").attr("src", imageUrl);
 });
 
+
+$(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+        },
+    });
+
+
+
 // Add assignment
 $(".loading").hide();
 $(".count-loading").hide();
@@ -30,6 +40,8 @@ $(".add-assignment").click(function (e) {
             $(".assignment-data")[0].reset();
             showFlashMessage(response.message);
             countAssignments();
+            $(".loading").hide();
+            $(".loading-text").show();
         },
 
         error: function (xhr) {
@@ -45,12 +57,6 @@ $(".add-assignment").click(function (e) {
     });
 });
 
-$(document).ready(function () {
-    $.ajaxSetup({
-        headers: {
-            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-        },
-    });
 
     // Function to count assignments
     function countAssignments() {
@@ -96,12 +102,14 @@ $(document).ready(function () {
 
     // Get assignments
     function getAssignments() {
-        const batch_no = window.location.pathname.split("/").pop();
+        const user_id = window.location.pathname.split("/").pop();
+        console.log(window.location.pathname.split('/'))
+        console.log(user_id)
         $(".loader-table").show();
         $(".assignment-table").hide();
 
         $.ajax({
-            url: `/dashboard/student/assignments-get/${batch_no}`,
+            url: `/dashboard/student/assignments-get/${user_id}`,
             type: "GET",
             success: function (response) {
                 let assignmentsHtml = response
@@ -169,7 +177,15 @@ $(document).ready(function () {
     }
 
     // Call the function to load assignments
-    getAssignments();
+    $(document).ready(function () {
+        if (
+            window.location.pathname.split("/")[1] == 'dashboard' &&
+            window.location.pathname.split("/")[2] == 'student' &&
+            window.location.pathname.split("/")[3] == 'assignments'
+        ) {
+            getAssignments();
+        }
+    })
 
     // Attach event listeners to file inputs and submit buttons
     $(document).on("change", ".file-input", function () {
@@ -359,9 +375,11 @@ $(document).ready(function () {
             ".loader-table, .course-loading, .teacher-loading, .batch-loading, .error"
         ).hide();
         getMarks();
-        getCourses();
-        getCoursesTeacher();
-        checkFormCompletion();
+        if (window.location.pathname.split('/').includes('staff')) {
+            getCourses();
+            getCoursesTeacher();
+            checkFormCompletion();
+        }
 
         // Image preview functionality
         $('input[name="image"]').on("change", function (e) {
@@ -650,6 +668,8 @@ $(document).ready(function () {
 
     // Assign batches
     $(document).ready(function () {
+        if (window.location.pathname.split('/').includes('staff')) {
+
         $(".batch-btn").attr("disabled", true).addClass("btn-disabled");
 
         // Initially hide course and teacher fields
@@ -728,6 +748,7 @@ $(document).ready(function () {
                 e.preventDefault();
                 addBatch();
             });
+        }
 
         // Function to check form validity
     });
@@ -804,7 +825,9 @@ $(document).ready(function () {
     }
 
     $(document).ready(function () {
-        loadBatches(1); // Load first page of batches on page load
+        if (window.location.pathname.split('/').includes('staff')) {
+            loadBatches(1); // Load first page of batches on page load
+        }
 
         // Handle pagination click
         $(document).on(
@@ -962,7 +985,7 @@ $(document).ready(function () {
                         $(`#batch-row-${batchId}`).remove();
                         loadBatches(1);
                     } else {
-                        alert("Something went wrong, please try again.");
+                        // alert("Something went wrong, please try again.");
                     }
                 },
                 error: function (xhr) {
@@ -1215,7 +1238,12 @@ $(document).ready(function () {
     }
 
     // Initial course and teacher load
-    fetchCourses();
+
+    $(document).ready(function () {
+        if (window.location.pathname.split('/').includes('staff')) {
+            fetchCourses();
+        }
+    })
 });
 
 function loadStudents(page = 1) {
@@ -1256,7 +1284,7 @@ function loadStudents(page = 1) {
         },
         error: function (xhr) {
             console.error(xhr.statusText);
-            alert("Error loading students. Please try again.");
+            // alert("Error loading students. Please try again.");
             // Handle error if needed (e.g., show error message or retry option)
         },
     });
@@ -1265,7 +1293,9 @@ function loadStudents(page = 1) {
 // Fetch and display students
 $(document).ready(function () {
     // Initial load of students on page load
-    loadStudents(1);
+    if (window.location.pathname.split('/').includes('staff')) {
+        loadStudents(1);
+    }
 
     // Function to load students based on filters (course, batch, and pagination)
     // Load batches when course is selected
@@ -1309,7 +1339,7 @@ $(document).ready(function () {
             },
             error: function (xhr) {
                 console.error("Error loading batches", xhr.statusText);
-                alert("Error loading batches. Please try again.");
+                // alert("Error loading batches. Please try again.");
             },
         });
 
@@ -1480,7 +1510,9 @@ function showFlashMessage(message, type) {
 }
 
 $(document).ready(function () {
-    fetchCourses();
+    if (window.location.pathname.split('/').includes('staff')) {
+            fetchCourses();
+    }
 
     // Load student details into the edit modal
     $(document).on("click", ".edit-student", function (e) {
@@ -1505,10 +1537,11 @@ $(document).ready(function () {
                 $("#edit_student_gender").val(response.gender);
 
                 // Load courses into the dropdown
+
                 fetchCourses(response.course_assigned, response.batch_assigned);
             },
             error: function () {
-                alert("Error loading student details");
+                // alert("Error loading student details");
             },
         });
     });
@@ -1608,8 +1641,8 @@ $(document).ready(function () {
                     $("#editStudentModal").modal("hide");
 
                     // Reload student list (or update the row dynamically)
+
                     loadStudents();
-                    alert(response.message); // Show success message
                 }
             },
             error: function (xhr) {
@@ -1773,18 +1806,19 @@ $(".sign-in-form").on("submit", function (e) {
 
 // count the student assignment and test data
 
-function fetchStudentCounts() {
+function fetchStudentCounts(id) {
+    $('.loading-count').show()
     $.ajax({
-        url: "/dashboard/student/get-data-count", // The route defined in web.php
+        url: `/dashboard/student/get-data-count/${id}`, // The route defined in web.php
         type: "GET",
         success: function (response) {
+            $('.loading-count').hide()
             // Extract counts from the response
             const assignmentCount = response.assignments;
             const testCount = response.tests;
-            console.log(response);
             // Update UI elements (assume IDs for displaying counts exist)
-            $("#assignmentCount").text(assignmentCount);
-            $("#testCount").text(testCount);
+            $(".student-assignments").text(assignmentCount);
+            $(".student-tests").text(testCount);
         },
         error: function (xhr, status, error) {
             // Handle errors
@@ -1798,10 +1832,42 @@ function fetchStudentCounts() {
 
 $(document).ready(function () {
     if (
-        window.location.pathname.split("/")[2] == "student" &&
         window.location.pathname.split("/")[1] == "dashboard" &&
+        window.location.pathname.split("/")[2] == "student" &&
         window.location.pathname.split("/")[3] == "home"
     ) {
-        fetchStudentCounts();
+        let id = window?.location.pathname.split('/').pop()
+        fetchStudentCounts(id);
     }
 });
+
+
+
+$(document).ready(function () {
+    let user_id = window.location.pathname.split('/').pop();
+    if (window.location.pathname.split('/').includes('teacher')) {
+        $.ajax({
+            url: `/dashboard/teacher/get-relevent-batches/${user_id}`,
+            type: 'GET',
+            beforeSend: function(){
+                $('select[name="batch_no"]').html(`
+                    <option disabled selected>Loading Batches...</option>
+                    `)
+            },
+            success: function (response) {
+                let batchOptions = "<option selected disabled>Select Batch</option>" +
+                   response
+                        .map(
+                            (item) =>
+                                `<option value="${item?.batch_no}">Batch ${item.batch_no}</option>`
+                        )
+                        .join("");
+                console.log(batchOptions)
+                $('select[name="batch_no"]').html(batchOptions)
+            },
+            error: function (xhr) {
+                console.log(xhr.statusText)
+            }
+        })
+    }
+})

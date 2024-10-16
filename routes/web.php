@@ -8,20 +8,21 @@ use App\Http\Controllers\courseController;
 use App\Http\Controllers\marksController;
 use App\Http\Controllers\staffController;
 use App\Http\Controllers\studentController;
+use App\Http\Controllers\teacherController;
 use App\Http\Controllers\teacherDashboardController;
 use App\Http\Controllers\userController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('login');
 
 
 
 Route::prefix('/dashboard/student')->middleware(['auth', 'student'])->group(function () {
     Route::view('/home/{id}', 'student.dashboard')->name('student-dashboard');
 
-    Route::view('/assignments/{id}/{batch}', 'student.pages.assignments')->name('student-assignments');
+    Route::view('/assignments/{id}', 'student.pages.assignments')->name('student-assignments');
 
     Route::view('/attendance/{id}', 'student.pages.attendance')->name('student-attendance');
 
@@ -35,7 +36,7 @@ Route::prefix('/dashboard/student')->middleware(['auth', 'student'])->group(func
 
     Route::get('/courses/{id}', [courseController::class, 'makeCharts'])->name('student-courses');
 
-    Route::get('/assignments-get/{id}/{batch}', [assignmentController::class, 'getAssignments'])->name('student-assignments-get');
+    Route::get('/assignments-get/{id}/', [assignmentController::class, 'getAssignments'])->name('student-assignments-get');
 
     Route::post('/upload-assignment', [assignmentController::class, 'uploadAssignmentStudent'])->name('student-upload-assignments');
 
@@ -45,21 +46,21 @@ Route::prefix('/dashboard/student')->middleware(['auth', 'student'])->group(func
 
 
 
-    Route::get('get-data-count', [studentController::class, 'countData'])->name('count-stuudent-data');
+    Route::get('get-data-count/{id}', [studentController::class, 'countData'])->name('count-stuudent-data');
 });
 
 Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(function () {
     Route::view('/home/{id}', 'teacher.pages.dashboard')->name('teacher-dashboard');
 
-    Route::view('/attendance/mark', 'teacher.pages.attendance')->name('teacher-attendance');
+    Route::view('/attendance/mark/{id}', 'teacher.pages.attendance')->name('teacher-attendance');
 
-    Route::view('/attendance/view/', 'teacher.pages.view-attendance')->name('teacher-view-attendance');
+    Route::view('/attendance/view/{id}', 'teacher.pages.view-attendance')->name('teacher-view-attendance');
 
-    Route::view('/assignments/', 'teacher.pages.attendance')->name('teacher-assignments');
+    Route::view('/assignments/{id}', 'teacher.pages.attendance')->name('teacher-assignments');
 
-    Route::view('/assignments/view', 'teacher.pages.view-assignments')->name('teacher-view-assignments');
+    Route::view('/assignments/view/{id}', 'teacher.pages.view-assignments')->name('teacher-view-assignments');
 
-    Route::view('/assignments/upload', 'teacher.pages.upload-assignment')->name('teacher-upload-assignments');
+    Route::view('/assignments/upload/{id}', 'teacher.pages.upload-assignment')->name('teacher-upload-assignments');
 
 
     Route::view('/settings/{id}', 'teacher.pages.attendance')->name('teacher-settings');
@@ -78,6 +79,8 @@ Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(func
     Route::get('/submitted-assignment/', [assignmentController::class, 'getSubmittedAssignments'])->name('submitted-assignment');
 
     Route::post('/mark-assignment/', [marksController::class, 'markAssignment'])->name('mark-assignment');
+
+    Route::get('/get-relevent-batches/{id}', [teacherController::class, 'getReleventBatches'])->name('get-relevent-batches');
 });
 
 

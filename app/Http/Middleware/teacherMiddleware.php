@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class teacherMiddleware
@@ -15,10 +16,13 @@ class teacherMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->user()->role == 'teacher') {
-            return $next($request);
-        } else {
-            abort(401);
+        if (Auth::check()) {
+
+            if (auth()->user()->role == 'teacher') {
+                return $next($request);
+            } else {
+                abort(401);
+            }
         }
     }
 }

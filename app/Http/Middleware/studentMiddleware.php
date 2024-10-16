@@ -15,11 +15,20 @@ class studentMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $id = $request->route('id');
-        if (auth()->user()->role == 'student' && (auth()->user()->id == $id)) {
-            return $next($request);
-        } else {
-            abort(401);
+        $id = $request->route('id'); // Try to get 'id' from the route, it may be null
+        $user = auth()->user();
+
+        // Check if the user is a student
+        if ($user && $user->role == 'student') {
+            // If there's an 'id' in the route, check if it matches the authenticated student's id
+            if ($id && $user->id != $id) {
+                abort(401); // Unauthorized if id mismatch
+            }
+
+            return $next($request); // Proceed with the request
         }
+
+        // If not a student, return unauthorized
+        abort(401);
     }
 }

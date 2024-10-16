@@ -54,7 +54,7 @@
                     Lessons
                 </p>
                 <p style="color:#8338EB" class="m-0 fw-medium">
-                    of 73 completed
+                    {{-- of 73 completed --}}
                 </p>
             </section>
         </div>
@@ -72,12 +72,16 @@
                             alt="assignmate image">
                     </div>
                 </div>
-                <h2 class="m-0">41</h2>
+                <div class="loading-count" id="loading-count">
+                    <img width="40px" src="{{ asset('assets/images/loading.gif') }}" alt="Loading...">
+                </div>
+
+                <h2 class="m-0 student-assignments"></h2>
                 <p class="fw-medium fs-4 text-secondary m-0">
                     Assignments
                 </p>
                 <p style="color:#8338EB" class="m-0 fw-medium">
-                    of 24 completed
+                    {{-- of 24 completed --}}
                 </p>
             </section>
         </section>
@@ -95,7 +99,12 @@
                             alt="assignmate image">
                     </div>
                 </div>
-                <h2 class="m-0">03</h2>
+                <div class="loading-count" id="loading-count">
+                    <img width="40px" src="{{ asset('assets/images/loading.gif') }}" alt="Loading...">
+                </div>
+
+                <h2 class="m-0 student-tests">
+                </h2>
                 <p class="fw-medium fs-4 text-secondary fs-3 m-0">
                     Tests
                 </p>

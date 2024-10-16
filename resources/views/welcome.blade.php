@@ -16,7 +16,7 @@
         </div>
         <div class="container mx-auto row justify-content-center align-items-center">
             <div class="col-lg-6">
-                <form action="" class="sign-in-form">
+                <form action="" method="POST" class="sign-in-form">
                     @csrf
                     <h2>Sign In</h2>
                     <div class="form-group">

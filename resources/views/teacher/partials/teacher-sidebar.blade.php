@@ -12,7 +12,7 @@
             })
                 ? 'text-white'
                 : 'text-dark' }}"
-                href="{{ route('teacher-dashboard', ['id' => 1]) }}">
+                href="{{ route('teacher-dashboard', ['id' => auth()->user()->id]) }}">
                 Dashboard
             </a>
         </h6>
@@ -49,14 +49,14 @@
             <li class="d-flex rounded-3 p-3 gap-3 align-items-center ">
                 <div class="bi bi-speedometer"></div>
                 <a class="text-decoration-none dropdown-item text-dark"
-                    href="{{ route('teacher-upload-assignments', []) }}">
+                    href="{{ route('teacher-upload-assignments', ['id' => auth()->user()->id]) }}">
                     Upload Assignment
                 </a>
             </li>
             <li class="d-flex rounded-3 p-3 gap-3 align-items-center ">
                 <div class="bi bi-speedometer"></div>
                 <a class="text-decoration-none text-dark dropdown-item"
-                    href="{{ route('teacher-view-assignments', []) }}">
+                    href="{{ route('teacher-view-assignments', ['id' => auth()->user()->id]) }}">
                     View submitted assignments
                 </a>
             </li>
@@ -76,14 +76,15 @@
         <ul class="dropdown-menu">
             <li class="d-flex rounded-3 p-3 gap-3 align-items-center ">
                 <div class="bi bi-speedometer"></div>
-                <a class="text-decoration-none dropdown-item text-dark" href="{{ route('teacher-attendance', []) }}">
+                <a class="text-decoration-none dropdown-item text-dark"
+                    href="{{ route('teacher-attendance', ['id' => auth()->user()->id]) }}">
                     Mark Attendance
                 </a>
             </li>
             <li class="d-flex rounded-3 p-3 gap-3 align-items-center ">
                 <div class="bi bi-speedometer"></div>
                 <a class="text-decoration-none text-dark dropdown-item"
-                    href="{{ route('teacher-view-attendance', []) }}">
+                    href="{{ route('teacher-view-attendance', ['id' => auth()->user()->id]) }}">
                     View Attendance
                 </a>
             </li>
@@ -105,7 +106,7 @@
             })
                 ? 'text-white'
                 : 'text-dark' }}"
-                href="{{ route('teacher-settings', ['id' => 1]) }}">
+                href="{{ route('teacher-settings', ['id' => auth()->user()->id]) }}">
                 Settings
             </a>
         </h6>
