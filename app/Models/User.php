@@ -22,7 +22,7 @@ class User extends Authenticatable
 
     public function courses()
     {
-        return $this->hasMany(Course::class);
+        return $this->hasMany(Course::class, 'id', 'course_assigned');
     }
 
 

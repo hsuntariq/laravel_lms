@@ -13,4 +13,10 @@ class Course extends Model
     {
         return $this->hasMany(Batch::class, 'course_assigned');
     }
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

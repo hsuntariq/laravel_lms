@@ -1843,17 +1843,29 @@ $(document).ready(function () {
                 $('select[name="batch_no"]').html(`
                     <option disabled selected>Loading Batches...</option>
                     `);
+                $('select[name="course_name_teacher"]').html(`
+                    <option disabled selected>Loading Courses...</option>
+                    `);
             },
             success: function (response) {
                 console.log(response);
                 let batchOptions =
                     "<option selected disabled>Select Batch</option>" +
-                    response
-                        .map(
+                    response?.batches
+                        ?.map(
                             (item) =>
                                 `<option value="${item?.batch_no}">Batch ${item.batch_no}</option>`
                         )
                         .join("");
+                let courseOptions =
+                    "<option selected disabled>Select Course</option>" +
+                    response?.courses
+                        ?.map(
+                            (item) =>
+                                `<option value="${item?.id}">Batch ${item?.course_name}</option>`
+                        )
+                        .join("");
+                $('select[name="course_name_teacher"]').html(courseOptions);
                 $('select[name="batch_no"]').html(batchOptions);
             },
             error: function (xhr) {

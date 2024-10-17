@@ -11,11 +11,11 @@ class teacherController extends Controller
     public function getReleventBatches()
     {
         $teacher_id = auth()->user()->id;
-        $courses = User::with('courses')->where('role', 'teacher')->where('id', $teacher_id)->get();
+        $courses = User::with('courses')->find($teacher_id);
         $batches = Batch::where('teacher', $teacher_id)->get();
         return response()->json([
             "batches" => $batches,
-            "courses" => $courses
+            "courses" => $courses->courses
         ]);
     }
 
