@@ -81,6 +81,8 @@ Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(func
     Route::post('/mark-assignment/', [marksController::class, 'markAssignment'])->name('mark-assignment');
 
     Route::get('/get-relevent-batches/{id}', [teacherController::class, 'getReleventBatches'])->name('get-relevent-batches');
+
+    Route::post('/get-relevent-info-batches', [teacherController::class, 'getInfoForBatches'])->name('getInfoForBatches');
 });
 
 

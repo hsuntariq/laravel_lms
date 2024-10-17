@@ -29,4 +29,15 @@ class teacherController extends Controller
             "courses" => $courses
         ]);
     }
+
+
+
+    public function getInfoForBatches(Request $request)
+    {
+        $course_id = $request->course_id;
+        $batches = Batch::where('course_id', $course_id)->get();
+        return response()->json([
+            "batches" => $batches
+        ]);
+    }
 }

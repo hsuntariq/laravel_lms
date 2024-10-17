@@ -1874,3 +1874,30 @@ $(document).ready(function () {
         });
     }
 });
+
+// get info for relevent batxhes againt a course
+
+$(document).ready(function () {
+    if (window.location.pathname.split("/").includes("teacher")) {
+        getInfoBatches();
+    }
+});
+
+function getInfoBatches() {
+    $('select[name="course_name_teacher"]').on("change", function () {
+        let course_id = $(this).val();
+        $.ajax({
+            url: "/dashboard/teacher/get-relevent-info-batches",
+            type: "POST",
+            data: {
+                course_id,
+            },
+            success: function (response) {
+                console.log(response);
+            },
+            error: function (xhr) {
+                console.log(xhr.statusText);
+            },
+        });
+    });
+}

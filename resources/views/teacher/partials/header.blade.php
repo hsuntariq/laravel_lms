@@ -2,7 +2,7 @@
     <h5 class="text-capitalize">
         {{ request()->segment(3) }}
     </h5>
-    <form action="" class="d-flex gap-3">
+    <form action="" class="d-flex gap-3 my-2">
         <select name="course_name_teacher" id="" class="form-select border-purple text-purple fw-medium bg-transparent">
 
         </select>
