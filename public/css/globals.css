@@ -141,6 +141,17 @@ body {
     display: none;
 }
 
+
+.custom-loader {
+
+    display: none;
+}
+
+.total-strength{
+    display: none;
+}
+
+
 .notificationCard {
     width: 220px;
     height: 280px;

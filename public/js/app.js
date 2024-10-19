@@ -1848,7 +1848,6 @@ $(document).ready(function () {
                     `);
             },
             success: function (response) {
-                console.log(response);
                 let batchOptions =
                     "<option selected disabled>Select Batch</option>" +
                     response?.batches
@@ -1894,6 +1893,41 @@ function getInfoBatches() {
             },
             success: function (response) {
                 console.log(response);
+            },
+            error: function (xhr) {
+                console.log(xhr.statusText);
+            },
+        });
+    });
+}
+
+
+// get students info for teacher
+$(document).ready(function () {
+    if (window.location.pathname.split("/").includes("teacher")) {
+        getInfoStudents();
+    }
+});
+
+function getInfoStudents() {
+    $('select[name="batch_no"]').on("change", function () {
+        $('.loading-strength').show()
+        $('.placeholder-text').hide()
+        let batch_no = $(this).val();
+        $.ajax({
+            url: "/dashboard/teacher/get-relevent-students-info",
+            type: "POST",
+            data: {
+                batch_no,
+            },
+            beforeSend: function () {
+                $('.total-strength').hide()
+
+            },
+            success: function (response) {
+                $('.total-strength').show()
+                $('.total-students').html(response.students)
+                $('.loading-strength').hide()
             },
             error: function (xhr) {
                 console.log(xhr.statusText);

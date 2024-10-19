@@ -20,15 +20,27 @@ class teacherController extends Controller
     }
 
 
-    public function getReleventStudents($batch_no)
+
+
+
+
+
+    public function getReleventStudents(Request $request)
     {
-        $students = User::where('role', 'student')->where('batch_assigned', $batch_no)->count();
-        $courses = User::with('courses')->where('role', 'teacher')->get();
+        // Get batch number from the request
+        $batch_no = $request->batch_no;
+
+        // Get students count based on the batch number
+        $studentCount = User::where('role', 'student')
+            ->where('batch_assigned', $batch_no)
+            ->count();
+
+
         return response()->json([
-            "students" => $students,
-            "courses" => $courses
+            'students' => $studentCount,
         ]);
     }
+
 
 
 
