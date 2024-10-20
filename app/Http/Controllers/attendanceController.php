@@ -141,4 +141,22 @@ class attendanceController extends Controller
             'attendance_marked' => $attendanceExists,
         ]);
     }
+
+
+    public function totalClasses(Request $request)
+    {
+        // Fetch all attendance records for the student for the given batch and course
+        $batch_no = $request->batch_no;
+        $course_name = $request->course_name;
+        $attendanceRecords = Attendance::where('batch_no', $batch_no)
+            ->where('course_id', $course_name)
+            ->get();
+
+        // Total classes based on distinct attendance dates
+        $totalClasses = $attendanceRecords->groupBy('attendance_date')->count();
+
+        return response()->json([
+            "totalClasses" => $totalClasses
+        ]);
+    }
 }

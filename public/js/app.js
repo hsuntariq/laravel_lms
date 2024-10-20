@@ -2365,3 +2365,36 @@ function closeErrorMessages() {
         $(".message-box").css("opacity", "0");
     });
 }
+
+// count total classes
+
+function countTotalClasses() {
+    let batch_no = $('select[name="batch_no"]').val();
+    let course_name = $('select[name="course_name_teacher"]').val();
+    let user_id = window.location.pathname.split("/").pop();
+    $.ajax({
+        url: `/dashboard/student/get-total-classes/${user_id}`,
+        type: "GET",
+        data: {
+            batch_no,
+            course_name,
+        },
+        success: function (response) {
+            console.log(response);
+        },
+        error: function (xhr) {
+            console.log(xhr.statusText);
+        },
+    });
+}
+
+$(document).ready(function () {
+    // if (
+    //     window.location.pathname.split("/").includes("/student") &&
+    //     window.location.pathname.split("/").includes("/home") &&
+    //     window.location.pathname.split("/").includes("/dashboard")
+    // ) {
+    //     countTotalClasses();
+    // }
+    countTotalClasses();
+});

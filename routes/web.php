@@ -44,7 +44,7 @@ Route::prefix('/dashboard/student')->middleware(['auth', 'student'])->group(func
 
     Route::get('/get-marks', [marksController::class, 'getMarks'])->name('get-student-marks');
 
-
+    Route::get('/get-total-classes/{id}', [attendanceController::class, 'totalClasses'])->name('totalClasses');
 
     Route::get('get-data-count/{id}', [studentController::class, 'countData'])->name('count-stuudent-data');
 });
@@ -92,6 +92,8 @@ Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(func
     Route::get('/show-students/{id}', [attendanceController::class, 'getStudents'])->name('show-students');
 
     Route::get('/check-attendance-marked/{id}', [attendanceController::class, 'checkAttendanceMarked'])->name('checkAttendanceMarked');
+
+    Route::get('get-total-classes/{id}', [attendanceController::class, 'totalClasses'])->name('totalClasses');
 });
 
 
