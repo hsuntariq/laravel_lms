@@ -30,7 +30,7 @@ class marksController extends Controller
             return response()->json([
                 "status" => 'error',
                 'message' => 'Invalid Obtained marks, obtained marks should be less than or equal to the max marks'
-            ]);
+            ], 400);
         }
 
 

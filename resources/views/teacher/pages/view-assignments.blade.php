@@ -31,7 +31,9 @@
                         <td>Date</td>
                         <td>day</td>
                         <td>student</td>
-                        <td> time</td>
+                        <td>topic</td>
+                        <td>batch</td>
+                        <td>submit time</td>
                         <td>File</td>
                         <td>Max Marks</td>
                         <td>Obt marks</td>

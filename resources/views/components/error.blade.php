@@ -1,4 +1,4 @@
-<div class="error position-fixed  align-items-center" style="top: 10px;left:50%;transform: translateX(-50%)">
+<!-- <div class="error position-fixed  align-items-center" style="top: 10px;left:50%;transform: translateX(-50%)">
     <div class="error__icon">
         <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -15,5 +15,21 @@
                 d="m15.8333 5.34166-1.175-1.175-4.6583 4.65834-4.65833-4.65834-1.175 1.175 4.65833 4.65834-4.65833 4.6583 1.175 1.175 4.65833-4.6583 4.6583 4.6583 1.175-1.175-4.6583-4.6583z"
                 fill="#393a37"></path>
         </svg>
+    </div>
+</div> -->
+
+<div class="underlay error  position-fixed top-0 justify-content-center align-items-center" style="height:100vh;width:100vw;">
+    <div class="message-box alert alert-danger position-fixed bg-white rounded-3 p-3" style=" box-shadow: 0 4px 15px rgba(255, 0, 0, 0.5),0 8px 30px rgba(255, 0, 0, 0.3);top:50%;left:50%;">
+        <i class="bi bi-x-lg fs-2 position-absolute end-0 p-3 top-0" style="cursor:pointer" onclick="closeErrorMessages()"></i><br>
+        <div class="d-flex align-items-center gap-3">
+            <i class="bi bi-ban fs-2"></i>
+            <h2>Error!</h2>
+        </div>
+        <p class="alert-danger fw-semibold">
+            Please correct the following errors to proceed
+        </p>
+        <ol class="error__title">
+
+        </ol>
     </div>
 </div>

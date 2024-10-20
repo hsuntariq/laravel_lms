@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attendance;
 use App\Models\Batch;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -20,15 +21,28 @@ class teacherController extends Controller
     }
 
 
-    public function getReleventStudents($batch_no)
+
+
+
+
+
+    public function getReleventStudents(Request $request)
     {
-        $students = User::where('role', 'student')->where('batch_assigned', $batch_no)->count();
-        $courses = User::with('courses')->where('role', 'teacher')->get();
+        // Get batch number from the request
+        $batch_no = $request->batch_no;
+        $course_no = $request->course_no;
+
+        // Get students count based on the batch number
+        $studentCount = User::where('role', 'student')
+            ->where('batch_assigned', $batch_no)->where('course_assigned', $course_no)
+            ->count();
+
+
         return response()->json([
-            "students" => $students,
-            "courses" => $courses
+            'students' => $studentCount,
         ]);
     }
+
 
 
 
@@ -40,4 +54,9 @@ class teacherController extends Controller
             "batches" => $batches
         ]);
     }
+
+
+
+    // check if the attendance has been marked for current date
+
 }

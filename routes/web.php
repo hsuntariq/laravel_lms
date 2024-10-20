@@ -56,7 +56,7 @@ Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(func
 
     Route::view('/attendance/view/{id}', 'teacher.pages.view-attendance')->name('teacher-view-attendance');
 
-    Route::view('/assignments/{id}', 'teacher.pages.attendance')->name('teacher-assignments');
+    Route::view('/assignments/{id}', 'teacher.pages.view-assignments')->name('teacher-assignments');
 
     Route::view('/assignments/view/{id}', 'teacher.pages.view-assignments')->name('teacher-view-assignments');
 
@@ -70,7 +70,7 @@ Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(func
 
     Route::get('/attendance/view', [attendanceController::class, 'makeCharts2'])->name('teacher-view-attendance');
 
-    Route::get('/assignments/view', [assignmentController::class, 'makeCharts'])->name('teacher-view-assignments');
+    Route::get('/assignments/view/{id}', [assignmentController::class, 'makeCharts'])->name('teacher-view-assignments');
 
     Route::post('/upload-assignment/', [assignmentController::class, 'uploadAssignment'])->name('upload-assignment');
 
@@ -83,6 +83,15 @@ Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(func
     Route::get('/get-relevent-batches/{id}', [teacherController::class, 'getReleventBatches'])->name('get-relevent-batches');
 
     Route::post('/get-relevent-info-batches', [teacherController::class, 'getInfoForBatches'])->name('getInfoForBatches');
+
+    Route::post('/get-relevent-students-info', [teacherController::class, 'getReleventStudents'])->name('getReleventStudents');
+
+    Route::post('/submit-attendance/{id}', [attendanceController::class, 'submitAttendance'])->name('getReleventStudents');
+
+
+    Route::get('/show-students/{id}', [attendanceController::class, 'getStudents'])->name('show-students');
+
+    Route::get('/check-attendance-marked/{id}', [attendanceController::class, 'checkAttendanceMarked'])->name('checkAttendanceMarked');
 });
 
 

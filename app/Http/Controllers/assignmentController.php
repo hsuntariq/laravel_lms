@@ -97,11 +97,12 @@ class assignmentController extends Controller
 
     public function uploadAssignmentStudent(Request $request)
     {
+        $user_id = auth()->id(); // Get the authenticated user ID
+
         // Validate the request
         $validator = Validator::make($request->all(), [
             'assignment_id' => ['required'],
-            'user_id' => ['required'],
-            'answer_file' => ['required', 'max:10240'], // File validation, max size 10MB
+            'answer_file' => ['required', 'max:10240'], // File validation with allowed types
         ]);
 
         if ($validator->fails()) {
@@ -111,52 +112,50 @@ class assignmentController extends Controller
             ], 422);
         }
 
-
-
-        // check if its not already present
-        $checkExisting = Answers::where('user_id', $request->input('user_id'))->where('assignment_id', $request->input('assignment_id'))->first();
-
+        // Check if the assignment has already been submitted
+        $checkExisting = Answers::where('user_id', $user_id)
+            ->where('assignment_id', $request->input('assignment_id'))
+            ->first();
 
         if ($checkExisting) {
             return response()->json([
                 "status" => "already present",
-                "message" => "Already submitted"
-            ]);
-        } else {
-            // get all data from the form
-
-            $formFields = $request->except('_token');
-
-
-            // Store the uploaded file
-            $formFields['answer_file'] = $request->file('answer_file')->store('assignment_answers', 'public');
-
-            // Update the assignment with the file path
-            $answer = Answers::create($formFields);
-            $answer->update([
-                "status" => 'submitted'
-            ]);
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Submitted successfully'
-            ]);
+                "message" => "Assignment already submitted"
+            ], 409); // Use HTTP status code 409 (Conflict) for already existing submissions
         }
-    }
 
+        // Prepare form fields
+        $formFields = $request->except('_token');
+        $formFields['user_id'] = $user_id; // Assign user_id to the form fields
+
+        // Store the uploaded file
+        $formFields['answer_file'] = $request->file('answer_file')->store('assignment_answers', 'public');
+
+        // Create a new answer record
+        $answer = Answers::create($formFields);
+        $answer->update([
+            'status' => 'submitted'
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Assignment submitted successfully'
+        ], 200); // Use HTTP status code 200 (OK) for success
+    }
 
 
 
     function getAssignmentStatus(Request $request)
     {
         // $user_id = $request->input('user_id'); // Get user_id from query string
-        $getStatus = Answers::where('user_id', 1)->get();
+        $getStatus = Answers::where('user_id', auth()->user()->id)->get();
         return response()->json($getStatus);
     }
 
 
     function getSubmittedAssignments(Request $request)
     {
-        $batch_no = $request->query('batch_no');
+        $batch_no = $request->batch_no;
         $assignments = Answers::where('status', 'submitted')
             ->whereHas('assignment', function ($query) use ($batch_no) {
                 $query->where('batch_no', $batch_no);

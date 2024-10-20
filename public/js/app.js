@@ -55,10 +55,7 @@ $(document).ready(function () {
     });
 
     // Function to count assignments
-    function countAssignments() {
-        const batch_no =
-            $('[name="batch_no"]').val() ||
-            $('[name="batch_no"]').find("option:first").val();
+    function countAssignments(batch_no) {
         $(".count-loading").show();
         $(".total-assignments, .total-tests").hide();
 
@@ -89,10 +86,14 @@ $(document).ready(function () {
     // Count assignments on page load
     $(document).ready(function () {
         if (
-            window.location.pathname === "/dashboard/teacher/assignments/upload"
+            window.location.pathname.split("/").includes("teacher") &&
+            window.location.pathname.split("/").includes("assignments") &&
+            window.location.pathname.split("/").includes("upload")
         ) {
-            countAssignments();
-            $('[name="batch_no"]').on("input", countAssignments);
+            console.log($(this).find("option:first").val());
+            $('select[name="batch_no"]').on("change", function () {
+                countAssignments($(this).val());
+            });
         }
     });
 
@@ -298,12 +299,12 @@ $(document).ready(function () {
         const ext = file?.split(".").pop();
         const fileUrl = `/storage/${file}`;
         const fileIcons = {
-            html: "https://example.com/html-icon.png",
-            png: "https://example.com/png-icon.png",
-            jpeg: "https://example.com/jpeg-icon.png",
-            docx: "https://example.com/docx-icon.png",
-            jpg: "https://example.com/jpg-icon.png",
-            default: "https://example.com/default-icon.png",
+            html: "/assets/file_icons/html.png",
+            png: "/assets/file_icons/png.webp",
+            jpeg: "/assets/file_icons/jpeg.png",
+            docx: "/assets/file_icons/docx.webp",
+            jpg: "/assets/file_icons/jpg.png",
+            default: "/assets/file_icons/default.png",
         };
 
         return `<a href='${fileUrl}' download>
@@ -314,45 +315,99 @@ $(document).ready(function () {
     }
 
     // Get submitted assignments for teacher
-    function getSubmittedAssignments() {
+    // Get submitted assignments for teacher
+    function getSubmittedAssignments(batch_no) {
+        console.log(batch_no);
         $(".loader-table").show();
-        const batch_no =
-            $('[name="batch_no"]').val() ||
-            $('[name="batch_no"]').find("option:first").val();
-
         $.ajax({
             url: "/dashboard/teacher/submitted-assignment",
             type: "GET",
             data: { batch_no: batch_no },
             success: function (response) {
-                let assignmentsHtml = response
-                    .map((assignment) => {
-                        const date = new Date(assignment.created_at);
-                        const options = {
-                            timeZone: "Asia/Karachi",
-                            month: "2-digit",
-                            day: "2-digit",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                        };
-                        const formattedDate = date.toLocaleString(
-                            "en-US",
-                            options
-                        );
+                console.log(response);
+                if (response?.length > 0) {
+                    let assignmentsHtml = response
+                        .map((assignment) => {
+                            const createdAt = new Date(
+                                assignment.assignment?.created_at
+                            );
+                            const options = {
+                                timeZone: "Asia/Karachi",
+                                month: "2-digit",
+                                day: "2-digit",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            };
+                            const formattedDate = createdAt.toLocaleString(
+                                "en-US",
+                                options
+                            );
+                            const day = getDay(createdAt.getDay());
 
-                        return `
-                <tr>
-                    <td>${assignment.topic}</td>
-                    <td>${formattedDate}</td>
-                    <td>${assignment.max_marks}</td>
-                    <td>${displayFile(assignment.answer_file)}</td>
+                            const studentName = assignment?.user?.name || "N/A";
+                            const topicName =
+                                assignment?.assignment?.topic || "N/A";
+                            const batchName =
+                                assignment?.assignment?.batch_no || "N/A";
+                            const answerFile = assignment?.answer_file
+                                ? displayFile(assignment.answer_file)
+                                : "No file";
+                            const maxMarks =
+                                assignment?.assignment?.max_marks || "N/A";
+                            const obtainedMarks =
+                                assignment?.marks !== null
+                                    ? assignment.marks?.obt_marks
+                                    : `<input type='number' name='obtainedMarks-${assignment.id}' class='form-control rounded-pill' placeholder='Obtained Marks...' >`;
+
+                            // Create button element dynamically using jQuery
+                            const button = $("<button/>", {
+                                class: `btn btn-purple px-4 rounded-pill btn-sm mark-assignment ${
+                                    assignment.marks !== null
+                                        ? "btn-disabled"
+                                        : ""
+                                } `,
+                                text:
+                                    assignment.marks !== null
+                                        ? "Marked"
+                                        : "Mark",
+                                disabled: assignment.marks !== null,
+                                "data-assignment_id": assignment.assignment_id,
+                                "data-user_id": assignment?.user?.id,
+                                "data-answer_id": assignment.id,
+                                "data-max_marks":
+                                    assignment.assignment?.max_marks,
+                                "data-answer_id": assignment.id,
+                            });
+
+                            // Generate the row HTML with the button
+                            return `
+                        <tr>
+                            <td>${formattedDate}</td>
+                            <td>${day}</td>
+                            <td>${studentName}</td>
+                            <td>${topicName}</td>
+                            <td>Batch${batchName}</td>
+
+                            <td>${
+                                assignment?.assignment?.deadline || "N/A"
+                            }</td>
+                            <td>${answerFile}</td>
+                            <td>${maxMarks}</td>
+                            <td class='error-marks'>${obtainedMarks}</td>
+                            <td>${button[0].outerHTML}</td>
+                        </tr>`;
+                        })
+                        .join("");
+
+                    // Render the HTML in the table body
+                    $(".submitted-assignments").html(assignmentsHtml);
+                } else {
+                    `<tr>
+                   <th colspan='8'> No assignments Submitted yet</th>
                 </tr>`;
-                    })
-                    .join("");
-                $("#submittedAssignmentsTableBody").html(assignmentsHtml);
+                }
             },
             error: function (xhr) {
-                // Handle error appropriately
                 console.error(
                     "Error fetching submitted assignments:",
                     xhr.statusText
@@ -363,6 +418,94 @@ $(document).ready(function () {
             },
         });
     }
+
+    $(document).ready(function () {
+        if (
+            window.location.pathname.split("/").includes("teacher") &&
+            window.location.pathname.split("/").includes("assignments") &&
+            window.location.pathname.split("/").includes("view")
+        ) {
+            $('select[name="batch_no"]').on("change", function () {
+                getSubmittedAssignments($(this).val());
+            });
+        }
+    });
+
+    // Mark assignments
+    $(document).ready(function () {
+        if (
+            window.location.pathname.split("/").includes("teacher") &&
+            window.location.pathname.split("/").includes("assignments") &&
+            window.location.pathname.split("/").includes("view")
+        ) {
+            $(document)
+                .off("click", ".mark-assignment")
+                .on("click", ".mark-assignment", function () {
+                    const $button = $(this); // Reference to the clicked button
+                    const answerId = $button.data("answer_id");
+                    const obtainedMarks = $(
+                        `input[name="obtainedMarks-${answerId}"]`
+                    ).val();
+
+                    let data = {
+                        assignment_id: $button.data("assignment_id"),
+                        answer_id: answerId,
+                        user_id: $button.data("user_id"),
+                        obt_marks: obtainedMarks,
+                        max_marks: $button.data("max_marks"),
+                        comments: "salam",
+                    };
+
+                    // Show loader and change button text
+                    const loaderHtml =
+                        '<div class="d-flex gap-1"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Marking...</div>';
+                    $button
+                        .html(loaderHtml)
+                        .attr("disabled", true)
+                        .addClass("btn-disabled");
+
+                    $.ajax({
+                        url: "/dashboard/teacher/mark-assignment/",
+                        type: "POST",
+                        data,
+                        success: function (response) {
+                            $button
+                                .html("Marked")
+                                .attr("disabled", true)
+                                .addClass("btn-disabled");
+
+                            // Optionally do something with the response here
+                        },
+                        error: function (xhr) {
+                            console.error("Error:", xhr);
+                            $button
+                                .html("Mark")
+                                .attr("disabled", false)
+                                .removeClass("btn-disabled");
+                            // Find the input field related to the current row and show the error message under it
+                            const $inputField = $(
+                                `input[name="obtainedMarks-${answerId}"]`
+                            );
+
+                            // Remove any existing error message to prevent duplicates
+                            $inputField.siblings(".alert-danger").remove();
+
+                            // Add the error message directly under the input field
+                            $inputField.after(`
+                        <p class="alert alert-danger text-sm mt-1">
+                            ${xhr.responseJSON?.message || xhr.statusText}
+                        </p>
+                    `);
+                        },
+                        complete: function () {
+                            // Restore button text and hide loader
+                            // $button.html('Marked').attr('disabled', true).removeClass('btn-disabled');
+                            // getSubmittedAssignments($('input[name="batch_no"]').val()); // Refresh assignments if necessary
+                        },
+                    });
+                });
+        }
+    });
 
     // get marks for the student
 
@@ -1050,9 +1193,9 @@ $(document).ready(function () {
                 },
                 success: function (response) {
                     let batchOptions =
-                        "<option disabled selected>Loading batches...</option>";
+                        "<option disabled selected>Select Batch</option>";
                     response.batches.forEach(function (batch) {
-                        batchOptions += `<option value="${batch.id}">${batch.batch_no}</option>`;
+                        batchOptions += `<option value="${batch.batch_no}">${batch.batch_no}</option>`;
                     });
                     $("#batch_assigned").html(batchOptions);
                 },
@@ -1294,7 +1437,9 @@ $(document).ready(function () {
     $(document).on("change", ".courses-select", function () {
         let courseId = $(this).val();
         // if (!courseId) return; // Prevent AJAX call if no course is selected
-
+        $(".batch-select").html(
+            "<option disabled selected>Loading batches...</option>"
+        );
         // Show loader while fetching batches and students
         $(".staff-loader").show();
         $(".student-table").hide();
@@ -1306,20 +1451,15 @@ $(document).ready(function () {
             data: {
                 course_id: courseId,
             },
-            beforeSend: function () {
-                $(".batch-select").html(
-                    "<option disabled selected>Loading batches...</option>"
-                );
-            },
+            beforeSend: function () {},
             success: function (response) {
                 let batchOptions =
                     "<option disabled selected>Select Batch</option>";
                 // Populate batch dropdown based on the selected course
                 response.options.data.forEach(function (batch) {
-                    batchOptions += `<option value="${batch.id}">${batch.batch_no}</option>`;
+                    batchOptions += `<option value="${batch.batch_no}">${batch.batch_no}</option>`;
                 });
                 $(".batch-select").html(batchOptions); // Update the batch select options
-                console.log(response);
                 $(".total-students").html(
                     `Total Students(${response.options.data.length})`
                 );
@@ -1848,7 +1988,6 @@ $(document).ready(function () {
                     `);
             },
             success: function (response) {
-                console.log(response);
                 let batchOptions =
                     "<option selected disabled>Select Batch</option>" +
                     response?.batches
@@ -1899,5 +2038,330 @@ function getInfoBatches() {
                 console.log(xhr.statusText);
             },
         });
+    });
+}
+
+// get students info for teacher
+$(document).ready(function () {
+    if (window.location.pathname.split("/").includes("teacher")) {
+        getInfoStudents();
+    }
+});
+
+function getInfoStudents() {
+    $('select[name="batch_no"]').on("change", function () {
+        $(".loading-strength").show();
+        $(".placeholder-text").hide();
+        let batch_no = $(this).val();
+        let course_no = $('select[name="course_name_teacher"]').val();
+        $.ajax({
+            url: "/dashboard/teacher/get-relevent-students-info",
+            type: "POST",
+            data: {
+                batch_no,
+                course_no,
+            },
+            beforeSend: function () {
+                $(".total-strength").hide();
+            },
+            success: function (response) {
+                $(".total-strength").show();
+                $(".total-students").html(response.students);
+                $(".loading-strength").hide();
+            },
+            error: function (xhr) {
+                console.log(xhr.statusText);
+            },
+        });
+    });
+}
+
+// get stuedents for attendace
+
+$(document).ready(function () {
+    let user_id = window.location.pathname.split("/").pop();
+
+    if (
+        window.location.pathname.split("/").includes("teacher") &&
+        window.location.pathname.split("/").includes("attendance") &&
+        window.location.pathname.split("/").includes("mark")
+    ) {
+        $(".loader-table-teacher").hide();
+
+        // When the 'batch_no' is changed
+        $('select[name="batch_no"]').on("change", function () {
+            let batch_no = $(this).val(); // Get the selected batch number
+            let course_name = $("select[name='course_name_teacher']").val(); // Get the selected course name
+            $(".teacher-attendance-mark-table").hide();
+            $(".loader-table-teacher").show();
+
+            $.ajax({
+                url: `/dashboard/teacher/show-students/${user_id}`,
+                type: "GET",
+                data: {
+                    batch_no:
+                        batch_no ||
+                        $("select[name='batch_no']").find("option:first").val(),
+                    course_name:
+                        course_name ||
+                        $("select[name='course_name_teacher']")
+                            .find("option:first")
+                            .val(),
+                },
+                success: function (response) {
+                    console.log(response);
+                    let rowsHtml = response?.students
+                        ?.map((student) => {
+                            return `
+                            <tr>
+                                <td id='slice-name' >${
+                                    student.name && student.name.length > 10
+                                        ? student.name.slice(0, 10) + "..."
+                                        : student.name
+                                }</td>
+                                <td class='fw-semibold ${
+                                    student?.attendance_percentage >= 75
+                                        ? "text-success"
+                                        : "text-danger"
+                                }' >
+                                    ${student?.attendance_percentage}%
+                                </td>
+                                <td>
+                                    <input type="radio" name="attendance_${
+                                        student.id
+                                    }" value="present" />
+                                </td>
+                                <td>
+                                    <input type="radio" name="attendance_${
+                                        student.id
+                                    }" value="absent" />
+                                </td>
+                                <td>
+                                    <input type="radio" name="attendance_${
+                                        student.id
+                                    }" value="leave" />
+                                </td>
+                                <td>
+                                    <div class='input-group input-group-sm'>
+                                        <input type="text" name="remarks_${
+                                            student.id
+                                        }" class="form-control rounded-pill input-group-sm" placeholder="Enter remarks" />
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                        })
+                        .join("");
+
+                    // Append generated rows to the table body
+                    $(".teacher-mark-attendace").html(rowsHtml);
+                    $(".teacher-attendance-mark-table").show();
+                    $(".loader-table-teacher").hide();
+                },
+                error: function (xhr) {
+                    console.log(xhr.statusText);
+                },
+            });
+        });
+    }
+
+    // Submit the attendance
+    $(document)
+        .off("click")
+        .on("click", ".att-mark-btn", function (e) {
+            e.preventDefault();
+            let loader = $(".attendace-loading-gif");
+
+            let user_id = window.location.pathname.split("/").pop();
+            // Collect the attendance data for each student
+            let attendanceData = [];
+            let topic = $(`input[name="topic_name"]`).val();
+            $("tbody.teacher-mark-attendace tr").each(function () {
+                let studentId = $(this)
+                    .find('input[type="radio"][name^="attendance_"]')
+                    .attr("name")
+                    .split("_")[1];
+                let attendance = $(this)
+                    .find(
+                        `input[type="radio"][name="attendance_${studentId}"]:checked`
+                    )
+                    .val();
+                let remarks = $(`input[name="remarks_${studentId}"]`).val();
+
+                if (attendance) {
+                    attendanceData.push({
+                        student_id: studentId,
+                        attendance: attendance,
+                        remarks: remarks,
+                        topic: topic,
+                    });
+                }
+            });
+
+            // Send the data to the backend
+            $.ajax({
+                url: `/dashboard/teacher/submit-attendance/${user_id}`,
+                type: "POST",
+                data: {
+                    batch_no: $("select[name='batch_no']").val(),
+                    course_name: $("select[name='course_name_teacher']").val(),
+                    attendance: attendanceData,
+                    _token: $('meta[name="csrf-token"]').attr("content"), // Ensure CSRF token is sent
+                },
+                beforeSend: function () {
+                    $(".att-mark-btn")
+                        .html(
+                            `<div class="spinner-border  " style="width:25px;height:25px" role="status">
+  <span class="visually-hidden">Loading...</span>
+</div> `
+                        )
+                        .prop("disabled", true)
+                        .addClass("btn-disabled"); // Disable the button while loading
+                },
+                success: function (response) {
+                    alert("Attendance submitted successfully!");
+                    console.log(response);
+                },
+                error: function (xhr) {
+                    console.log(xhr.responseJSON);
+
+                    showErrorMessages(xhr.responseJSON.errors);
+
+                    $(".att-mark-btn")
+                        .prop("disabled", false)
+                        .removeClass("btn-disabled"); // Re-enable the button after completion
+                },
+                complete: function () {
+                    $(".att-mark-btn").prop("disabled", false); // Re-enable the button after completion
+                    // Optionally reset the button text
+                    $(".att-mark-btn").html("Submit Attendance");
+                },
+            });
+        });
+});
+
+function sliceName(name) {
+    if (name.length > 10) {
+        return name.slice(0, 10) + "...";
+    } else {
+        return name;
+    }
+}
+
+// check if the attendace has been marked for the current date
+
+$(document).ready(function () {
+    let user_id = window.location.pathname.split("/").pop();
+
+    // Check if attendance is already marked when loading the page or when batch/course is selected
+    function checkAttendanceMarked(batch_no, course_name) {
+        $.ajax({
+            url: `/dashboard/teacher/check-attendance-marked/${user_id}`,
+            type: "GET",
+            data: {
+                batch_no: batch_no,
+                course_name: course_name,
+            },
+            success: function (response) {
+                if (response.attendance_marked) {
+                    // Disable the button if attendance has already been marked
+                    $(".att-mark-btn")
+                        .prop("disabled", true)
+                        .text("Attendance Already Marked")
+                        .addClass("btn-disabled");
+                } else {
+                    // Enable the button if no attendance is marked for today
+                    $(".att-mark-btn")
+                        .prop("disabled", false)
+                        .text("Submit Attendance")
+                        .removeClass("btn-disabled");
+                }
+            },
+            error: function (xhr) {
+                console.error("Error checking attendance:", xhr.statusText);
+            },
+        });
+    }
+
+    // Example usage: Call the function when a batch or course is selected or on page load
+    $('select[name="batch_no"], select[name="course_name_teacher"]').on(
+        "change",
+        function () {
+            let batch_no = $('select[name="batch_no"]').val();
+            let course_name = $('select[name="course_name_teacher"]').val();
+
+            checkAttendanceMarked(batch_no, course_name); // Call to check if attendance is already marked
+        }
+    );
+
+    // Initial check when the page loads
+    setTimeout(() => {
+        let batch_no = $('select[name="batch_no"]').find("option:eq(1)").val();
+        let course_name = $('select[name="course_name_teacher"]')
+            .find("option:eq(1)")
+            .val();
+        console.log(batch_no, course_name);
+        checkAttendanceMarked(batch_no, course_name);
+    }, 1000);
+});
+
+// handle the error showing
+
+function showErrorMessages(errors) {
+    // Show the error container and add the flex class for display
+    $(".error").show().addClass("d-flex");
+
+    // Clear any existing messages
+    $(".error__title").empty();
+
+    // Check if errors is an object
+    if (typeof errors === "object" && errors !== null) {
+        for (let key in errors) {
+            if (errors.hasOwnProperty(key)) {
+                // Check if the property is an array
+                if (Array.isArray(errors[key])) {
+                    // Iterate over the array of errors
+                    errors[key].forEach(function (item) {
+                        $(".error__title").append(
+                            `<li class='fw-bold alert-danger'>${item}</li>`
+                        );
+                    });
+                } else if (typeof errors[key] === "string") {
+                    // If it's a single error string, display it
+                    $(".error__title").append(
+                        `<li class='fw-bold alert-danger'>${errors[key]}</li>`
+                    );
+                }
+            }
+        }
+    } else if (typeof errors === "string") {
+        // If errors is a single error string
+        $(".error__title").append(
+            `<li class='fw-bold alert-danger'>${errors}</li>`
+        );
+    } else {
+        // Fallback in case of unexpected error structure
+        $(".error__title").append(
+            `<li class='fw-bold alert-danger'>Unexpected error occurred.</li>`
+        );
+    }
+
+    // Optionally show the message box with a slight delay
+    setTimeout(() => {
+        $(".message-box").css("transform", "translate(-50%,-50%)");
+        $(".message-box").css("opacity", "1");
+    }, 100);
+}
+
+// close error message
+
+function closeErrorMessages() {
+    // Optionally, animate the closing of the error message
+    $(".error").fadeOut(300, function () {
+        // Reset styles or clear the error messages after hiding
+        $(".error__title").empty();
+        $(".error").removeClass("d-flex"); // Remove the flex class
+        $(".message-box").css("transform", "translate(-50%,-20%)");
+        $(".message-box").css("opacity", "0");
     });
 }
