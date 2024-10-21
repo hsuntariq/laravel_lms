@@ -56,7 +56,7 @@ Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(func
 
     Route::view('/attendance/view/{id}', 'teacher.pages.view-attendance')->name('teacher-view-attendance');
 
-    Route::view('/assignments/{id}', 'teacher.pages.attendance')->name('teacher-assignments');
+    Route::view('/assignments/{id}', 'teacher.pages.view-assignments')->name('teacher-assignments');
 
     Route::view('/assignments/view/{id}', 'teacher.pages.view-assignments')->name('teacher-view-assignments');
 
@@ -70,7 +70,7 @@ Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(func
 
     Route::get('/attendance/view', [attendanceController::class, 'makeCharts2'])->name('teacher-view-attendance');
 
-    Route::get('/assignments/view', [assignmentController::class, 'makeCharts'])->name('teacher-view-assignments');
+    Route::get('/assignments/view/{id}', [assignmentController::class, 'makeCharts'])->name('teacher-view-assignments');
 
     Route::post('/upload-assignment/', [assignmentController::class, 'uploadAssignment'])->name('upload-assignment');
 

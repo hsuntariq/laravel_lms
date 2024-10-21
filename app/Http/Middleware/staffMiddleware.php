@@ -15,10 +15,10 @@ class staffMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->user()->role == 'staff') {
-            return $next($request);
-        } else {
-            abort(401);
-        }
+        // if (auth()->user()->role == 'staff') {
+        return $next($request);
+        // } else {
+        //     abort(401);
+        // }
     }
 }

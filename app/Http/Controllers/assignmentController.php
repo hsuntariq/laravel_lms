@@ -149,14 +149,14 @@ class assignmentController extends Controller
     function getAssignmentStatus(Request $request)
     {
         // $user_id = $request->input('user_id'); // Get user_id from query string
-        $getStatus = Answers::where('user_id', 1)->get();
+        $getStatus = Answers::where('user_id', auth()->user()->id)->get();
         return response()->json($getStatus);
     }
 
 
     function getSubmittedAssignments(Request $request)
     {
-        $batch_no = $request->query('batch_no');
+        $batch_no = $request->batch_no;
         $assignments = Answers::where('status', 'submitted')
             ->whereHas('assignment', function ($query) use ($batch_no) {
                 $query->where('batch_no', $batch_no);

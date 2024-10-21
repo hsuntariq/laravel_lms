@@ -298,12 +298,12 @@ $(document).ready(function () {
         const ext = file?.split(".").pop();
         const fileUrl = `/storage/${file}`;
         const fileIcons = {
-            html: "https://example.com/html-icon.png",
-            png: "https://example.com/png-icon.png",
-            jpeg: "https://example.com/jpeg-icon.png",
-            docx: "https://example.com/docx-icon.png",
-            jpg: "https://example.com/jpg-icon.png",
-            default: "https://example.com/default-icon.png",
+            html: "/assets/file_icons/html.png",
+            png: "/assets/file_icons/png.webp",
+            jpeg: "/assets/file_icons/jpeg.png",
+            docx: "/assets/file_icons/docx.webp",
+            jpg: "/assets/file_icons/jpg.png",
+            default: "/assets/file_icons/default.png",
         };
 
         return `<a href='${fileUrl}' download>
@@ -314,42 +314,59 @@ $(document).ready(function () {
     }
 
     // Get submitted assignments for teacher
-    function getSubmittedAssignments() {
+    function getSubmittedAssignments(batch_no) {
+        console.log(batch_no)
         $(".loader-table").show();
-        const batch_no =
-            $('[name="batch_no"]').val() ||
-            $('[name="batch_no"]').find("option:first").val();
-
         $.ajax({
             url: "/dashboard/teacher/submitted-assignment",
             type: "GET",
             data: { batch_no: batch_no },
             success: function (response) {
+                console.log(response)
                 let assignmentsHtml = response
-                    .map((assignment) => {
-                        const date = new Date(assignment.created_at);
-                        const options = {
-                            timeZone: "Asia/Karachi",
-                            month: "2-digit",
-                            day: "2-digit",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                        };
-                        const formattedDate = date.toLocaleString(
-                            "en-US",
-                            options
-                        );
+    .map((assignment) => {
+        const createdAt = new Date(assignment.assignment?.created_at);
+        const options = {
+            timeZone: "Asia/Karachi",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+        };
+        const formattedDate = createdAt.toLocaleString("en-US", options);
+        const day = getDay(createdAt);
 
-                        return `
-                <tr>
-                    <td>${assignment.topic}</td>
-                    <td>${formattedDate}</td>
-                    <td>${assignment.max_marks}</td>
-                    <td>${displayFile(assignment.answer_file)}</td>
-                </tr>`;
-                    })
-                    .join("");
-                $("#submittedAssignmentsTableBody").html(assignmentsHtml);
+        // Get student name and file information
+        const studentName = assignment?.user?.name || "N/A";
+        const answerFile = assignment?.answer_file ? displayFile(assignment.answer_file) : "No file";
+
+        // Max marks and obtained marks
+        const maxMarks = assignment?.assignment?.max_marks || "N/A";
+        const obtainedMarks = assignment?.marks !== null ? assignment.marks : `<input type='number' placeholder="Mark Assignment..." name='obt-marks' class='form-control rounded-pill' >`;
+
+        // Generate row for each assignment
+        return `
+            <tr>
+                <td>${formattedDate}</td>
+                <td>${day}</td>
+                <td>${studentName}</td>
+                <td>${assignment?.assignment?.deadline || "N/A"}</td>
+                <td>${answerFile}</td>
+                <td>${maxMarks}</td>
+                <td>${obtainedMarks}</td>
+                <td>
+                    <button class="btn btn-purple btn-sm mark-assignment" data-assignment_id="${assignment.assignment_id} data-user_id="${assignment?.user?.id} data-answer_id="${assignment.id} data-obt_marks="${obtainedMarks} data-max_marks="${assignment.assignment?.max_marks}"
+                        ${assignment.marks !== null ? 'disabled' : ''}>
+                        ${assignment.marks !== null ? 'Marked' : 'Mark'}
+                    </button>
+                </td>
+            </tr>`;
+    })
+    .join("");
+
+// Render the HTML in the table body
+$(".submitted-assignments").html(assignmentsHtml);
+
             },
             error: function (xhr) {
                 // Handle error appropriately
@@ -363,6 +380,19 @@ $(document).ready(function () {
             },
         });
     }
+
+    $(document).ready(function () {
+        if (
+            window.location.pathname.split('/').includes('teacher') &&
+            window.location.pathname.split('/').includes('assignments') &&
+            window.location.pathname.split('/').includes('view')
+    ) {
+            $('select[name="batch_no"]').on('change', function () {
+                getSubmittedAssignments($(this).val())
+            })
+
+        }
+    })
 
     // get marks for the student
 
