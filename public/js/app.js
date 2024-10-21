@@ -55,10 +55,8 @@ $(document).ready(function () {
     });
 
     // Function to count assignments
-    function countAssignments() {
-        const batch_no =
-            $('[name="batch_no"]').val() ||
-            $('[name="batch_no"]').find("option:first").val();
+    function countAssignments(batch_no) {
+
         $(".count-loading").show();
         $(".total-assignments, .total-tests").hide();
 
@@ -89,10 +87,15 @@ $(document).ready(function () {
     // Count assignments on page load
     $(document).ready(function () {
         if (
-            window.location.pathname === "/dashboard/teacher/assignments/upload"
+            window.location.pathname.split('/').includes('teacher') &&
+            window.location.pathname.split('/').includes('assignments') &&
+            window.location.pathname.split('/').includes('upload')
         ) {
-            countAssignments();
-            $('[name="batch_no"]').on("input", countAssignments);
+            console.log($(this).find('option:first').val())
+            $('select[name="batch_no"]').on("change", function () {
+                countAssignments($(this).val());
+
+            });
         }
     });
 
@@ -314,85 +317,160 @@ $(document).ready(function () {
     }
 
     // Get submitted assignments for teacher
-    function getSubmittedAssignments(batch_no) {
-        console.log(batch_no)
-        $(".loader-table").show();
-        $.ajax({
-            url: "/dashboard/teacher/submitted-assignment",
-            type: "GET",
-            data: { batch_no: batch_no },
-            success: function (response) {
-                console.log(response)
-                let assignmentsHtml = response
-    .map((assignment) => {
-        const createdAt = new Date(assignment.assignment?.created_at);
-        const options = {
-            timeZone: "Asia/Karachi",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-        };
-        const formattedDate = createdAt.toLocaleString("en-US", options);
-        const day = getDay(createdAt);
+// Get submitted assignments for teacher
+function getSubmittedAssignments(batch_no) {
+    console.log(batch_no);
+    $(".loader-table").show();
+    $.ajax({
+        url: "/dashboard/teacher/submitted-assignment",
+        type: "GET",
+        data: { batch_no: batch_no },
+        success: function (response) {
+            console.log(response);
+            if (response?.length > 0) {
 
-        // Get student name and file information
-        const studentName = assignment?.user?.name || "N/A";
-        const answerFile = assignment?.answer_file ? displayFile(assignment.answer_file) : "No file";
+            let assignmentsHtml = response
+                .map((assignment) => {
+                    const createdAt = new Date(assignment.assignment?.created_at);
+                    const options = {
+                        timeZone: "Asia/Karachi",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    };
+                    const formattedDate = createdAt.toLocaleString("en-US", options);
+                    const day = getDay(createdAt.getDay());
 
-        // Max marks and obtained marks
-        const maxMarks = assignment?.assignment?.max_marks || "N/A";
-        const obtainedMarks = assignment?.marks !== null ? assignment.marks : `<input type='number' placeholder="Mark Assignment..." name='obt-marks' class='form-control rounded-pill' >`;
+                    const studentName = assignment?.user?.name || "N/A";
+                    const topicName = assignment?.assignment?.topic || "N/A"
+                    const batchName = assignment?.assignment?.batch_no || "N/A"
+                    const answerFile = assignment?.answer_file ? displayFile(assignment.answer_file) : "No file";
+                    const maxMarks = assignment?.assignment?.max_marks || "N/A";
+                    const obtainedMarks = assignment?.marks !== null
+                        ? assignment.marks?.obt_marks
+                        : `<input type='number' name='obtainedMarks-${assignment.id}' class='form-control rounded-pill' placeholder='Obtained Marks...' >`;
 
-        // Generate row for each assignment
-        return `
-            <tr>
-                <td>${formattedDate}</td>
-                <td>${day}</td>
-                <td>${studentName}</td>
-                <td>${assignment?.assignment?.deadline || "N/A"}</td>
-                <td>${answerFile}</td>
-                <td>${maxMarks}</td>
-                <td>${obtainedMarks}</td>
-                <td>
-                    <button class="btn btn-purple btn-sm mark-assignment" data-assignment_id="${assignment.assignment_id} data-user_id="${assignment?.user?.id} data-answer_id="${assignment.id} data-obt_marks="${obtainedMarks} data-max_marks="${assignment.assignment?.max_marks}"
-                        ${assignment.marks !== null ? 'disabled' : ''}>
-                        ${assignment.marks !== null ? 'Marked' : 'Mark'}
-                    </button>
-                </td>
-            </tr>`;
-    })
-    .join("");
+                    // Create button element dynamically using jQuery
+                    const button = $('<button/>', {
+                        class: `btn btn-purple px-4 rounded-pill btn-sm mark-assignment ${assignment.marks !== null ? 'btn-disabled' : ''} `,
+                        text: assignment.marks !== null ? 'Marked' : 'Mark',
+                        disabled: assignment.marks !== null,
+                        'data-assignment_id': assignment.assignment_id,
+                        'data-user_id': assignment?.user?.id,
+                        'data-answer_id': assignment.id,
+                        'data-max_marks': assignment.assignment?.max_marks,
+                        'data-answer_id': assignment.id,
+                    });
 
-// Render the HTML in the table body
-$(".submitted-assignments").html(assignmentsHtml);
+                    // Generate the row HTML with the button
+                    return `
+                        <tr>
+                            <td>${formattedDate}</td>
+                            <td>${day}</td>
+                            <td>${studentName}</td>
+                            <td>${topicName}</td>
+                            <td>Batch${batchName}</td>
 
-            },
-            error: function (xhr) {
-                // Handle error appropriately
-                console.error(
-                    "Error fetching submitted assignments:",
-                    xhr.statusText
-                );
-            },
-            complete: function () {
-                $(".loader-table").hide();
-            },
+                            <td>${assignment?.assignment?.deadline || "N/A"}</td>
+                            <td>${answerFile}</td>
+                            <td>${maxMarks}</td>
+                            <td class='error-marks'>${obtainedMarks}</td>
+                            <td>${button[0].outerHTML}</td>
+                        </tr>`;
+                })
+                .join("");
+
+            // Render the HTML in the table body
+                $(".submitted-assignments").html(assignmentsHtml);
+            } else {
+                `<tr>
+                   <th colspan='8'> No assignments Submitted yet</th>
+                </tr>`
+            }
+
+        },
+        error: function (xhr) {
+            console.error("Error fetching submitted assignments:", xhr.statusText);
+        },
+        complete: function () {
+            $(".loader-table").hide();
+        },
+    });
+}
+
+$(document).ready(function () {
+    if (
+        window.location.pathname.split('/').includes('teacher') &&
+        window.location.pathname.split('/').includes('assignments') &&
+        window.location.pathname.split('/').includes('view')
+    ) {
+        $('select[name="batch_no"]').on('change', function () {
+            getSubmittedAssignments($(this).val());
         });
     }
+});
 
-    $(document).ready(function () {
-        if (
-            window.location.pathname.split('/').includes('teacher') &&
-            window.location.pathname.split('/').includes('assignments') &&
-            window.location.pathname.split('/').includes('view')
+// Mark assignments
+$(document).ready(function () {
+    if (
+        window.location.pathname.split('/').includes('teacher') &&
+        window.location.pathname.split('/').includes('assignments') &&
+        window.location.pathname.split('/').includes('view')
     ) {
-            $('select[name="batch_no"]').on('change', function () {
-                getSubmittedAssignments($(this).val())
-            })
+        $(document).off('click', '.mark-assignment').on('click', '.mark-assignment', function () {
+            const $button = $(this);  // Reference to the clicked button
+            const answerId = $button.data('answer_id');
+            const obtainedMarks = $(`input[name="obtainedMarks-${answerId}"]`).val();
 
-        }
-    })
+            let data = {
+                assignment_id: $button.data('assignment_id'),
+                answer_id: answerId,
+                user_id: $button.data('user_id'),
+                obt_marks: obtainedMarks,
+                max_marks: $button.data('max_marks'),
+                comments: 'salam'
+            };
+
+            // Show loader and change button text
+            const loaderHtml = '<div class="d-flex gap-1"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Marking...</div>';
+            $button.html(loaderHtml).attr('disabled', true).addClass('btn-disabled');
+
+            $.ajax({
+                url: '/dashboard/teacher/mark-assignment/',
+                type: 'POST',
+                data,
+                success: function (response) {
+                    $button.html('Marked').attr('disabled', true).addClass('btn-disabled');
+
+                    // Optionally do something with the response here
+                },
+                error: function (xhr) {
+                    console.error("Error:", xhr);
+                     $button.html('Mark').attr('disabled', false).removeClass('btn-disabled');
+                    // Find the input field related to the current row and show the error message under it
+                    const $inputField = $(`input[name="obtainedMarks-${answerId}"]`);
+
+                    // Remove any existing error message to prevent duplicates
+                    $inputField.siblings('.alert-danger').remove();
+
+                    // Add the error message directly under the input field
+                    $inputField.after(`
+                        <p class="alert alert-danger text-sm mt-1">
+                            ${xhr.responseJSON?.message || xhr.statusText}
+                        </p>
+                    `);
+                },
+                complete: function () {
+                    // Restore button text and hide loader
+                    // $button.html('Marked').attr('disabled', true).removeClass('btn-disabled');
+                    // getSubmittedAssignments($('input[name="batch_no"]').val()); // Refresh assignments if necessary
+                }
+            });
+        });
+    }
+});
+
 
     // get marks for the student
 
