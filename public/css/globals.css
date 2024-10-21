@@ -151,6 +151,11 @@ body {
     display: none;
 }
 
+td,th{
+    vertical-align: center !important;
+    text-align:center;
+}
+
 
 .notificationCard {
     width: 220px;

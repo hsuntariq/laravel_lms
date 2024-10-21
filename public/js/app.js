@@ -472,6 +472,19 @@ $(document).ready(function () {
 });
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     // get marks for the student
 
     $(document).ready(function () {
@@ -1158,9 +1171,9 @@ $(document).ready(function () {
                 },
                 success: function (response) {
                     let batchOptions =
-                        "<option disabled selected>Loading batches...</option>";
+                        "<option disabled selected>Select Batch</option>";
                     response.batches.forEach(function (batch) {
-                        batchOptions += `<option value="${batch.id}">${batch.batch_no}</option>`;
+                        batchOptions += `<option value="${batch.batch_no}">${batch.batch_no}</option>`;
                     });
                     $("#batch_assigned").html(batchOptions);
                 },
@@ -1402,7 +1415,9 @@ $(document).ready(function () {
     $(document).on("change", ".courses-select", function () {
         let courseId = $(this).val();
         // if (!courseId) return; // Prevent AJAX call if no course is selected
-
+        $(".batch-select").html(
+                    "<option disabled selected>Loading batches...</option>"
+                );
         // Show loader while fetching batches and students
         $(".staff-loader").show();
         $(".student-table").hide();
@@ -1415,19 +1430,16 @@ $(document).ready(function () {
                 course_id: courseId,
             },
             beforeSend: function () {
-                $(".batch-select").html(
-                    "<option disabled selected>Loading batches...</option>"
-                );
+
             },
             success: function (response) {
                 let batchOptions =
                     "<option disabled selected>Select Batch</option>";
                 // Populate batch dropdown based on the selected course
                 response.options.data.forEach(function (batch) {
-                    batchOptions += `<option value="${batch.id}">${batch.batch_no}</option>`;
+                    batchOptions += `<option value="${batch.batch_no}">${batch.batch_no}</option>`;
                 });
                 $(".batch-select").html(batchOptions); // Update the batch select options
-                console.log(response);
                 $(".total-students").html(
                     `Total Students(${response.options.data.length})`
                 );
@@ -2043,3 +2055,117 @@ function getInfoStudents() {
         });
     });
 }
+
+
+
+
+
+// get stuedents for attendace
+
+$(document).ready(function () {
+    let user_id = window.location.pathname.split('/').pop();
+
+    if (
+        window.location.pathname.split('/').includes('teacher') &&
+        window.location.pathname.split('/').includes('attendance') &&
+        window.location.pathname.split('/').includes('mark')
+    ) {
+        $('.loader-table-teacher').hide();
+
+        // When the 'batch_no' is changed
+        $('select[name="batch_no"]').on('change', function () {
+            let batch_no = $(this).val(); // Get the selected batch number
+            let course_name = $("select[name='course_name_teacher']").val(); // Get the selected course name
+            $('.teacher-attendance-mark-table').hide();
+            $('.loader-table-teacher').show();
+
+            $.ajax({
+                url: `/dashboard/teacher/show-students/${user_id}`,
+                type: 'GET',
+                data: {
+                    batch_no: batch_no || $("select[name='batch_no']").find('option:first').val(),
+                    course_name: course_name || $("select[name='course_name_teacher']").find('option:first').val()
+                },
+                success: function (response) {
+                    let rowsHtml = response?.students?.map((student) => {
+                        return `
+                            <tr>
+                                <td>
+                                    <div class='input-group input-group-sm'>
+                                        <input type="text" name="topic_${student.id}" class="form-control rounded-pill input-group-sm" placeholder="Enter topic name" />
+                                    </div>
+                                </td>
+                                <td>${student.name && student.name.length > 10 ? student.name.slice(0, 10) + '...' : student.name}</td>
+                                <td>
+                                    <input type="radio" name="attendance_${student.id}" value="present" />
+                                </td>
+                                <td>
+                                    <input type="radio" name="attendance_${student.id}" value="absent" />
+                                </td>
+                                <td>
+                                    <input type="radio" name="attendance_${student.id}" value="leave" />
+                                </td>
+                                <td>
+                                    <div class='input-group input-group-sm'>
+                                        <input type="text" name="remarks_${student.id}" class="form-control rounded-pill input-group-sm" placeholder="Enter remarks" />
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+
+                    // Append generated rows to the table body
+                    $('.teacher-mark-attendace').html(rowsHtml);
+                    $('.teacher-attendance-mark-table').show();
+                    $('.loader-table-teacher').hide();
+                },
+                error: function (xhr) {
+                    console.log(xhr.statusText);
+                }
+            });
+        });
+    }
+
+    // Submit the attendance
+    $(document).off('click').on('click', '.att-mark-btn', function (e) {
+        e.preventDefault();
+        let user_id = window.location.pathname.split('/').pop();
+        // Collect the attendance data for each student
+        let attendanceData = [];
+        $('tbody.teacher-mark-attendace tr').each(function () {
+            let studentId = $(this).find('input[type="radio"][name^="attendance_"]').attr('name').split('_')[1];
+            let attendance = $(this).find(`input[type="radio"][name="attendance_${studentId}"]:checked`).val();
+            let remarks = $(`input[name="remarks_${studentId}"]`).val();
+            let topic = $(`input[name="topic_${studentId}"]`).val();
+
+            if (attendance) {
+                attendanceData.push({
+                    student_id: studentId,
+                    attendance: attendance,
+                    remarks: remarks,
+                    topic: topic
+                });
+            }
+        });
+
+        // Send the data to the backend
+        $.ajax({
+            url: `/dashboard/teacher/submit-attendance/${user_id}`,
+            type: 'POST',
+            data: {
+                batch_no: $("select[name='batch_no']").val(),
+                course_name: $("select[name='course_name_teacher']").val(),
+                attendance: attendanceData,
+                _token: $('meta[name="csrf-token"]').attr('content') // Ensure CSRF token is sent
+            },
+            success: function (response) {
+                alert('Attendance submitted successfully!');
+                console.log(response);
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                alert('Error submitting attendance!');
+            }
+        });
+    });
+});

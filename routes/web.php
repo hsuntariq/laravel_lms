@@ -85,6 +85,11 @@ Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(func
     Route::post('/get-relevent-info-batches', [teacherController::class, 'getInfoForBatches'])->name('getInfoForBatches');
 
     Route::post('/get-relevent-students-info', [teacherController::class, 'getReleventStudents'])->name('getReleventStudents');
+
+    Route::post('/submit-attendance/{id}', [attendanceController::class, 'submitAttendance'])->name('getReleventStudents');
+
+
+    Route::get('/show-students/{id}', [attendanceController::class, 'getStudents'])->name('show-students');
 });
 
 

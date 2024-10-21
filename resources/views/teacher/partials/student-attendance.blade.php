@@ -7,41 +7,25 @@
         <input type="text" class="border-0 w-100 input-search" style="outline-width:0" placeholder="Topic name">
 </section>
 <section class="table-responsive" style="height:80vh;overflow-y:scroll">
-    <table class="table text-capitalize ">
+    @include('teacher.partials.table-loader')
+    <table class="table text-capitalize teacher-attendance-mark-table">
         <thead>
             <tr>
                 <th>Topic name</th>
                 <th>student name</th>
+                <th>percentage</th>
                 <th> present</th>
                 <th>absent</th>
                 <th>leave</th>
                 <th>remarks</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class='teacher-mark-attendace'>
 
-            @for ($i = 0; $i < 10; $i++)
-                <tr>
-                    <td>HTML Tables</td>
-                    <td>Ali Khan</td>
-                    <td>
-                        <input type="radio" name="attendance" class="radio form-check">
-                    </td>
-                    <td>
-                        <input type="radio" name="attendance" class="radio form-check">
-                    </td>
-                    <td>
-                        <input type="radio" name="attendance" class="radio form-check">
-                    </td>
-                    <td>
-                        <textarea name="remarks" id="" cols="30" class="form-control" rows="1"></textarea>
-                    </td>
-                </tr>
-            @endfor
         </tbody>
     </table>
 
-    <button class="btn btn-purple d-block ms-auto">
+    <button class="btn btn-purple  d-block ms-auto att-mark-btn">
         Submit Attendance
     </button>
 </section>
