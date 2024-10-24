@@ -38,7 +38,7 @@ Route::prefix('/dashboard/student')->middleware(['auth', 'student'])->group(func
 
     Route::get('/assignments-get/{id}/', [assignmentController::class, 'getAssignments'])->name('student-assignments-get');
 
-    Route::post('/upload-assignment', [assignmentController::class, 'uploadAssignmentStudent'])->name('student-upload-assignments');
+    Route::post('/upload-assignment/{id}', [assignmentController::class, 'uploadAssignmentStudent'])->name('student-upload-assignments');
 
     Route::get('/get-status', [assignmentController::class, 'getAssignmentStatus'])->name('get-assignment-status');
 

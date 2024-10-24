@@ -48,7 +48,7 @@
             })
                 ? 'text-white'
                 : 'text-dark' }}"
-                href="{{ route('student-assignments', ['id' => auth()->user()->id, 'batch' => auth()->user()->batch_assigned]) }}">
+                href="{{ route('student-assignments', ['id' => auth()->user()->id]) }}">
                 Assignments
             </a>
         </h6>

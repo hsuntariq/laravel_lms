@@ -149,7 +149,7 @@ $(document).ready(function () {
                         </td>
                         <td>
                             <button class="btn btn-purple border-0 btn-disabled p-1 px-2 submit-btn" disabled>
-                                <img class="loading-submit d-none" src="loading.gif" width="20px" alt="loading">
+                                <img class="loading-submit d-none" src="/assets/images/loading.gif" width="20px" alt="loading">
                                 <span>Submit</span>
                             </button>
                         </td>`
@@ -195,28 +195,32 @@ $(document).ready(function () {
     });
 
     // Handle assignment upload
-    $(document).on("click", ".submit-btn", function (e) {
-        e.preventDefault();
-        const form = $(this).closest("tr").find(".upload-form");
-        const input = $(this).closest("tr").find(".file-input");
-        const row = $(this).closest("tr");
-        const loader = $(this).closest("tr").find(".loading-submit");
-        addUploadAssignment(form, input, row, loader);
+    $(document).ready(function () {
+        $(document).on("click", ".submit-btn", function (e) {
+            e.preventDefault();
+            const form = $(this).closest("tr").find(".upload-form");
+            const input = $(this).closest("tr").find(".file-input");
+            const row = $(this).closest("tr");
+            const loader = $(this).closest("tr").find(".loading-submit");
+            addUploadAssignment(form, input, row, loader);
+        });
     });
 
     // Add assignment upload function
     function addUploadAssignment(form, input, row, loader) {
+        let user_id = window.location.pathname.split("/").pop();
         const formData = new FormData(form[0]);
         const errorMessageDiv = form.find(".error-message");
         loader.removeClass("d-none");
         errorMessageDiv.hide().text("");
 
         $.ajax({
-            url: `/dashboard/student/upload-assignment`,
+            url: `/dashboard/student/upload-assignment/${user_id}`,
             type: "POST",
             data: formData,
             processData: false,
             contentType: false,
+
             success: function (response) {
                 if (response.status === "success") {
                     updateRowAfterSubmission(row);
