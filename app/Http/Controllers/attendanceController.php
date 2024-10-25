@@ -19,8 +19,14 @@ class attendanceController extends Controller
             ->where('course_id', auth()->user()->course_assigned)
             ->where('user_id', auth()->user()->id);
 
-        $presents = $attendanceQuery->where('status', 'present')->count();
-        $absents = $attendanceQuery->where('status', 'absent')->count();
+        $presents = $attendanceQuery->whereIn('status', ['present', 'leave'])
+            ->count();
+        $absents = Attendance::where('batch_no', auth()->user()->batch_assigned)
+            ->where('course_id', auth()->user()->course_assigned)
+            ->where('user_id', auth()->user()->id)
+            ->where('status', 'absent')->count();
+
+
         $pieChart->labels(['Presents', 'Absents']);
         $pieChart->dataset('Attendance', 'pie', [$presents, $absents])->options([
             'backgroundColor' => ['#03C03C', '#F70101']  // Soft green and pinkish red
@@ -32,22 +38,49 @@ class attendanceController extends Controller
 
         return view('student.pages.attendance', compact('pieChart', 'doughnetChart', 'radarChart'));
     }
-    public function makeCharts2()
+    public function makeCharts2(Request $request)
     {
-        $pieChart = new attendanceChart;
-        $doughnetChart = new attendanceChart;
-        $radarChart = new attendanceChart;
-        $pieChart->labels(['presents', 'absents']);
-        $pieChart->dataset('presents', 'pie', [40, 10])->options([
-            'backgroundColor' => ['green', 'red']
-        ]);
-        $doughnetChart->labels(['presents', 'absents']);
-        $doughnetChart->dataset('presents', 'doughnut', [40, 10])->options([
-            'backgroundColor' => ['green', 'red']
-        ]);
+        $batch_no = $request->batch_no;
+        $course_id = $request->course_id;
 
-        return view('teacher.pages.view-attendance', compact('pieChart', 'doughnetChart', 'radarChart'));
+        // Get counts for presents and absents
+        $presentsCount = Attendance::where('batch_no', $batch_no)
+            ->where('course_id', $course_id)
+            ->whereIn('status', ['present', 'leave'])
+            ->count();
+
+        $absentsCount = Attendance::where('batch_no', $batch_no)
+            ->where('course_id', $course_id)
+            ->where('status', 'absent')
+            ->count();
+
+        // Create the charts and set data
+        $pieChart = new attendanceChart;
+        $doughnutChart = new attendanceChart;
+        $radarChart = new attendanceChart;
+
+        $pieChart->labels(['Presents', 'Absents']);
+        $pieChart->dataset('Attendance', 'pie', [$presentsCount, $absentsCount])
+            ->options([
+                'backgroundColor' => ['green', 'red'],
+            ]);
+
+        $doughnutChart->labels(['Presents', 'Absents']);
+        $doughnutChart->dataset('Attendance', 'doughnut', [$presentsCount, $absentsCount])
+            ->options([
+                'backgroundColor' => ['green', 'red'],
+            ]);
+
+        // Return view with charts and counts
+        return response()->json([
+            "pieChart" => $pieChart,
+            "doughnutChart" => $doughnutChart,
+            "presentsCount" => $presentsCount,
+            "absentsCount" => $absentsCount,
+
+        ]);
     }
+
 
 
     public function getStudents(Request $request)

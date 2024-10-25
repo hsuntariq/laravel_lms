@@ -5,12 +5,6 @@ $(".update-image").on("input", function (e) {
     $(".image-preview").css("display", "block").attr("src", imageUrl);
 });
 
-
-
-
-
-
-
 $(document).ready(function () {
     $.ajaxSetup({
         headers: {
@@ -23,67 +17,51 @@ $(document).ready(function () {
     $(".count-loading").hide();
     $(".flash").hide();
     $(document).ready(function () {
-    $('.add-assignment').off('click').on('click', function (e) {
-        e.preventDefault();
-        $(".loading").show();
-        $(".loading-text").hide();
+        $(".add-assignment")
+            .off("click")
+            .on("click", function (e) {
+                e.preventDefault();
+                $(".loading").show();
+                $(".loading-text").hide();
 
-        $.ajax({
-            url: "/dashboard/teacher/upload-assignment",
-            type: "POST",
-            data: new FormData($(".assignment-data")[0]),
-            processData: false,
-            contentType: false,
+                $.ajax({
+                    url: "/dashboard/teacher/upload-assignment",
+                    type: "POST",
+                    data: new FormData($(".assignment-data")[0]),
+                    processData: false,
+                    contentType: false,
 
-            beforeSend: function () {
-                $(".text-danger").remove(); // Clear previous errors
-            },
+                    beforeSend: function () {
+                        $(".text-danger").remove(); // Clear previous errors
+                    },
 
-            success: function (response) {
-                $(".assignment-data")[0].reset();
-                showFlashMessage(response.message);
-                countAssignments();
-                $(".loading").hide();
-                $(".loading-text").show();
-            },
+                    success: function (response) {
+                        $(".assignment-data")[0].reset();
+                        showFlashMessage(response.message);
+                        countAssignments();
+                        $(".loading").hide();
+                        $(".loading-text").show();
+                    },
 
-            error: function (xhr) {
-                if (xhr.status === 422) {
-                    displayValidationErrors(xhr.responseJSON.errors);
-                }
-            },
+                    error: function (xhr) {
+                        if (xhr.status === 422) {
+                            displayValidationErrors(xhr.responseJSON.errors);
+                        }
+                    },
 
-            complete: function () {
-                $(".loading").hide();
-                $(".loading-text").show();
-            },
-        });
+                    complete: function () {
+                        $(".loading").hide();
+                        $(".loading-text").show();
+                    },
+                });
+            });
     });
-    });
 
-
-
-
-// Usage examples:
-// showToast('This is a success message!', 'success');
-// showToast('This is an error message!', 'error');
-// showToast('This is an informational message!', 'info');
-// showToast('This is a warning message!', 'warning');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    // Usage examples:
+    // showToast('This is a success message!', 'success');
+    // showToast('This is an error message!', 'error');
+    // showToast('This is an informational message!', 'info');
+    // showToast('This is a warning message!', 'warning');
 
     // Function to count assignments
     function countAssignments(batch_no) {
@@ -140,7 +118,7 @@ $(document).ready(function () {
             url: `/dashboard/student/assignments-get/${user_id}`,
             type: "GET",
             success: function (response) {
-                 let assignmentsHtml = response
+                let assignmentsHtml = response
                     .map((assignment, index) => {
                         const createdAtDate = new Date(assignment.created_at);
                         const options = {
@@ -168,7 +146,7 @@ $(document).ready(function () {
                             ? `<td colspan="5" class="text-center">
                                     <i class="bi bi-check-circle-fill text-success"></i> Submitted
                             </td>`
-                    : `
+                            : `
                         <td class="text-sm">pending...</td>
                         <td class="text-sm">
                             <form class="upload-form" enctype="multipart/form-data">
@@ -186,15 +164,14 @@ $(document).ready(function () {
                                 <span>Submit</span>
                             </button>
                         </td>`
-            }
+                    }
 
                             </tr>`;
-                                })
-                                .join("");
+                    })
+                    .join("");
 
                 $("#assignmentsTableBody").html(assignmentsHtml);
-
-                        },
+            },
 
             error: function (xhr) {
                 // Handle error appropriately
@@ -204,7 +181,6 @@ $(document).ready(function () {
             complete: function () {
                 $(".loader-table").hide();
                 $(".assignment-table").show();
-
             },
         });
     }
@@ -232,14 +208,16 @@ $(document).ready(function () {
 
     // Handle assignment upload
     $(document).ready(function () {
-        $(document).off('click').on("click", ".submit-btn", function (e) {
-            e.preventDefault();
-            const form = $(this).closest("tr").find(".upload-form");
-            const input = $(this).closest("tr").find(".file-input");
-            const row = $(this).closest("tr");
-            const loader = $(this).closest("tr").find(".loading-submit");
-            addUploadAssignment(form, input, row, loader);
-        });
+        $(document)
+            .off("click")
+            .on("click", ".submit-btn", function (e) {
+                e.preventDefault();
+                const form = $(this).closest("tr").find(".upload-form");
+                const input = $(this).closest("tr").find(".file-input");
+                const row = $(this).closest("tr");
+                const loader = $(this).closest("tr").find(".loading-submit");
+                addUploadAssignment(form, input, row, loader);
+            });
     });
 
     // Add assignment upload function
@@ -264,8 +242,7 @@ $(document).ready(function () {
                 }
             },
             error: function (xhr) {
-                                    showErrorMessages(xhr.responseJSON.errors);
-
+                showErrorMessages(xhr.responseJSON.errors);
             },
             complete: function () {
                 loader.addClass("d-none");
@@ -437,7 +414,7 @@ $(document).ready(function () {
                 }
             },
             error: function (xhr) {
-                showErrorMessages(xhr.responseJSON.errors)
+                showErrorMessages(xhr.responseJSON.errors);
             },
             complete: function () {
                 $(".loader-table").hide();
@@ -453,8 +430,8 @@ $(document).ready(function () {
         ) {
             setTimeout(() => {
                 let batch_no = $('select[name="batch_no"]')
-            .find("option:eq(1)")
-            .val();
+                    .find("option:eq(1)")
+                    .val();
                 getSubmittedAssignments(batch_no);
             }, 1000);
 
@@ -492,9 +469,7 @@ $(document).ready(function () {
                     // Show loader and change button text
                     const loaderHtml =
                         '<div class="d-flex gap-1"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Marking...</div>';
-                    $button
-                        .attr("disabled", true)
-                        .addClass("btn-disabled");
+                    $button.attr("disabled", true).addClass("btn-disabled");
 
                     $.ajax({
                         url: "/dashboard/teacher/mark-assignment/",
@@ -652,10 +627,12 @@ $(document).ready(function () {
     }
 
     // Add course
-    $(".course-btn").off('click').on('click',function (e) {
-        e.preventDefault();
-        addCourse();
-    });
+    $(".course-btn")
+        .off("click")
+        .on("click", function (e) {
+            e.preventDefault();
+            addCourse();
+        });
 
     function addCourse() {
         $(".course-loading").show();
@@ -751,10 +728,12 @@ $(document).ready(function () {
     }
 
     // Add instructor
-    $(".teacher-btn").off('click').on('click',function (e) {
-        e.preventDefault();
-        addInstructor();
-    });
+    $(".teacher-btn")
+        .off("click")
+        .on("click", function (e) {
+            e.preventDefault();
+            addInstructor();
+        });
 
     function addInstructor() {
         $(".teacher-loading").show();
@@ -2204,7 +2183,7 @@ $(document).ready(function () {
     }
 
     // Submit the attendance
-    $('.att-mark-btn')
+    $(".att-mark-btn")
         .off("click")
         .on("click", function (e) {
             e.preventDefault();
@@ -2258,8 +2237,7 @@ $(document).ready(function () {
                 },
                 success: function (response) {
                     alert("Attendance submitted successfully!");
-                    $(".att-mark-btn")
-                        .prop("disabled", false)
+                    $(".att-mark-btn").prop("disabled", false);
                 },
                 error: function (xhr) {
                     console.log(xhr.responseJSON);
@@ -2417,15 +2395,15 @@ function countTotalClasses() {
         //     batch_no,
         //     course_name,
         // },
-        beforeSend: function () {
-
-        },
+        beforeSend: function () {},
         success: function (response) {
-            console.log(response)
-            $('.student-lessons').html(response?.totalClasses)
-            $('.total-classes-student').html(`Total(${response?.totalClasses})`)
-            $('.total-present-student').html(`Presents(${response?.presents})`)
-            $('.total-absent-student').html(`Absents(${response?.absents})`)
+            console.log(response);
+            $(".student-lessons").html(response?.totalClasses);
+            $(".total-classes-student").html(
+                `Total(${response?.totalClasses})`
+            );
+            $(".total-present-student").html(`Presents(${response?.presents})`);
+            $(".total-absent-student").html(`Absents(${response?.absents})`);
         },
         error: function (xhr) {
             console.log(xhr.statusText);
@@ -2444,8 +2422,6 @@ $(document).ready(function () {
     // countTotalClasses();
 });
 
-
-
 function attendanceRecord() {
     // let batch_no = $('select[name="batch_no"]').val();
     // let course_name = $('select[name="course_name_teacher"]').val();
@@ -2460,32 +2436,29 @@ function attendanceRecord() {
         success: function (response) {
             // console.log(response)
             // $('.student-lessons').html(response?.totalClasses)
-            let records = '';
+            let records = "";
 
             response?.attendance?.forEach((item, index) => {
-                let createdAt = new Date(item?.created_at)
+                let createdAt = new Date(item?.created_at);
                 records += `
                     <tr>
-                        <td>${index+1}</td>
+                        <td>${index + 1}</td>
                         <td>${item?.attendance_date}</td>
                         <td>${getCurrentDay(createdAt.getDay())}</td>
                         <td>${item?.topic}</td>
-                        <td>${item?.remarks || 'No remarks'}</td>
+                        <td>${item?.remarks || "No remarks"}</td>
                         <td>${item?.status}</td>
                     </tr>
-                `
-            })
+                `;
+            });
 
-
-            $('.student-attendance-table').html(records)
-
+            $(".student-attendance-table").html(records);
         },
         error: function (xhr) {
             console.log(xhr.statusText);
         },
     });
 }
-
 
 $(document).ready(function () {
     if (
@@ -2498,93 +2471,86 @@ $(document).ready(function () {
     }
 });
 function getCurrentDay(day) {
-        const days = [
-            "Sunday",
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-        ];
-        return days[day] || "";
-    }
+    const days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+    ];
+    return days[day] || "";
+}
 
-
-
-    // get the attendace for teacher
+// get the attendace for teacher
 
 $(document).ready(function () {
-
     if (
         window.location.pathname.split("/").includes("teacher") &&
         window.location.pathname.split("/").includes("attendance") &&
         window.location.pathname.split("/").includes("view")
     ) {
-
+        let user_id = window.location.pathname.split("/").pop();
         setTimeout(() => {
-            let batch_no = $("select[name='batch_no']").find("option:eq(1)").val()
-            let course_name = $("select[name='course_name_teacher']").find("option:eq(1)").val()
+            let batch_no = $("select[name='batch_no']")
+                .find("option:eq(1)")
+                .val();
+            let course_name = $("select[name='course_name_teacher']")
+                .find("option:eq(1)")
+                .val();
             getStudentAttendance(batch_no, course_name);
         }, 1000);
-
 
         $(".loader-table-teacher").hide();
 
         // When the 'batch_no' is changed
         $('select[name="batch_no"]').on("change", function () {
             let batch_no = $(this).val(); // Get the selected batch number
-            let course_name = $("select[name='course_name_teacher']").find("option:eq(1)").val(); // Get the selected course name
+            let course_name = $("select[name='course_name_teacher']")
+                .find("option:eq(1)")
+                .val(); // Get the selected course name
             $(".loader-table-teacher").show();
 
             getStudentAttendance(batch_no, course_name);
+            attendanceChartTeacher(user_id, batch_no, course_name);
         });
-
-            }
-    })
-
-
+    }
+});
 
 function getStudentAttendance(batch_no, course_name) {
-        let user_id = window.location.pathname.split("/").pop();
+    let user_id = window.location.pathname.split("/").pop();
 
-        $.ajax({
-                url: `/dashboard/teacher/show-students/${user_id}`,
-                type: "GET",
-                data: {
-                    batch_no:
-                        batch_no ,
-                    course_name:
-                        course_name
-                },
-                success: function (response) {
+    $.ajax({
+        url: `/dashboard/teacher/show-students/${user_id}`,
+        type: "GET",
+        data: {
+            batch_no: batch_no,
+            course_name: course_name,
+        },
+        success: function (response) {
+            studentAttendance(response);
 
-
-                    studentAttendance(response)
-
-                    $('.view-att').off('click').on('click', function () {
-                        const user_id = $(this).data('id');
-                        showAttendance(user_id)
-
-                    })
-
-
-                },
-                error: function (xhr) {
-                    console.log(xhr.statusText);
-                },
-            });
-    }
-
-
+            $(".view-att")
+                .off("click")
+                .on("click", function () {
+                    const user_id = $(this).data("id");
+                    showAttendance(user_id);
+                });
+        },
+        error: function (xhr) {
+            console.log(xhr.statusText);
+        },
+    });
+}
 
 function studentAttendance(response) {
     let rowsHtml = response?.students
 
-                        ?.map((student,index) => {
-                            return `
+        ?.map((student, index) => {
+            return `
                             <tr>
-                            <td>${index+1}</td>
+                            <td>${index + 1}</td>
                                 <td id='slice-name' >${
                                     student.name && student.name.length > 10
                                         ? student.name.slice(0, 10) + "..."
@@ -2610,121 +2576,265 @@ function studentAttendance(response) {
                                 </td>
                             </tr>
                         `;
-                        })
-                        .join("");
+        })
+        .join("");
 
-                    // Append generated rows to the table body
-                    $(".student-attendance-teacher").html(rowsHtml);
-                    $(".teacher-attendance-mark-table").show();
-                    $(".loader-table-teacher").hide();
-
+    // Append generated rows to the table body
+    $(".student-attendance-teacher").html(rowsHtml);
+    $(".teacher-attendance-mark-table").show();
+    $(".loader-table-teacher").hide();
 }
 
-
-
 function showAttendance(user_id) {
-    $('.loader-table-teacher').show()
+    $(".loader-table-teacher").show();
 
     $.ajax({
-            url: `/dashboard/teacher/student/attendance/${user_id}`,
-            method: 'GET',
+        url: `/dashboard/teacher/student/attendance/${user_id}`,
+        method: "GET",
         success: function (response) {
-                console.log(response)
-                // Populate modal with fetched data
-                $('#attModalLabel').text(`${response.student.name} - Attendance`);
+            console.log(response);
+            // Populate modal with fetched data
+            $("#attModalLabel").text(`${response.student.name} - Attendance`);
 
-                let attendanceHtml = response.attendanceRecords.map(record => `
+            let attendanceHtml = response.attendanceRecords
+                .map(
+                    (record) => `
                     <tr>
                         <td>${record.attendance_date}</td>
-                        <td>${new Date(record.attendance_date).toLocaleDateString('en-US', { weekday: 'long' })}</td>
+                        <td>${new Date(
+                            record.attendance_date
+                        ).toLocaleDateString("en-US", { weekday: "long" })}</td>
                         <td>${record.topic}</td>
-                        <td>${record.remarks || 'No remarks'}</td>
-                        <td class="${record.status === 'present' ? 'text-success' : 'text-danger'}">
-                            ${record.status.charAt(0).toUpperCase() + record.status.slice(1)}
+                        <td>${record.remarks || "No remarks"}</td>
+                        <td class="${
+                            record.status === "present"
+                                ? "text-success"
+                                : "text-danger"
+                        }">
+                            ${
+                                record.status.charAt(0).toUpperCase() +
+                                record.status.slice(1)
+                            }
                         </td>
                         <td>
-                            <select class="form-select form-select-sm attendance-status" data-record-id="${record.id}">
-                                <option value="present" ${record.status === 'present' ? 'selected' : ''}>Present</option>
-                                <option value="leave" ${record.status === 'leave' ? 'selected' : ''}>Leave</option>
-                                <option value="absent" ${record.status === 'absent' ? 'selected' : ''}>Absent</option>
+                            <select class="form-select form-select-sm attendance-status" data-record-id="${
+                                record.id
+                            }">
+                                <option value="present" ${
+                                    record.status === "present"
+                                        ? "selected"
+                                        : ""
+                                }>Present</option>
+                                <option value="leave" ${
+                                    record.status === "leave" ? "selected" : ""
+                                }>Leave</option>
+                                <option value="absent" ${
+                                    record.status === "absent" ? "selected" : ""
+                                }>Absent</option>
                             </select>
                         </td>
                     </tr>
-                `).join('');
+                `
+                )
+                .join("");
 
-                $('.student-attendance-table').html(attendanceHtml);
-                    $('.loader-table-teacher').hide()
-
-            },
-            error: function () {
-                alert('Failed to fetch attendance records');
-            }
-        });
-
+            $(".student-attendance-table").html(attendanceHtml);
+            $(".loader-table-teacher").hide();
+        },
+        error: function () {
+            alert("Failed to fetch attendance records");
+        },
+    });
 }
 
 $(document).ready(function () {
-    if (window.location.pathname.split('/').includes('teacher') &&
-    window.location.pathname.split('/').includes('attendance') &&
-    window.location.pathname.split('/').includes('view')
-){
-            $(document).off('change').on('change', '.attendance-status', function () {
-                $('.att-loading').show()
-                    $('.att-loading-btn').prop('disabled',true).addClass('btn-disabled').html(`<div style='width:20px;height:20px;' class="spinner-border" role="status">
+    if (
+        window.location.pathname.split("/").includes("teacher") &&
+        window.location.pathname.split("/").includes("attendance") &&
+        window.location.pathname.split("/").includes("view")
+    ) {
+        $(document)
+            .off("change")
+            .on("change", ".attendance-status", function () {
+                $(".att-loading").show();
+                $(".att-loading-btn")
+                    .prop("disabled", true)
+                    .addClass(
+                        "btn-disabled"
+                    ).html(`<div style='width:20px;height:20px;' class="spinner-border" role="status">
                     <span class="visually-hidden">Loading...</span>
-                    </div>`)
-        const recordId = $(this).data('record-id');
-        const newStatus = $(this).val();
-                    $(".spinner-border").show();
+                    </div>`);
+                const recordId = $(this).data("record-id");
+                const newStatus = $(this).val();
+                $(".spinner-border").show();
 
-        $.ajax({
-            url: `/dashboard/teacher/student/attendance/update/${recordId}`,
-            method: 'POST',
-            data: {
-                status: newStatus,
-                _token: $('meta[name="csrf-token"]').attr('content')
-            },
+                $.ajax({
+                    url: `/dashboard/teacher/student/attendance/update/${recordId}`,
+                    method: "POST",
+                    data: {
+                        status: newStatus,
+                        _token: $('meta[name="csrf-token"]').attr("content"),
+                    },
 
-            success: function () {
-                $('.att-loading').hide()
-                $('.att-loading-btn').prop('disabled', false).removeClass('btn-disabled').text('Close')
-                showToast('Updated Status','Attendance status updated successfully','success');
-            },
-            complete: function () {
-                 $('.att-loading').hide()
-                $('.att-loading-btn').prop('disabled', false).removeClass('btn-disabled').text('Close')
-            },
-            error: function (xhr) {
-                showErrorMessages(xhr.responseJSON.errors)
-                 $('.att-loading').hide()
-                $('.att-loading-btn').prop('disabled', false).removeClass('btn-disabled').text('Close')
-                alert('Attendance status updated successfully');
-            }
-        });
-    });
+                    success: function () {
+                        $(".att-loading").hide();
+                        $(".att-loading-btn")
+                            .prop("disabled", false)
+                            .removeClass("btn-disabled")
+                            .text("Close");
+                        showToast(
+                            "Updated Status",
+                            "Attendance status updated successfully",
+                            "success"
+                        );
+                    },
+                    complete: function () {
+                        $(".att-loading").hide();
+                        $(".att-loading-btn")
+                            .prop("disabled", false)
+                            .removeClass("btn-disabled")
+                            .text("Close");
+                    },
+                    error: function (xhr) {
+                        showErrorMessages(xhr.responseJSON.errors);
+                        $(".att-loading").hide();
+                        $(".att-loading-btn")
+                            .prop("disabled", false)
+                            .removeClass("btn-disabled")
+                            .text("Close");
+                        alert("Attendance status updated successfully");
+                    },
+                });
+            });
     }
-})
-
+});
 
 // toast message
 
 function showToast(title, message, type) {
-    $('#toast-title').text(title);
-    $('#toast-message').text(message);
+    $("#toast-title").text(title);
+    $("#toast-message").text(message);
 
     // Remove previous toast type classes and add new one based on type
-    $('#toast').removeClass('toast-success toast-warning toast-error').addClass(`toast-${type}`);
+    $("#toast")
+        .removeClass("toast-success toast-warning toast-error")
+        .addClass(`toast-${type}`);
 
-    $('#toast')
+    $("#toast")
         .stop(true, true) // Stop any ongoing animations
-        .slideDown(300)    // Slide down to show the toast
-        .delay(4000)       // Wait for 4 seconds
-        .slideUp(300);     // Slide up to hide the toast
+        .slideDown(300) // Slide down to show the toast
+        .delay(4000) // Wait for 4 seconds
+        .slideUp(300); // Slide up to hide the toast
 
     // Add close button functionality
-    $('#toast-close').off('click').on('click', function() {
-        $('#toast').stop(true, true).slideUp(300); // Slide up on close
+    $("#toast-close")
+        .off("click")
+        .on("click", function () {
+            $("#toast").stop(true, true).slideUp(300); // Slide up on close
+        });
+}
+
+// $(document).ready(function () {
+//     if (
+//         window.location.pathname.split("/").includes("teacher") &&
+//         window.location.pathname.split("/").includes("attendance") &&
+//         window.location.pathname.split("/").includes("view")
+//     ) {
+//         let user_id = window.location.pathname.split("/").pop();
+
+//         // Course select change event
+//         $("select[name='course_name_teacher']")
+//             .off("change")
+//             .on("change", function () {
+//                 let course_id = $(this).val();
+
+//                 // Batch select change event
+//                 $("select[name='batch_no']")
+//                     .off("change")
+//                     .on("change", function () {
+//                         let batch_no = $(this).val();
+//                         attendanceChartTeacher(user_id, batch_no, course_id);
+//                     });
+//             });
+//     }
+// });
+
+function attendanceChartTeacher(user_id, batch_no, course_id) {
+    $.ajax({
+        url: `/dashboard/teacher/attendance/data/${user_id}`,
+        type: "GET",
+        data: {
+            batch_no: batch_no,
+            course_id: course_id,
+        },
+        success: function (response) {
+            console.log("Data loaded successfully:", response);
+            updateCharts(response);
+        },
+        error: function (xhr) {
+            console.error("Error loading data:", xhr);
+        },
     });
 }
 
+let pieChart;
+let doughnutChart;
 
+function updateCharts(response) {
+    const presentsCount = response.presentsCount;
+    const absentsCount = response.absentsCount;
+
+    // Update the charts with the new data
+    if (pieChart) {
+        pieChart.data.datasets[0].data = [presentsCount, absentsCount];
+        pieChart.update();
+    } else {
+        createCharts(presentsCount, absentsCount);
+    }
+
+    if (doughnutChart) {
+        doughnutChart.data.datasets[0].data = [presentsCount, absentsCount];
+        doughnutChart.update();
+    } else {
+        createCharts(presentsCount, absentsCount);
+    }
+}
+
+function createCharts(presentsCount, absentsCount) {
+    const ctxPie = document.getElementById("pieChartCanvas").getContext("2d");
+    const ctxDoughnut = document
+        .getElementById("doughnutChartCanvas")
+        .getContext("2d");
+
+    pieChart = new Chart(ctxPie, {
+        type: "pie",
+        data: {
+            labels: ["Presents", "Absents"],
+            datasets: [
+                {
+                    data: [presentsCount, absentsCount],
+                    backgroundColor: ["green", "red"],
+                },
+            ],
+        },
+        options: {
+            maintainAspectRatio: false,
+        },
+    });
+
+    doughnutChart = new Chart(ctxDoughnut, {
+        type: "doughnut",
+        data: {
+            labels: ["Presents", "Absents"],
+            datasets: [
+                {
+                    data: [presentsCount, absentsCount],
+                    backgroundColor: ["green", "red"],
+                },
+            ],
+        },
+        options: {
+            maintainAspectRatio: false,
+        },
+    });
+}

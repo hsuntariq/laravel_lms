@@ -11,12 +11,10 @@
         </section>
         <section class="row justify-content-between">
             <div class="col-sm-6" style="height:200px">
-
-                {!! $pieChart->container() !!}
+                <canvas id="pieChartCanvas"></canvas>
             </div>
             <div class="col-sm-6" style="height:200px">
-
-                {!! $doughnetChart->container() !!}
+                <canvas id="doughnutChartCanvas"></canvas>
             </div>
 
         </section>
@@ -42,8 +40,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script>
-    {!! $pieChart->script() !!}
-    {!! $doughnetChart->script() !!}
 
 
 
