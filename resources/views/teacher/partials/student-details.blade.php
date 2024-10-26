@@ -8,24 +8,11 @@
         </p>
     </div>
     {{-- list of students --}}
-    @for ($i = 0; $i < 3; $i++)
-        <section class="d-flex align-items-center w-100 justify-content-between my-1">
-            <section class="d-flex gap-2 align-items-center">
-                {{-- user image --}}
-                <img width="40px" height="40px" class="rounded-circle object-contain  border-purple"
-                    src="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8dXNlcnxlbnwwfHwwfHx8MA%3D%3D"
-                    alt="Assign mate user image">
-                <div class="d-flex flex-column">
-                    <h6>Student Name</h6>
 
-                </div>
-            </section>
-            {{-- status --}}
-            <button class="btn fw-medium border-purple rounded-pill">
-                View
-            </button>
-        </section>
-    @endfor
+    <div class="struggling-list"></div>
+
+
+
     <div class="d-flex gap-3 my-2">
         <!-- icon -->
         <i class="bi bi-star-fill text-warning"></i>
@@ -36,20 +23,20 @@
     {{-- student details --}}
     @for ($i = 0; $i < 3; $i++)
         <section class="d-flex align-items-center w-100 justify-content-between my-1">
-            <section class="d-flex gap-2 align-items-center">
-                {{-- user image --}}
-                <img width="40px" height="40px" class="rounded-circle object-contain  border-purple"
-                    src="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8dXNlcnxlbnwwfHwwfHx8MA%3D%3D"
-                    alt="Assign mate user image">
-                <div class="d-flex flex-column">
-                    <h6>Student Name</h6>
+        <section class="d-flex gap-2 align-items-center">
+            {{-- user image --}}
+            <img width="40px" height="40px" class="rounded-circle object-contain  border-purple"
+                src="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8dXNlcnxlbnwwfHwwfHx8MA%3D%3D"
+                alt="Assign mate user image">
+            <div class="d-flex flex-column">
+                <h6>Student Name</h6>
 
-                </div>
-            </section>
-            {{-- status --}}
-            <button class="btn fw-medium border-purple rounded-pill">
-                View
-            </button>
+            </div>
         </section>
-    @endfor
+        {{-- status --}}
+        <button class="btn fw-medium border-purple rounded-pill">
+            View
+        </button>
+</section>
+@endfor
 </section>

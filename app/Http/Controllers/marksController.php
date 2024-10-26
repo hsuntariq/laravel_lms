@@ -17,7 +17,9 @@ class marksController extends Controller
             'user_id' => 'required|exists:users,id',
             'obt_marks' => 'required|integer|min:0',
             'comments' => 'nullable|string',
-            'max_marks' => 'required'
+            'max_marks' => 'required',
+            'batch_no' => 'required',
+            'course_no' => 'required'
         ]);
 
         // Check if the assignment has already been marked

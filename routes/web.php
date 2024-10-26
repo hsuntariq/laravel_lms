@@ -80,7 +80,7 @@ Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(func
 
     Route::get('/submitted-assignment/{id}', [assignmentController::class, 'getSubmittedAssignments'])->name('submitted-assignment');
 
-    Route::post('/mark-assignment/', [marksController::class, 'markAssignment'])->name('mark-assignment');
+    Route::post('/mark-assignment/{id}', [marksController::class, 'markAssignment'])->name('mark-assignment');
 
     Route::get('/get-relevent-batches/{id}', [teacherController::class, 'getReleventBatches'])->name('get-relevent-batches');
 

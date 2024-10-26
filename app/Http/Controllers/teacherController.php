@@ -40,12 +40,19 @@ class teacherController extends Controller
             ->count();
 
         $students = DB::table('marks')
+            ->join('users', 'marks.user_id', '=', 'users.id')
+            ->where('users.batch_assigned', $batch_no)
+            ->where('users.course_assigned', $course_no)
+            ->where('users.role', 'student')
             ->select(
-                'user_id',
-                DB::raw('SUM(obt_marks) as total_obtained_marks'),
-                DB::raw('SUM(max_marks) as total_max_marks')
+                'marks.user_id',
+                'users.name',
+                'users.email',
+                'users.image',
+                DB::raw('SUM(marks.obt_marks) as total_obtained_marks'),
+                DB::raw('SUM(marks.max_marks) as total_max_marks')
             )
-            ->groupBy('user_id')
+            ->groupBy('marks.user_id', 'users.name', 'users.email', 'users.image') // Include users.image here
             ->get();
 
         // Categorize students
@@ -56,10 +63,10 @@ class teacherController extends Controller
         foreach ($students as $student) {
             $percentage = ($student->total_obtained_marks / $student->total_max_marks) * 100;
 
-            if ($percentage > 80) {
+            if ($percentage >= 70) {
                 $excellingStudents[] = $student;
             } elseif (
-                $percentage > 50 && $percentage <= 80
+                $percentage > 50 && $percentage < 70
             ) {
                 $averageStudents[] = $student;
             } else {

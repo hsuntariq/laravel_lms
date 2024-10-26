@@ -583,6 +583,8 @@ $(document).ready(function () {
                             "data-user_id": assignment?.user?.id,
                             "data-answer_id": assignment.id,
                             "data-max_marks": assignment.assignment?.max_marks,
+                            "data-batch_no": assignment.user?.batch_assigned,
+                            "data-course_no": assignment.user?.course_assigned,
                         });
 
                         return `
@@ -630,6 +632,7 @@ $(document).ready(function () {
 
     // Mark assignments
     $(document).ready(function () {
+        let user_id = window.location.pathname.split("/").pop();
         if (
             window.location.pathname.split("/").includes("teacher") &&
             window.location.pathname.split("/").includes("assignments") &&
@@ -651,6 +654,8 @@ $(document).ready(function () {
                         obt_marks: obtainedMarks,
                         max_marks: $button.data("max_marks"),
                         comments: "salam",
+                        batch_no: $button.data("batch_no"),
+                        course_no: $button.data("course_no"),
                     };
 
                     // Show loader and change button text
@@ -659,7 +664,7 @@ $(document).ready(function () {
                     $button.attr("disabled", true).addClass("btn-disabled");
 
                     $.ajax({
-                        url: "/dashboard/teacher/mark-assignment/",
+                        url: `/dashboard/teacher/mark-assignment/${user_id}`,
                         type: "POST",
                         data,
                         beforeSend: function () {
@@ -2243,10 +2248,11 @@ $(document).ready(function () {
 });
 
 function getInfoBatches() {
+    const user_id = window.location.pathname.split("/").pop();
     $('select[name="course_name_teacher"]').on("change", function () {
         let course_id = $(this).val();
         $.ajax({
-            url: "/dashboard/teacher/get-relevent-info-batches",
+            url: `/dashboard/teacher/get-relevent-info-batches/${user_id}`,
             type: "POST",
             data: {
                 course_id,
@@ -2310,6 +2316,43 @@ function getStudentProgressData(batch_no, course_no) {
                 response?.struggling_students?.length
             );
             $(".loading-strength").hide();
+            let struggling_list = response?.struggling_students
+                ?.map((item, index) => {
+                    const marks = (
+                        (item?.total_obtained_marks / item?.total_max_marks) *
+                        100
+                    ).toFixed(2);
+                    return `
+                    <section class="d-flex  align-items-center w-100 justify-content-between my-1">
+                        <section class="d-flex gap-2 justify-content-between align-items-center mb-2">
+                           <img width="40px" height="40px" class="rounded-circle object-contain border-purple"
+                            src="${
+                                item?.image
+                                    ? `/storage/${item.image}`
+                                    : "/assets/images/user-image.png"
+                            }"
+                            alt="Assign mate user image">
+
+                            <div class="d-flex flex-column">
+                                <h6>${item.name || "Student Name"}</h6>
+                                <p class='fw-semibold'>Marks Percentage:
+                                <span class='${
+                                    marks > 40 ? "text-warning" : "text-danger"
+                                }'>
+                                ${marks}%
+                                </span>
+                                 
+                                 </p>
+                            </div>
+                            </section>
+                            <button class="btn fw-medium border-purple rounded-pill">
+                                View
+                            </button>
+                        </section>
+    `;
+                })
+                .join(""); // Use join('') to convert the array to a single HTML string
+            $(".struggling-list").html(struggling_list);
         },
         error: function (xhr) {
             console.log(xhr.statusText);
