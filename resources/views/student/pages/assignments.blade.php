@@ -15,7 +15,7 @@
                 </div>
                 <ul class="d-flex m-0 align-items-center list-unstyled text-purple fw-semibold text-sm gap-2">
                     <li class="filter-button-student btn text-sm btn-sm btn-purple" data-status="all">All</li>
-                    <li class="filter-button-student btn text-sm btn-sm" data-status="submitted">Marked</li>
+                    <li class="filter-button-student btn text-sm btn-sm" data-status="submitted">Submitted</li>
                     <li class="filter-button-student btn text-sm btn-sm" data-status="unsubmitted">Unsubmitted</li>
                 </ul>
 

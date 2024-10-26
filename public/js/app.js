@@ -510,6 +510,8 @@ $(document).ready(function () {
 
             // Function to fetch and display assignments based on batch_no
             function getSubmittedAssignments(batch_no) {
+                $(".loader-table-teacher").show();
+
                 let user_id = window.location.pathname.split("/").pop();
                 $.ajax({
                     url: `/dashboard/teacher/submitted-assignment/${user_id}`,
@@ -517,15 +519,21 @@ $(document).ready(function () {
                     data: {
                         batch_no,
                     },
+                    beforeSend: function () {
+                        $(".loader-table-teacher").show();
+                    },
                     success: function (response) {
                         allAssignments = response; // Store assignments locally
                         displayAssignments(allAssignments); // Display all initially
+                        $(".loader-table-teacher").hide();
                     },
                     error: function (xhr) {
+                        showErrorMessages(xhr.responseJSON.errors);
                         console.error(
                             "Error fetching assignments:",
                             xhr.statusText
                         );
+                        $(".loader-table-teacher").hide();
                     },
                 });
             }

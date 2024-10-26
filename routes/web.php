@@ -70,7 +70,7 @@ Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(func
 
     Route::get('/home/{id}', [teacherDashboardController::class, 'makeCharts'])->name('teacher-dashboard');
 
-    Route::get('/attendance/data/{id}', [attendanceController::class, 'makeCharts2'])->name('teacher-view-attendance');
+    Route::get('/attendance/data/{id}', [attendanceController::class, 'makeCharts2'])->name('teacher-view-attendance2');
 
     Route::get('/assignments/view/{id}', [assignmentController::class, 'makeCharts'])->name('teacher-view-assignments');
 

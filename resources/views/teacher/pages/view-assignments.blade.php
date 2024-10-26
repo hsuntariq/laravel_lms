@@ -35,7 +35,7 @@
 
         </section>
         <div class="table-responsive">
-            @include('student.partials.table-loader')
+            @include('teacher.partials.table-loader')
             <table class="table text-capitalize table-sm table-bordered table-striped text-sm btn-sm input-group-sm">
                 <thead>
                     <tr>
