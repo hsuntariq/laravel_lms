@@ -90,7 +90,11 @@ class assignmentController extends Controller
         $assignments->each(function ($assignment) {
             $assignment->answers = $assignment->answer; // Load the related answers
         });
-        return response()->json($assignments);
+        $getStatus = Answers::where('user_id', auth()->user()->id)->get();
+        return response()->json([
+            'assignments' => $assignments,
+            'status' => $getStatus
+        ]);
         // return view('student.pages.assignments', compact('assignments'));
     }
 

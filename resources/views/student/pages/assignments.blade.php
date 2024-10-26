@@ -1,7 +1,8 @@
 <x-layout>
     <x-header />
     <x-error />
-    <x-flash />
+    {{-- <x-flash /> --}}
+    <x-toast />
     <hr class="m-1">
     <main class="row">
         <section class="col-xl-2 col-lg-3">
@@ -12,25 +13,28 @@
                 <div class="d-flex">
                     <h2>Assignments</h2>
                 </div>
-                <ul class="list-unstyled text-capitalize d-flex gap-3 fw-medium">
-                    <li style="color: #8338EB">All</li>
-
+                <ul class="d-flex m-0 align-items-center list-unstyled text-purple fw-semibold text-sm gap-2">
+                    <li class="filter-button-student btn text-sm btn-sm btn-purple" data-status="all">All</li>
+                    <li class="filter-button-student btn text-sm btn-sm" data-status="submitted">Marked</li>
+                    <li class="filter-button-student btn text-sm btn-sm" data-status="unsubmitted">Unsubmitted</li>
                 </ul>
+
+
             </section>
             <div class="table-responsive assignment-table text-sm my-4" style='height:75vh;overflow-y:scroll'>
                 @include('student.partials.table-loader')
                 <table class="table text-center table-sm table-striped table-bordered">
                     <thead>
                         <tr>
-                            <td>#</td>
-                            <td>Topic</td>
-                            <td>Marks</td>
-                            <td>End Time</td>
-                            <td>Upload Time</td>
-                            <td>File</td>
-                            <td>Status</td>
-                            <td style="width:20%">Upload</td>
-                            <td>Action</td>
+                            <td class='text-sm'>#</td>
+                            <td class='text-sm'>Topic</td>
+                            <td class='text-sm'>Marks</td>
+                            <td class='text-sm'>End Time</td>
+                            <td class='text-sm'>Upload Time</td>
+                            <td class='text-sm'>File</td>
+                            <td class='text-sm'>Status</td>
+                            <td class='text-sm' style="width:20%">Upload</td>
+                            <td class='text-sm'>Action</td>
 
 
                         </tr>

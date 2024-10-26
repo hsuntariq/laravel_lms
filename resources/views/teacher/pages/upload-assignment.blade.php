@@ -1,4 +1,6 @@
 <x-teacher-dashboard-layout>
+    <x-error />
+    <x-toast />
     @include('teacher.partials.header')
     <main style="height: 88vh;overflow-y:scroll; position-relative">
         <x-flash />
@@ -76,9 +78,9 @@
                 <input type="text" name="topic" placeholder="Enter name of the topic..." class="form-control"
                     style="background: #F9F9F9">
                 @error('topic')
-                    <p class="text-danger fw-medium m-0">
-                        {{ $message }}
-                    </p>
+                <p class="text-danger fw-medium m-0">
+                    {{ $message }}
+                </p>
                 @enderror
             </div>
             <div class="form-group">
@@ -86,9 +88,9 @@
                 <input type="text" name="description" placeholder="Enter description of the topic..."
                     class="form-control" style="background: #F9F9F9">
                 @error('description')
-                    <p class="text-danger fw-medium m-0">
-                        {{ $message }}
-                    </p>
+                <p class="text-danger fw-medium m-0">
+                    {{ $message }}
+                </p>
                 @enderror
             </div>
             <div class="form-group">
@@ -96,9 +98,9 @@
                 <input type="number" name="max_marks" placeholder="e.g. 15" class="form-control"
                     style="background: #F9F9F9">
                 @error('max_marks')
-                    <p class="text-danger fw-medium m-0">
-                        {{ $message }}
-                    </p>
+                <p class="text-danger fw-medium m-0">
+                    {{ $message }}
+                </p>
                 @enderror
             </div>
             <div class="form-group">
@@ -106,14 +108,14 @@
                 <select class="form-select" name="batch_no" id="">
                     @for ($i = 0; $i < 5; $i++)
                         <option value="{{ $i + 1 }}">
-                            batch {{ $i + 1 }}
+                        batch {{ $i + 1 }}
                         </option>
-                    @endfor
+                        @endfor
                 </select>
                 @error('batch_no')
-                    <p class="text-danger fw-medium m-0">
-                        {{ $message }}
-                    </p>
+                <p class="text-danger fw-medium m-0">
+                    {{ $message }}
+                </p>
                 @enderror
             </div>
             <div class="form-group">
@@ -121,9 +123,9 @@
                 <input type="time" name="deadline" placeholder="e.g. 15" class="form-control"
                     style="background: #F9F9F9">
                 @error('deadline')
-                    <p class="text-danger fw-medium m-0">
-                        {{ $message }}
-                    </p>
+                <p class="text-danger fw-medium m-0">
+                    {{ $message }}
+                </p>
                 @enderror
             </div>
             <div class="form-group">
@@ -140,9 +142,9 @@
                     </option>
                 </select>
                 @error('type')
-                    <p class="text-danger fw-medium m-0">
-                        {{ $message }}
-                    </p>
+                <p class="text-danger fw-medium m-0">
+                    {{ $message }}
+                </p>
                 @enderror
             </div>
             <div class="form-group">
@@ -150,9 +152,9 @@
                 <input type="file" name="file" placeholder="e.g. 15" class="form-control"
                     style="background: #F9F9F9">
                 @error('file')
-                    <p class="text-danger fw-medium m-0">
-                        {{ $message }}
-                    </p>
+                <p class="text-danger fw-medium m-0">
+                    {{ $message }}
+                </p>
                 @enderror
             </div>
             {{-- preview goes here --}}

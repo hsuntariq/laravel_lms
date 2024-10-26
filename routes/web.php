@@ -42,7 +42,7 @@ Route::prefix('/dashboard/student')->middleware(['auth', 'student'])->group(func
 
     Route::get('/get-status', [assignmentController::class, 'getAssignmentStatus'])->name('get-assignment-status');
 
-    Route::get('/get-marks', [marksController::class, 'getMarks'])->name('get-student-marks');
+    Route::get('/get-marks/{id}', [marksController::class, 'getMarks'])->name('get-student-marks');
 
     Route::get('/get-total-classes/{id}', [attendanceController::class, 'totalClasses'])->name('totalClasses');
 
@@ -78,7 +78,7 @@ Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(func
 
     Route::get('/assignment-count/', [assignmentController::class, 'countAssignment'])->name('assignment-count');
 
-    Route::get('/submitted-assignment/', [assignmentController::class, 'getSubmittedAssignments'])->name('submitted-assignment');
+    Route::get('/submitted-assignment/{id}', [assignmentController::class, 'getSubmittedAssignments'])->name('submitted-assignment');
 
     Route::post('/mark-assignment/', [marksController::class, 'markAssignment'])->name('mark-assignment');
 

@@ -1,5 +1,6 @@
 <x-staff-dashboard-layout>
-    <x-flash />
+    {{-- <x-flash /> --}}
+    <x-toast />
     <x-error />
     <form method="POST" enctype="multipart/form-data"
         class="student-form col-lg-7 col-md-10 mx-auto border-purple p-3 rounded-3 shadow">

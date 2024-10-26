@@ -65,7 +65,7 @@ class marksController extends Controller
 
     public function getMarks(Request $request)
     {
-        $user_id = 3;
+        $user_id = auth()->user()->id;
 
         // Fetch marks with eager loading, including both 'answer' and 'assignment'
         $marks = Marks::where('user_id', $user_id)
