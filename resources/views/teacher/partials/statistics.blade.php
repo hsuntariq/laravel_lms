@@ -18,7 +18,6 @@
                     <img width="40px" src="{{ asset('assets/images/loading.gif') }}" alt="Loading...">
                 </div>
                 <p class="text-purple text-sm placeholder-text">
-                    Choose batch to see students
                 </p>
                 <div class="total-strength">
                     <h6 class="total-students"></h6>
@@ -36,10 +35,17 @@
                     alt="Assign Mate total students logo">
                 {{-- text --}}
                 <div class="d-flex flex-column">
-                    <h6>100</h6>
-                    <p class="fw-medium text-secondary text-sm">
-                        Excelling students
+                    <div class="custom-loader loading-strength" id="loading-strength">
+                        <img width="40px" src="{{ asset('assets/images/loading.gif') }}" alt="Loading...">
+                    </div>
+                    <p class="text-purple text-sm placeholder-text">
                     </p>
+                    <div class="total-strength">
+                        <h6 class="excelling-students"></h6>
+                        <p class="fw-medium text-secondary text-sm">
+                            Excelling students
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -51,10 +57,17 @@
                     alt="Assign Mate total students logo">
                 {{-- text --}}
                 <div class="d-flex flex-column">
-                    <h6>40</h6>
-                    <p class="fw-medium text-secondary text-sm">
-                        struggling students
+                    <div class="custom-loader loading-strength" id="loading-strength">
+                        <img width="40px" src="{{ asset('assets/images/loading.gif') }}" alt="Loading...">
+                    </div>
+                    <p class="text-purple text-sm placeholder-text">
                     </p>
+                    <div class="total-strength">
+                        <h6 class="struggling-students"></h6>
+                        <p class="fw-medium text-secondary text-sm">
+                            Struggling students
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

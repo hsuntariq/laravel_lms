@@ -19,11 +19,8 @@ class Marks extends Model
         return $this->belongsTo(Answers::class);
     }
 
-    public function student()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-
-
-
 }

@@ -2269,30 +2269,55 @@ $(document).ready(function () {
 });
 
 function getInfoStudents() {
+    setTimeout(() => {
+        let batch_no = $('select[name="batch_no"]').find("option:eq(1)").val();
+        let course_no = $('select[name="course_name_teacher"]')
+            .find("option:eq(1)")
+            .val();
+        getStudentProgressData(batch_no, course_no);
+    }, 1000);
+
     $('select[name="batch_no"]').on("change", function () {
         $(".loading-strength").show();
         $(".placeholder-text").hide();
         let batch_no = $(this).val();
         let course_no = $('select[name="course_name_teacher"]').val();
-        $.ajax({
-            url: "/dashboard/teacher/get-relevent-students-info",
-            type: "POST",
-            data: {
-                batch_no,
-                course_no,
-            },
-            beforeSend: function () {
-                $(".total-strength").hide();
-            },
-            success: function (response) {
-                $(".total-strength").show();
-                $(".total-students").html(response.students);
-                $(".loading-strength").hide();
-            },
-            error: function (xhr) {
-                console.log(xhr.statusText);
-            },
-        });
+        getStudentProgressData(batch_no, course_no);
+    });
+}
+
+function getStudentProgressData(batch_no, course_no) {
+    let user_id = window.location.pathname.split("/").pop();
+    $.ajax({
+        url: `/dashboard/teacher/get-relevent-students-info/${user_id}`,
+        type: "POST",
+        data: {
+            batch_no,
+            course_no,
+        },
+        beforeSend: function () {
+            $(".total-strength").hide();
+            $(".excelling-strength").hide();
+            $(".struggling-strength").hide();
+            $(".loading-strength").show();
+        },
+        success: function (response) {
+            console.log(response);
+            $(".total-strength").show();
+            $(".total-students").html(response.students);
+            $(".excelling-students").html(response?.excelling_students?.length);
+            $(".struggling-students").html(
+                response?.struggling_students?.length
+            );
+            $(".loading-strength").hide();
+        },
+        error: function (xhr) {
+            console.log(xhr.statusText);
+            $(".loading-strength").hide();
+        },
+        complete: function () {
+            $(".loading-strength").hide();
+        },
     });
 }
 
