@@ -16,8 +16,8 @@ $(document).ready(function () {
     $(".loading").hide();
     $(".count-loading").hide();
     $(".flash").hide();
-
-    $(".add-assignment").click(function (e) {
+    $(document).ready(function () {
+    $('.add-assignment').off('click').on('click', function (e) {
         e.preventDefault();
         $(".loading").show();
         $(".loading-text").hide();
@@ -53,6 +53,7 @@ $(document).ready(function () {
             },
         });
     });
+});
 
     // Function to count assignments
     function countAssignments(batch_no) {
@@ -109,7 +110,7 @@ $(document).ready(function () {
             url: `/dashboard/student/assignments-get/${user_id}`,
             type: "GET",
             success: function (response) {
-                let assignmentsHtml = response
+                 let assignmentsHtml = response
                     .map((assignment, index) => {
                         const createdAtDate = new Date(assignment.created_at);
                         const options = {
@@ -131,12 +132,14 @@ $(document).ready(function () {
                     <td class="text-sm">${assignment.max_marks}</td>
                     <td class="text-sm">${formattedCreatedAt}</td>
                     <td class="text-sm">${formattedCreatedAt}</td>
+                    <td class="text-sm">${displayFile(assignment?.file)}</td>
                     ${
                         assignment?.answers?.length > 0
-                            ? `<td colspan="4" class="text-center">
-                            <i class="bi bi-check-circle-fill text-success"></i> Submitted
-                        </td>`
-                            : `<td class="text-sm">pending...</td>
+                            ? `<td colspan="5" class="text-center">
+                                    <i class="bi bi-check-circle-fill text-success"></i> Submitted
+                            </td>`
+                    : `
+                        <td class="text-sm">pending...</td>
                         <td class="text-sm">
                             <form class="upload-form" enctype="multipart/form-data">
                                 <input name="assignment_id" type="hidden" value="${assignment.id}">
@@ -148,18 +151,20 @@ $(document).ready(function () {
                             </form>
                         </td>
                         <td>
-                            <button class="btn btn-purple border-0 btn-disabled p-1 px-2 submit-btn" disabled>
-                                <img class="loading-submit d-none" src="/assets/images/loading.gif" width="20px" alt="loading">
+                            <button class="btn btn-purple border-0 btn-disabled p-1 px-2 btn-sm submit-btn" disabled>
+                                <img class="loading-submit d-none" src="/assets/images/loading.gif" width="15px" alt="loading">
                                 <span>Submit</span>
                             </button>
                         </td>`
-                    }
-                </tr>`;
-                    })
-                    .join("");
+            }
+
+                            </tr>`;
+                                })
+                                .join("");
 
                 $("#assignmentsTableBody").html(assignmentsHtml);
-            },
+
+                        },
 
             error: function (xhr) {
                 // Handle error appropriately
@@ -169,6 +174,7 @@ $(document).ready(function () {
             complete: function () {
                 $(".loader-table").hide();
                 $(".assignment-table").show();
+
             },
         });
     }
@@ -196,7 +202,7 @@ $(document).ready(function () {
 
     // Handle assignment upload
     $(document).ready(function () {
-        $(document).on("click", ".submit-btn", function (e) {
+        $(document).off('click').on("click", ".submit-btn", function (e) {
             e.preventDefault();
             const form = $(this).closest("tr").find(".upload-form");
             const input = $(this).closest("tr").find(".file-input");
@@ -228,18 +234,8 @@ $(document).ready(function () {
                 }
             },
             error: function (xhr) {
-                if (xhr.status === 422) {
-                    displayValidationErrors(
-                        xhr.responseJSON.errors,
-                        errorMessageDiv
-                    );
-                } else {
-                    // Handle error appropriately
-                    showFlashMessage(
-                        "Failed to upload the assignment",
-                        "error"
-                    );
-                }
+                                    showErrorMessages(xhr.responseJSON.errors);
+
             },
             complete: function () {
                 loader.addClass("d-none");
@@ -249,9 +245,9 @@ $(document).ready(function () {
 
     // Function to update the row after submission
     function updateRowAfterSubmission(row) {
-        row.find("td:nth-child(6)").remove(); // Remove 'pending...'
-        row.find("td:nth-child(6)").remove(); // Remove form column
-        row.find("td:nth-child(6)").remove(); // Remove submit button column
+        row.find("td:nth-child(7)").remove(); // Remove 'pending...'
+        row.find("td:nth-child(7)").remove(); // Remove form column
+        row.find("td:nth-child(7)").remove(); // Remove submit button column
         row.append(`
         <td colspan="3" class="text-center">
             <i class="bi bi-check-circle-fill text-success"></i> Submitted
@@ -321,7 +317,6 @@ $(document).ready(function () {
     // Get submitted assignments for teacher
     // Get submitted assignments for teacher
     function getSubmittedAssignments(batch_no) {
-        console.log(batch_no);
         $(".loader-table").show();
         $.ajax({
             url: "/dashboard/teacher/submitted-assignment",
@@ -361,11 +356,11 @@ $(document).ready(function () {
                             const obtainedMarks =
                                 assignment?.marks !== null
                                     ? assignment.marks?.obt_marks
-                                    : `<input type='number' name='obtainedMarks-${assignment.id}' class='form-control rounded-pill' placeholder='Obtained Marks...' >`;
+                                    : `<input type='number' name='obtainedMarks-${assignment.id}' class=' p-0 form-control ' placeholder='e.g. 25' >`;
 
                             // Create button element dynamically using jQuery
                             const button = $("<button/>", {
-                                class: `btn btn-purple px-4 rounded-pill btn-sm mark-assignment ${
+                                class: `btn btn-purple btn-sm mark-assignment ${
                                     assignment.marks !== null
                                         ? "btn-disabled"
                                         : ""
@@ -397,7 +392,7 @@ $(document).ready(function () {
                             }</td>
                             <td>${answerFile}</td>
                             <td>${maxMarks}</td>
-                            <td class='error-marks'>${obtainedMarks}</td>
+                            <td class='error-marks small-ph'>${obtainedMarks}</td>
                             <td>${button[0].outerHTML}</td>
                         </tr>`;
                         })
@@ -412,10 +407,7 @@ $(document).ready(function () {
                 }
             },
             error: function (xhr) {
-                console.error(
-                    "Error fetching submitted assignments:",
-                    xhr.statusText
-                );
+                showErrorMessages(xhr.responseJSON.errors)
             },
             complete: function () {
                 $(".loader-table").hide();
@@ -429,6 +421,13 @@ $(document).ready(function () {
             window.location.pathname.split("/").includes("assignments") &&
             window.location.pathname.split("/").includes("view")
         ) {
+            setTimeout(() => {
+                let batch_no = $('select[name="batch_no"]')
+            .find("option:eq(1)")
+            .val();
+                getSubmittedAssignments(batch_no);
+            }, 1000);
+
             $('select[name="batch_no"]').on("change", function () {
                 getSubmittedAssignments($(this).val());
             });
@@ -464,7 +463,6 @@ $(document).ready(function () {
                     const loaderHtml =
                         '<div class="d-flex gap-1"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Marking...</div>';
                     $button
-                        .html(loaderHtml)
                         .attr("disabled", true)
                         .addClass("btn-disabled");
 
@@ -472,6 +470,12 @@ $(document).ready(function () {
                         url: "/dashboard/teacher/mark-assignment/",
                         type: "POST",
                         data,
+                        beforeSend: function () {
+                            $button
+                                .html("Marked")
+                                .attr("disabled", true)
+                                .addClass("btn-disabled");
+                        },
                         success: function (response) {
                             $button
                                 .html("Marked")
@@ -618,7 +622,7 @@ $(document).ready(function () {
     }
 
     // Add course
-    $(".course-btn").click(function (e) {
+    $(".course-btn").off('click').on('click',function (e) {
         e.preventDefault();
         addCourse();
     });
@@ -717,7 +721,7 @@ $(document).ready(function () {
     }
 
     // Add instructor
-    $(".teacher-btn").click(function (e) {
+    $(".teacher-btn").off('click').on('click',function (e) {
         e.preventDefault();
         addInstructor();
     });
@@ -2170,9 +2174,9 @@ $(document).ready(function () {
     }
 
     // Submit the attendance
-    $(document)
+    $('.att-mark-btn')
         .off("click")
-        .on("click", ".att-mark-btn", function (e) {
+        .on("click", function (e) {
             e.preventDefault();
             let loader = $(".attendace-loading-gif");
 
@@ -2224,7 +2228,8 @@ $(document).ready(function () {
                 },
                 success: function (response) {
                     alert("Attendance submitted successfully!");
-                    console.log(response);
+                    $(".att-mark-btn")
+                        .prop("disabled", false)
                 },
                 error: function (xhr) {
                     console.log(xhr.responseJSON);
@@ -2304,7 +2309,6 @@ $(document).ready(function () {
         let course_name = $('select[name="course_name_teacher"]')
             .find("option:eq(1)")
             .val();
-        console.log(batch_no, course_name);
         checkAttendanceMarked(batch_no, course_name);
     }, 1000);
 });
@@ -2383,8 +2387,15 @@ function countTotalClasses() {
         //     batch_no,
         //     course_name,
         // },
+        beforeSend: function () {
+
+        },
         success: function (response) {
+            console.log(response)
             $('.student-lessons').html(response?.totalClasses)
+            $('.total-classes-student').html(`Total(${response?.totalClasses})`)
+            $('.total-present-student').html(`Presents(${response?.presents})`)
+            $('.total-absent-student').html(`Absents(${response?.absents})`)
         },
         error: function (xhr) {
             console.log(xhr.statusText);
@@ -2453,8 +2464,8 @@ $(document).ready(function () {
         window.location.pathname.split("/").includes("dashboard")
     ) {
         attendanceRecord();
+        countTotalClasses();
     }
-    // countTotalClasses();
 });
 function getCurrentDay(day) {
         const days = [
@@ -2467,4 +2478,91 @@ function getCurrentDay(day) {
             "Saturday",
         ];
         return days[day] || "";
+    }
+
+
+
+    // get the attendace for teacher
+
+$(document).ready(function () {
+
+    if (
+        window.location.pathname.split("/").includes("teacher") &&
+        window.location.pathname.split("/").includes("attendance") &&
+        window.location.pathname.split("/").includes("view")
+    ) {
+
+        setTimeout(() => {
+            let batch_no = $("select[name='batch_no']").find("option:eq(1)").val()
+            let course_name = $("select[name='course_name_teacher']").find("option:eq(1)").val()
+            getStudentAttendance(batch_no, course_name);
+        }, 1000);
+
+
+        $(".loader-table-teacher").hide();
+
+        // When the 'batch_no' is changed
+        $('select[name="batch_no"]').on("change", function () {
+            let batch_no = $(this).val(); // Get the selected batch number
+            let course_name = $("select[name='course_name_teacher']").find("option:eq(1)").val(); // Get the selected course name
+            $(".loader-table-teacher").show();
+
+            getStudentAttendance(batch_no, course_name);
+        });
+
+            }
+    })
+
+
+
+function getStudentAttendance(batch_no, course_name) {
+        let user_id = window.location.pathname.split("/").pop();
+
+        $.ajax({
+                url: `/dashboard/teacher/show-students/${user_id}`,
+                type: "GET",
+                data: {
+                    batch_no:
+                        batch_no ,
+                    course_name:
+                        course_name
+                },
+                success: function (response) {
+                    let rowsHtml = response?.students
+                        ?.map((student,index) => {
+                            return `
+                            <tr>
+                            <td>${index+1}</td>
+                                <td id='slice-name' >${
+                                    student.name && student.name.length > 10
+                                        ? student.name.slice(0, 10) + "..."
+                                        : student.name
+                                }</td>
+                                <td class='fw-semibold ${
+                                    student?.attendance_percentage >= 75
+                                        ? "text-success"
+                                        : "text-danger"
+                                }' >
+                                    ${student?.attendance_percentage}%
+                                </td>
+
+                                <td>
+                                    <button class='btn btn-sm btn-purple'>
+                                        View
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                        })
+                        .join("");
+
+                    // Append generated rows to the table body
+                    $(".student-attendance-teacher").html(rowsHtml);
+                    $(".teacher-attendance-mark-table").show();
+                    $(".loader-table-teacher").hide();
+                },
+                error: function (xhr) {
+                    console.log(xhr.statusText);
+                },
+            });
     }

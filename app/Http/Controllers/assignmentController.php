@@ -15,20 +15,21 @@ class assignmentController extends Controller
         $pieChart = new assignmentChart;
         $lineChart = new assignmentChart;
         $doughnetChart = new assignmentChart;
+        // $submitted = Answers::where('batch_no', auth()->user()->batch_assigned)->count();
         $pieChart->labels(['Submitted', 'Remaining']);
         $lineChart->labels(['Submitted', 'Remaining']);
         $pieChart->dataset('Submitted', 'pie', [40, 10])->options([
-            'backgroundColor' => ['green', 'red']
+            'backgroundColor' => ['#03C03C', '#F70101']  // Soft green and pinkish red
         ]);
         $doughnetChart->labels(['Submitted', 'Remaining']);
         $doughnetChart->dataset('Submitted', 'doughnut', [40, 10])->options([
-            'backgroundColor' => ['green', 'red']
+            'backgroundColor' => ['#03C03C', '#F70101']  // Soft green and pinkish red
         ]);
         $lineChart->dataset('Submitted', 'line', [40, 10])->options([
-            'backgroundColor' => ['green']
+            'backgroundColor' => ['#03C03C']  // Soft green and pinkish red
         ]);
         $lineChart->dataset('Remaining', 'line', [10, 50])->options([
-            'backgroundColor' => ['red']
+            'backgroundColor' => ['#F70101']  // Soft green and pinkish red
         ]);
 
         return view('teacher.pages.view-assignments', compact('pieChart', 'doughnetChart', 'lineChart'));
@@ -130,6 +131,10 @@ class assignmentController extends Controller
 
         // Store the uploaded file
         $formFields['answer_file'] = $request->file('answer_file')->store('assignment_answers', 'public');
+
+        // add  batch number
+        $formFields['batch_no'] = auth()->user()->batch_assigned;
+
 
         // Create a new answer record
         $answer = Answers::create($formFields);

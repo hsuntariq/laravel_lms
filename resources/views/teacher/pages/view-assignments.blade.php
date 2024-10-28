@@ -2,10 +2,11 @@
     <section style="height:89vh;overflow-y:scroll;">
         @include('teacher.partials.header')
         <section class="filter my-2">
-            <form action="" method="POST" class="form-control d-flex align-items-center rounded-pill gap-2 w-25">
-                <div class="bi bi-search" style="color:#8338EB"></div>
+            <form action="" method="POST"
+                class="form-control form-control-sm p-0 px-3 d-flex align-items-center rounded-pill gap-2 w-25">
+                <i class="bi bi-search" style="color:#8338EB"></i>
                 <input type="text" class="border-0 w-100 input-search" style="outline-width:0"
-                    placeholder="Seach by date or student...">
+                    placeholder="Seach by student...">
             </form>
         </section>
         <section class="row justify-content-between">
@@ -25,7 +26,7 @@
         </section>
         <div class="table-responsive">
             @include('student.partials.table-loader')
-            <table class="table text-capitalize">
+            <table class="table text-capitalize table-sm table-bordered table-striped text-sm btn-sm input-group-sm">
                 <thead>
                     <tr>
                         <td>Date</td>
@@ -50,4 +51,9 @@
     {!! $pieChart->script() !!}
     {!! $doughnetChart->script() !!}
     {!! $lineChart->script() !!}
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+    </script>
 </x-teacher-dashboard-layout>

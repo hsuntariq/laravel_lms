@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('answers', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('assignment_id');
-            $table->foreign('assignment_id')->references('id')->on('assignments');
+            $table->foreign('assignment_id')->references('id')->on('assignments')->onDelete('cascade');
             $table->string('status')->default('pending');
             $table->timestamps();
         });

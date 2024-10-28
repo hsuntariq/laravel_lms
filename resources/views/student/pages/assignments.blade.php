@@ -1,5 +1,6 @@
 <x-layout>
     <x-header />
+    <x-error />
     <x-flash />
     <hr class="m-1">
     <main class="row">
@@ -16,9 +17,9 @@
 
                 </ul>
             </section>
-            <div class="table-responsive assignment-table my-4" style='height:75vh;overflow-y:scroll'>
+            <div class="table-responsive assignment-table text-sm my-4" style='height:75vh;overflow-y:scroll'>
                 @include('student.partials.table-loader')
-                <table class="table text-center text-sm">
+                <table class="table text-center table-sm table-striped table-bordered">
                     <thead>
                         <tr>
                             <td>#</td>
@@ -26,6 +27,7 @@
                             <td>Marks</td>
                             <td>End Time</td>
                             <td>Upload Time</td>
+                            <td>File</td>
                             <td>Status</td>
                             <td style="width:20%">Upload</td>
                             <td>Action</td>

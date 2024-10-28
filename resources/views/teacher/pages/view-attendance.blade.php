@@ -20,40 +20,32 @@
             </div>
 
         </section>
-        <div class="table-responsive" ">
-        <table class="table text-capitalize">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>day</th>
-                    <th>student</th>
-                    <th>status</th>
-                    <th>update</th>
-                </tr>
-            </thead>
-            <tbody>
-                          @for ($i=0; $i < 10; $i++)
-            <tr>
-                <td>21-01-21</td>
-                <td>Tuesday</td>
-                <td>Sara</td>
-                <td>
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="dot bg-success rounded-circle"></div>
-                        present
-                    </div>
-                </td>
-                <td>
-                    <button class="btn text-white btn-purple">
-                        Update
-                    </button>
-                </td>
-            </tr>
-            @endfor
-            </tbody>
+        <div class="table-responsive">
+            @include('teacher.partials.table-loader')
+            <table class="table text-capitalize table-sm table-striped table-bordered text-sm">
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>name</th>
+                        <th>percentage</th>
+                        <th>view</th>
+                    </tr>
+                </thead>
+                <tbody class='student-attendance-teacher'>
+
+                </tbody>
             </table>
         </div>
     </section>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+    </script>
     {!! $pieChart->script() !!}
     {!! $doughnetChart->script() !!}
+
+
+
+
+
+
 </x-teacher-dashboard-layout>

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('batch_no');
             $table->unsignedBigInteger('course_id'); // Make course_id unsignedBigInteger
             $table->unsignedBigInteger('teacher');
-            $table->foreign('teacher')->references('id')->on('users');
+            $table->foreign('teacher')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
 
             $table->unique(['batch_no', 'course_id']);

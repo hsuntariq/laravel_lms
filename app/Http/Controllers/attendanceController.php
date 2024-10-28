@@ -14,13 +14,20 @@ class attendanceController extends Controller
         $pieChart = new attendanceChart;
         $doughnetChart = new attendanceChart;
         $radarChart = new attendanceChart;
-        $pieChart->labels(['presents', 'absents']);
-        $pieChart->dataset('presents', 'pie', [40, 10])->options([
-            'backgroundColor' => ['green', 'red']
+
+        $attendanceQuery = Attendance::where('batch_no', auth()->user()->batch_assigned)
+            ->where('course_id', auth()->user()->course_assigned)
+            ->where('user_id', auth()->user()->id);
+
+        $presents = $attendanceQuery->where('status', 'present')->count();
+        $absents = $attendanceQuery->where('status', 'absent')->count();
+        $pieChart->labels(['Presents', 'Absents']);
+        $pieChart->dataset('Attendance', 'pie', [$presents, $absents])->options([
+            'backgroundColor' => ['#03C03C', '#F70101']  // Soft green and pinkish red
         ]);
         $doughnetChart->labels(['presents', 'absents']);
-        $doughnetChart->dataset('presents', 'doughnut', [40, 10])->options([
-            'backgroundColor' => ['green', 'red']
+        $doughnetChart->dataset('presents', 'doughnut', [$presents, $absents])->options([
+            'backgroundColor' => ['#03C03C', '#F70101']
         ]);
 
         return view('student.pages.attendance', compact('pieChart', 'doughnetChart', 'radarChart'));
@@ -149,14 +156,19 @@ class attendanceController extends Controller
         $batch_no = auth()->user()->batch_assigned;
         $course_name = auth()->user()->course_assigned;
         $attendanceRecords = Attendance::where('batch_no', $batch_no)
-            ->where('course_id', $course_name)
+            ->where('course_id', $course_name)->where('user_id', auth()->user()->id)
             ->get();
 
         // Total classes based on distinct attendance dates
         $totalClasses = $attendanceRecords->groupBy('attendance_date')->count();
+        $totalPresents = $attendanceRecords->where('status', 'present')->groupBy('attendance_date')->count();
+        $totalAbsents = $attendanceRecords->where('status', 'absent')->groupBy('attendance_date')->count();
+
 
         return response()->json([
-            "totalClasses" => $totalClasses
+            "totalClasses" => $totalClasses,
+            "presents" => $totalPresents,
+            "absents" => $totalAbsents,
         ]);
     }
 
@@ -168,7 +180,7 @@ class attendanceController extends Controller
         $course_no = auth()->user()->course_assigned;
 
 
-        $records = Attendance::where('batch_no', $batch_no)->where('course_id', $course_no)->get();
+        $records = Attendance::where('batch_no', $batch_no)->where('course_id', $course_no)->where('user_id', auth()->user()->id)->get();
 
         return response()->json([
             'attendance' => $records

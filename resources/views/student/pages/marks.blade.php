@@ -11,8 +11,8 @@
                 <div class="underline"></div>
             </div>
             @include('student.partials.table-loader')
-            <div class="table-responsive hide-table">
-                <table class="table text-capitalize">
+            <div class="table-responsive hide-table text-sm">
+                <table class="table table-sm table-bordered table-striped text-sm text-capitalize">
                     <thead>
                         <tr>
                             <td>Date</td>
@@ -37,7 +37,7 @@
             @include('student.partials.table-loader')
 
             <div class="table-responsive hide-table">
-                <table class="table text-capitalize">
+                <table class="table table-sm table-bordered table-striped text-sm text-capitalize text-capitalize">
                     <thead>
                         <tr>
                             <td>Date</td>

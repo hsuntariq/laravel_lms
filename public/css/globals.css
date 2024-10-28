@@ -155,6 +155,8 @@ th {
     text-align: center;
 }
 
+
+
 .notificationCard {
     width: 220px;
     height: 280px;
@@ -376,4 +378,25 @@ th {
     100% {
         background-color: #e0e0e0;
     }
+}
+thead th, thead td{
+     position: sticky !important;
+    top: 0 !important;
+    z-index: 1 !important;
+    background-color: var(--orange) !important;
+    color: white !important;
+}
+
+input{
+    /* height:30px !important; */
+    /* font-size:1rem !important; */
+}
+
+option{
+
+    font-size:1rem !important;
+}
+
+.small-ph::placeholder{
+    font-size: 0.7rem !important;
 }

@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('marks', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');  
+            $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('assignment_id');
             $table->unsignedBigInteger('answer_id');
             $table->unsignedBigInteger('max_marks');
             $table->integer('obt_marks');
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('assignment_id')->references('id')->on('assignments');
-            $table->foreign('answer_id')->references('id')->on('answers');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('assignment_id')->references('id')->on('assignments')->onDelete('cascade');
+            $table->foreign('answer_id')->references('id')->on('answers')->onDelete('cascade');
             $table->string('comments');
             $table->timestamps();
         });

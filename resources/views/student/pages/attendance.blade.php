@@ -10,15 +10,15 @@
             <div class="d-flex justify-content-center gap-3 align-items-center">
                 <div class="d-flex gap-2 align-items-center">
                     <div class='attendance-box bg-secondary'></div>
-                    <p class="text-purple m-0 text-sm fw-medium">Total(10)</p>
+                    <p class="text-purple m-0 text-sm fw-medium total-classes-student"></p>
                 </div>
                 <div class="d-flex gap-2 align-items-center">
                     <div class='attendance-box bg-success'></div>
-                    <p class="text-purple m-0 text-sm fw-medium ">Present(9)</p>
+                    <p class="text-purple m-0 text-sm fw-medium total-present-student"></p>
                 </div>
                 <div class="d-flex gap-2 align-items-center">
                     <div class='attendance-box bg-danger'></div>
-                    <p class="text-purple m-0 text-sm fw-medium ">Absents(1)</p>
+                    <p class="text-purple m-0 text-sm fw-medium total-absent-student"></p>
                 </div>
             </div>
             {{-- here goes the chart --}}

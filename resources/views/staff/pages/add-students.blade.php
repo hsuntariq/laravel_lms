@@ -1,7 +1,8 @@
 <x-staff-dashboard-layout>
     <x-flash />
     <x-error />
-    <form method="POST" enctype="multipart/form-data" class="student-form col-lg-7 col-md-10 mx-auto border-purple p-3 rounded-3 shadow">
+    <form method="POST" enctype="multipart/form-data"
+        class="student-form col-lg-7 col-md-10 mx-auto border-purple p-3 rounded-3 shadow">
         @csrf
         <h1 class="display-6 text-center">
             Add Student
@@ -17,7 +18,8 @@
         <div class="form-group">
             <label for="password">Password</label>
             <div class="d-flex form-control">
-                <input type="password" placeholder="e.g. ******" name="password" id="password" class="outline-none pass border-0 w-100" required>
+                <input type="password" placeholder="e.g. ******" name="password" id="password"
+                    class="outline-none pass border-0 w-100" required>
                 <span class="toggle-password" style="cursor:pointer;">
                     <i class="bi bi-eye-slash"></i>
                 </span>
@@ -52,7 +54,8 @@
         <div class="form-group">
             <label for="image">Student Image</label>
             <input type="file" name="image" id="image" class="form-control">
-            <img id="image-preview" src="#" alt="Image Preview" class="img-fluid mt-2" style="display:none; max-width: 150px;">
+            <img id="image-preview" src="#" alt="Image Preview" class="img-fluid mt-2"
+                style="display:none; max-width: 150px;">
         </div>
         <input type="hidden" value="student" name="role">
         <button class="btn btn-purple student-btn w-100 my-2">
@@ -62,5 +65,7 @@
             Add Student
         </button>
     </form>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+    </script>
 </x-staff-dashboard-layout>
