@@ -9,7 +9,7 @@
 </section>
 <section class="table-responsive" style="height:80vh;overflow-y:scroll">
     @include('teacher.partials.table-loader')
-    <table class="table text-capitalize teacher-attendance-mark-table">
+    <table class="table text-capitalize table-sm table-striped table-bordered text-sm teacher-attendance-mark-table">
         <thead>
             <tr>
                 <th>student name</th>
@@ -25,7 +25,7 @@
         </tbody>
     </table>
 
-    <button disabled class="btn btn-purple btn-disabled  d-block ms-auto att-mark-btn">
+    <button disabled class="btn btn-purple btn-sm btn-disabled  d-block ms-auto att-mark-btn">
         <img width="30px" class="loaderattendace-loading-gif" src="{{ asset('assets/images/loading.gif') }}"
             alt="Loading..."> Submit Attendance
     </button>
