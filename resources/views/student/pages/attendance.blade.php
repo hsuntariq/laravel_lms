@@ -34,29 +34,21 @@
 
             </section>
             <section class="table-responsive">
-                <div class="table-responsive  my-4">
-                    <table class="table text-center attendance-table text-capitalize ">
+                <div class="table-responsive text-sm    my-4">
+                    @include('student.partials.table-loader')
+                    <table class="table text-center table-bordered table-striped attendance-table text-capitalize ">
                         <thead>
                             <tr>
                                 <td>#</td>
                                 <td>Date</td>
                                 <td>Day</td>
-                                <td>Class Start time</td>
-                                <td>Class End time</td>
+                                <td>Topic</td>
+                                <td>Remarks</td>
                                 <td>status</td>
                             </tr>
                         </thead>
-                        <tbody>
-                            @for ($i = 0; $i < 5; $i++)
-                                <tr>
-                                    <td class="p-4">{{ $i + 1 }}</td>
-                                    <td class="p-4">{{ now()->format('d-m-y') }}</td>
-                                    <td class="p-4">Tuesday</td>
-                                    <td class="p-4">12.45am</td>
-                                    <td class="p-4">2.45am</td>
-                                    <td class="p-4">present</td>
-                                </tr>
-                            @endfor
+                        <tbody class='student-attendance-table'>
+
                         </tbody>
                     </table>
                 </div>

@@ -2373,18 +2373,18 @@ function closeErrorMessages() {
 // count total classes
 
 function countTotalClasses() {
-    let batch_no = $('select[name="batch_no"]').val();
-    let course_name = $('select[name="course_name_teacher"]').val();
+    // let batch_no = $('select[name="batch_no"]').val();
+    // let course_name = $('select[name="course_name_teacher"]').val();
     let user_id = window.location.pathname.split("/").pop();
     $.ajax({
         url: `/dashboard/student/get-total-classes/${user_id}`,
         type: "GET",
-        data: {
-            batch_no,
-            course_name,
-        },
+        // data: {
+        //     batch_no,
+        //     course_name,
+        // },
         success: function (response) {
-            console.log(response);
+            $('.student-lessons').html(response?.totalClasses)
         },
         error: function (xhr) {
             console.log(xhr.statusText);
@@ -2393,12 +2393,78 @@ function countTotalClasses() {
 }
 
 $(document).ready(function () {
-    // if (
-    //     window.location.pathname.split("/").includes("/student") &&
-    //     window.location.pathname.split("/").includes("/home") &&
-    //     window.location.pathname.split("/").includes("/dashboard")
-    // ) {
-    //     countTotalClasses();
-    // }
-    countTotalClasses();
+    if (
+        window.location.pathname.split("/").includes("student") &&
+        window.location.pathname.split("/").includes("home") &&
+        window.location.pathname.split("/").includes("dashboard")
+    ) {
+        countTotalClasses();
+    }
+    // countTotalClasses();
 });
+
+
+
+function attendanceRecord() {
+    // let batch_no = $('select[name="batch_no"]').val();
+    // let course_name = $('select[name="course_name_teacher"]').val();
+    let user_id = window.location.pathname.split("/").pop();
+    $.ajax({
+        url: `/dashboard/student/get-attendance-record/${user_id}`,
+        type: "GET",
+        // data: {
+        //     batch_no,
+        //     course_name,
+        // },
+        success: function (response) {
+            // console.log(response)
+            // $('.student-lessons').html(response?.totalClasses)
+            let records = '';
+
+            response?.attendance?.forEach((item, index) => {
+                let createdAt = new Date(item?.created_at)
+                records += `
+                    <tr>
+                        <td>${index+1}</td>
+                        <td>${item?.attendance_date}</td>
+                        <td>${getCurrentDay(createdAt.getDay())}</td>
+                        <td>${item?.topic}</td>
+                        <td>${item?.remarks || 'No remarks'}</td>
+                        <td>${item?.status}</td>
+                    </tr>
+                `
+            })
+
+
+            $('.student-attendance-table').html(records)
+
+        },
+        error: function (xhr) {
+            console.log(xhr.statusText);
+        },
+    });
+}
+
+
+$(document).ready(function () {
+    if (
+        window.location.pathname.split("/").includes("student") &&
+        window.location.pathname.split("/").includes("attendance") &&
+        window.location.pathname.split("/").includes("dashboard")
+    ) {
+        attendanceRecord();
+    }
+    // countTotalClasses();
+});
+function getCurrentDay(day) {
+        const days = [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+        ];
+        return days[day] || "";
+    }

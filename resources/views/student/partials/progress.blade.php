@@ -49,7 +49,11 @@
                             alt="assignmate image">
                     </div>
                 </section>
-                <h2 class="m-0">41</h2>
+                <div class="loading-count" id="loading-count">
+                    <img width="40px" src="{{ asset('assets/images/loading.gif') }}" alt="Loading...">
+                </div>
+
+                <h2 class="m-0 student-lessons"></h2>
                 <p class="fw-medium fs-4 text-secondary m-0">
                     Lessons
                 </p>

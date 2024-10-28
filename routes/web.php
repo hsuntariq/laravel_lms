@@ -47,6 +47,8 @@ Route::prefix('/dashboard/student')->middleware(['auth', 'student'])->group(func
     Route::get('/get-total-classes/{id}', [attendanceController::class, 'totalClasses'])->name('totalClasses');
 
     Route::get('get-data-count/{id}', [studentController::class, 'countData'])->name('count-stuudent-data');
+
+    Route::get('get-attendance-record/{id}', [attendanceController::class, 'getStudentAttendace'])->name('get-attendace-record');
 });
 
 Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(function () {

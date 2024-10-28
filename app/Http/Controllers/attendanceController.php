@@ -146,8 +146,8 @@ class attendanceController extends Controller
     public function totalClasses(Request $request)
     {
         // Fetch all attendance records for the student for the given batch and course
-        $batch_no = $request->batch_no;
-        $course_name = $request->course_name;
+        $batch_no = auth()->user()->batch_assigned;
+        $course_name = auth()->user()->course_assigned;
         $attendanceRecords = Attendance::where('batch_no', $batch_no)
             ->where('course_id', $course_name)
             ->get();
@@ -157,6 +157,21 @@ class attendanceController extends Controller
 
         return response()->json([
             "totalClasses" => $totalClasses
+        ]);
+    }
+
+
+
+    public function getStudentAttendace(Request $request)
+    {
+        $batch_no = auth()->user()->batch_assigned;
+        $course_no = auth()->user()->course_assigned;
+
+
+        $records = Attendance::where('batch_no', $batch_no)->where('course_id', $course_no)->get();
+
+        return response()->json([
+            'attendance' => $records
         ]);
     }
 }
