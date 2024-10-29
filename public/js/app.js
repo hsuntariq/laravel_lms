@@ -2528,7 +2528,9 @@ function getStudentAttendance(batch_no, course_name) {
                         course_name
                 },
                 success: function (response) {
+                    console.log(response)
                     let rowsHtml = response?.students
+
                         ?.map((student,index) => {
                             return `
                             <tr>
@@ -2547,9 +2549,14 @@ function getStudentAttendance(batch_no, course_name) {
                                 </td>
 
                                 <td>
-                                    <button class='btn btn-sm btn-purple'>
-                                        View
-                                    </button>
+                                   <button
+                                    type='button'
+                                    data-bs-toggle='modal'
+                                    data-bs-target='#attModal'
+                                    data-id='${student?.id}'
+                                    class="btn btn-sm view-att btn-purple">
+                                    View
+                                </button>
                                 </td>
                             </tr>
                         `;
@@ -2560,9 +2567,16 @@ function getStudentAttendance(batch_no, course_name) {
                     $(".student-attendance-teacher").html(rowsHtml);
                     $(".teacher-attendance-mark-table").show();
                     $(".loader-table-teacher").hide();
+
+
+
+
                 },
                 error: function (xhr) {
                     console.log(xhr.statusText);
                 },
             });
     }
+
+
+

@@ -21,6 +21,8 @@
 
         </section>
         <div class="table-responsive">
+            @include('teacher.partials.attendance-modal')
+
             @include('teacher.partials.table-loader')
             <table class="table text-capitalize table-sm table-striped table-bordered text-sm">
                 <thead>

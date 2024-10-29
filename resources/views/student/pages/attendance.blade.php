@@ -1,4 +1,5 @@
 <x-layout>
+
     <x-header />
     <hr class="my-1">
     <main class="row">
@@ -50,6 +51,7 @@
                         <tbody class='student-attendance-table'>
 
                         </tbody>
+
                     </table>
                 </div>
                 </div>
@@ -57,4 +59,6 @@
     </main>
     {!! $pieChart->script() !!}
     {!! $doughnetChart->script() !!}
+
+
 </x-layout>

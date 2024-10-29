@@ -7,8 +7,10 @@
         <input type="text" class="border-0 w-100 input-search" name="topic_name" style="outline-width:0"
             placeholder="Topic name">
 </section>
+
 <section class="table-responsive" style="height:80vh;overflow-y:scroll">
     @include('teacher.partials.table-loader')
+
     <table class="table text-capitalize table-sm table-striped table-bordered text-sm teacher-attendance-mark-table">
         <thead>
             <tr>
