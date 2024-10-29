@@ -5,6 +5,12 @@ $(".update-image").on("input", function (e) {
     $(".image-preview").css("display", "block").attr("src", imageUrl);
 });
 
+
+
+
+
+
+
 $(document).ready(function () {
     $.ajaxSetup({
         headers: {
@@ -53,7 +59,31 @@ $(document).ready(function () {
             },
         });
     });
-});
+    });
+
+
+
+
+// Usage examples:
+// showToast('This is a success message!', 'success');
+// showToast('This is an error message!', 'error');
+// showToast('This is an informational message!', 'info');
+// showToast('This is a warning message!', 'warning');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // Function to count assignments
     function countAssignments(batch_no) {
@@ -2528,8 +2558,28 @@ function getStudentAttendance(batch_no, course_name) {
                         course_name
                 },
                 success: function (response) {
-                    console.log(response)
-                    let rowsHtml = response?.students
+
+
+                    studentAttendance(response)
+
+                    $('.view-att').off('click').on('click', function () {
+                        const user_id = $(this).data('id');
+                        showAttendance(user_id)
+
+                    })
+
+
+                },
+                error: function (xhr) {
+                    console.log(xhr.statusText);
+                },
+            });
+    }
+
+
+
+function studentAttendance(response) {
+    let rowsHtml = response?.students
 
                         ?.map((student,index) => {
                             return `
@@ -2568,15 +2618,113 @@ function getStudentAttendance(batch_no, course_name) {
                     $(".teacher-attendance-mark-table").show();
                     $(".loader-table-teacher").hide();
 
+}
 
 
 
-                },
-                error: function (xhr) {
-                    console.log(xhr.statusText);
-                },
-            });
+function showAttendance(user_id) {
+    $('.loader-table-teacher').show()
+
+    $.ajax({
+            url: `/dashboard/teacher/student/attendance/${user_id}`,
+            method: 'GET',
+        success: function (response) {
+                console.log(response)
+                // Populate modal with fetched data
+                $('#attModalLabel').text(`${response.student.name} - Attendance`);
+
+                let attendanceHtml = response.attendanceRecords.map(record => `
+                    <tr>
+                        <td>${record.attendance_date}</td>
+                        <td>${new Date(record.attendance_date).toLocaleDateString('en-US', { weekday: 'long' })}</td>
+                        <td>${record.topic}</td>
+                        <td>${record.remarks || 'No remarks'}</td>
+                        <td class="${record.status === 'present' ? 'text-success' : 'text-danger'}">
+                            ${record.status.charAt(0).toUpperCase() + record.status.slice(1)}
+                        </td>
+                        <td>
+                            <select class="form-select form-select-sm attendance-status" data-record-id="${record.id}">
+                                <option value="present" ${record.status === 'present' ? 'selected' : ''}>Present</option>
+                                <option value="leave" ${record.status === 'leave' ? 'selected' : ''}>Leave</option>
+                                <option value="absent" ${record.status === 'absent' ? 'selected' : ''}>Absent</option>
+                            </select>
+                        </td>
+                    </tr>
+                `).join('');
+
+                $('.student-attendance-table').html(attendanceHtml);
+                    $('.loader-table-teacher').hide()
+
+            },
+            error: function () {
+                alert('Failed to fetch attendance records');
+            }
+        });
+
+}
+
+$(document).ready(function () {
+    if (window.location.pathname.split('/').includes('teacher') &&
+    window.location.pathname.split('/').includes('attendance') &&
+    window.location.pathname.split('/').includes('view')
+){
+            $(document).off('change').on('change', '.attendance-status', function () {
+                $('.att-loading').show()
+                    $('.att-loading-btn').prop('disabled',true).addClass('btn-disabled').html(`<div style='width:20px;height:20px;' class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                    </div>`)
+        const recordId = $(this).data('record-id');
+        const newStatus = $(this).val();
+                    $(".spinner-border").show();
+
+        $.ajax({
+            url: `/dashboard/teacher/student/attendance/update/${recordId}`,
+            method: 'POST',
+            data: {
+                status: newStatus,
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+
+            success: function () {
+                $('.att-loading').hide()
+                $('.att-loading-btn').prop('disabled', false).removeClass('btn-disabled').text('Close')
+                showToast('Updated Status','Attendance status updated successfully','success');
+            },
+            complete: function () {
+                 $('.att-loading').hide()
+                $('.att-loading-btn').prop('disabled', false).removeClass('btn-disabled').text('Close')
+            },
+            error: function (xhr) {
+                showErrorMessages(xhr.responseJSON.errors)
+                 $('.att-loading').hide()
+                $('.att-loading-btn').prop('disabled', false).removeClass('btn-disabled').text('Close')
+                alert('Attendance status updated successfully');
+            }
+        });
+    });
     }
+})
 
+
+// toast message
+
+function showToast(title, message, type) {
+    $('#toast-title').text(title);
+    $('#toast-message').text(message);
+
+    // Remove previous toast type classes and add new one based on type
+    $('#toast').removeClass('toast-success toast-warning toast-error').addClass(`toast-${type}`);
+
+    $('#toast')
+        .stop(true, true) // Stop any ongoing animations
+        .slideDown(300)    // Slide down to show the toast
+        .delay(4000)       // Wait for 4 seconds
+        .slideUp(300);     // Slide up to hide the toast
+
+    // Add close button functionality
+    $('#toast-close').off('click').on('click', function() {
+        $('#toast').stop(true, true).slideUp(300); // Slide up on close
+    });
+}
 
 

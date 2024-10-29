@@ -400,3 +400,51 @@ option{
 .small-ph::placeholder{
     font-size: 0.7rem !important;
 }
+
+
+.att-loading{
+    display: none;
+}
+
+
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    background-color: #333;
+    color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    z-index: 105430 !important;
+}
+
+.toast-header {
+    background-color: #555;
+    color: white;
+    padding: 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.toast-body {
+    padding: 10px;
+}
+
+
+#toast {
+    display: none;
+    color: white;
+}
+
+.toast-success {
+    background-color: #28a745 !important; /* Green */
+}
+
+.toast-warning {
+    background-color: #ffc107 !important; /* Yellow */
+}
+
+.toast-error {
+    background-color: #dc3545 !important; /* Red */
+}

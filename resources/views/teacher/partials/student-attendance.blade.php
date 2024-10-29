@@ -1,4 +1,5 @@
 <x-error />
+<x-toast />
 <section class="filter my-2">
     <form action="" method="POST" class="form-control d-flex align-items-center rounded-pill gap-2 w-25">
         <div style="color:#8338EB">

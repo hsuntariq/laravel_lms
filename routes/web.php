@@ -96,6 +96,10 @@ Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(func
     Route::get('/check-attendance-marked/{id}', [attendanceController::class, 'checkAttendanceMarked'])->name('checkAttendanceMarked');
 
     Route::get('get-total-classes/{id}', [attendanceController::class, 'totalClasses'])->name('totalClasses');
+
+    Route::get('/student/attendance/{id}', [AttendanceController::class, 'showAttendance'])->name('attendance.show');
+
+    Route::post('/student/attendance/update/{id}', [AttendanceController::class, 'updateStatus']);
 });
 
 

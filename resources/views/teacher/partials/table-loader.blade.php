@@ -1,4 +1,3 @@
-<x-layout>
     <div class="mt-5 loader-table-teacher">
         <div class="skeleton-table-wrapper">
             <table class="table table-bordered">
@@ -26,4 +25,3 @@
             </table>
         </div>
     </div>
-</x-layout>

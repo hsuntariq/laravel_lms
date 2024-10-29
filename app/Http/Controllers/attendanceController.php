@@ -186,4 +186,30 @@ class attendanceController extends Controller
             'attendance' => $records
         ]);
     }
+
+
+
+    public function showAttendance($id)
+    {
+        // Fetch the attendance details for the student
+        $student = User::findOrFail($id);
+        $attendanceRecords = Attendance::where('user_id', $id)->get();
+
+        return response()->json([
+            'student' => $student,
+            'attendanceRecords' => $attendanceRecords
+        ]);
+    }
+
+
+    // update the attenancce
+
+    public function updateStatus(Request $request, $id)
+    {
+        $attendanceRecord = Attendance::findOrFail($id);
+        $attendanceRecord->status = $request->input('status');
+        $attendanceRecord->save();
+
+        return response()->json(['message' => 'Attendance status updated successfully.']);
+    }
 }
