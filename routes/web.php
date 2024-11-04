@@ -42,7 +42,7 @@ Route::prefix('/dashboard/student')->middleware(['auth', 'student'])->group(func
 
     Route::get('/get-status', [assignmentController::class, 'getAssignmentStatus'])->name('get-assignment-status');
 
-    Route::get('/get-marks', [marksController::class, 'getMarks'])->name('get-student-marks');
+    Route::get('/get-marks/{id}', [marksController::class, 'getMarks'])->name('get-student-marks');
 
     Route::get('/get-total-classes/{id}', [attendanceController::class, 'totalClasses'])->name('totalClasses');
 

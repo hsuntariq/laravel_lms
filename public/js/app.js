@@ -723,9 +723,9 @@ function displayAssignments(assignments) {
     function getMarks() {
         $(".loader-table").show();
         $(".hide-table").hide();
-
+        let user_id = window.location.pathname.split('/').pop()
         $.ajax({
-            url: "/dashboard/student/get-marks",
+            url: `/dashboard/student/get-marks/${user_id}`,
             type: "GET",
             success: function (response) {
                 let assignmentTableBody = "";

@@ -1,4 +1,5 @@
 <x-teacher-dashboard-layout>
+    <x-toast />
     <section style="height:89vh;overflow-y:scroll;">
         @include('teacher.partials.header')
         <section class="filter justify-content-between my-2 d-flex align-items-center">
