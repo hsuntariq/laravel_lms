@@ -11,7 +11,10 @@
         <section class="col-xl-10 col-lg-9 p-3">
             <section class="d-flex align-items-center px-3 justify-content-between">
                 <div class="d-flex">
-                    <h2>Assignments</h2>
+                    <div class="max-width">
+                        <h1>Assignments</h1>
+                        <div class="underline"></div>
+                    </div>
                 </div>
                 <ul class="d-flex m-0 align-items-center list-unstyled text-purple fw-semibold text-sm gap-2">
                     <li class="filter-button-student btn text-sm btn-sm btn-purple" data-status="all">All</li>

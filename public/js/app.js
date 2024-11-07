@@ -770,44 +770,51 @@ $(document).ready(function () {
 
     // Get marks function
     function getMarks() {
-        $(".loader-table").show();
-        $(".hide-table").hide();
-        let user_id = window.location.pathname.split("/").pop();
-        $.ajax({
-            url: `/dashboard/student/get-marks/${user_id}`,
-            type: "GET",
-            success: function (response) {
-                let assignmentTableBody = "";
-                let testTableBody = "";
+        if (
+            window.location.pathname.split("/").includes("student") &&
+            window.location.pathname.split("/").includes("marks")
+        ) {
+            $(".loader-table").show();
+            $(".hide-table").hide();
+            let user_id = window.location.pathname.split("/").pop();
+            $.ajax({
+                url: `/dashboard/student/get-marks/${user_id}`,
+                type: "GET",
+                success: function (response) {
+                    let assignmentTableBody = "";
+                    let testTableBody = "";
 
-                if (response.length === 0) {
-                    assignmentTableBody = createNoDataRow(
-                        "No assignments marked yet"
-                    );
-                    testTableBody = createNoDataRow("No tests marked yet");
-                } else {
-                    response.forEach(function (mark) {
-                        const createdAt = new Date(mark.answer?.created_at);
-                        const rowHtml = createMarkRow(mark, createdAt);
-                        if (mark?.answer?.assignment?.type == "assignment") {
-                            assignmentTableBody += rowHtml;
-                        } else {
-                            testTableBody += rowHtml;
-                        }
-                    });
-                }
+                    if (response.length === 0) {
+                        assignmentTableBody = createNoDataRow(
+                            "No assignments marked yet"
+                        );
+                        testTableBody = createNoDataRow("No tests marked yet");
+                    } else {
+                        response.forEach(function (mark) {
+                            const createdAt = new Date(mark.answer?.created_at);
+                            const rowHtml = createMarkRow(mark, createdAt);
+                            if (
+                                mark?.answer?.assignment?.type == "assignment"
+                            ) {
+                                assignmentTableBody += rowHtml;
+                            } else {
+                                testTableBody += rowHtml;
+                            }
+                        });
+                    }
 
-                $(".marks-table").html(assignmentTableBody);
-                $(".marks-test-table").html(testTableBody);
-            },
-            error: function (xhr) {
-                console.error(xhr.statusText);
-            },
-            complete: function () {
-                $(".loader-table").hide();
-                $(".hide-table").show();
-            },
-        });
+                    $(".marks-table").html(assignmentTableBody);
+                    $(".marks-test-table").html(testTableBody);
+                },
+                error: function (xhr) {
+                    console.error(xhr.statusText);
+                },
+                complete: function () {
+                    $(".loader-table").hide();
+                    $(".hide-table").show();
+                },
+            });
+        }
     }
 
     // Create a row for marks
@@ -2305,10 +2312,11 @@ function getStudentProgressData(batch_no, course_no) {
             $(".total-strength").hide();
             $(".excelling-strength").hide();
             $(".struggling-strength").hide();
+            $("#doughnutChartCanvas").hide();
             $(".loading-strength").show();
+            $(".loading-chart").show();
         },
         success: function (response) {
-            console.log(response);
             $(".total-strength").show();
             $(".total-students").html(response.students);
             $(".excelling-students").html(response?.excelling_students?.length);
@@ -2316,14 +2324,66 @@ function getStudentProgressData(batch_no, course_no) {
                 response?.struggling_students?.length
             );
             $(".loading-strength").hide();
-            let struggling_list = response?.struggling_students
-                ?.map((item, index) => {
-                    const marks = (
-                        (item?.total_obtained_marks / item?.total_max_marks) *
-                        100
-                    ).toFixed(2);
-                    return `
-                    <section class="d-flex  align-items-center w-100 justify-content-between my-1">
+            $(".loading-chart").hide();
+            $("#doughnutChartCanvas").show();
+
+            getStudentsPerformance(
+                response?.struggling_students,
+                ".struggling-list"
+            );
+            getStudentsPerformance(
+                response?.excelling_students,
+                ".excelling-list"
+            );
+            getStudentsPerformance(response?.average_students, ".average-list");
+            getStudentsPercentage(
+                response.students,
+                response?.struggling_students,
+                ".struggling-percentage"
+            );
+            getStudentsPercentage(
+                response.students,
+                response?.excelling_students,
+                ".excelling-percentage"
+            );
+            getStudentsPercentage(
+                response.students,
+                response?.average_students,
+                ".average-percentage"
+            );
+
+            updateCharts2(response?.doughnet_chart);
+        },
+        error: function (xhr) {
+            console.log(xhr.statusText);
+            $(".loading-strength").hide();
+            $("#doughnutChartCanvas").show();
+            $(".loading-chart").hide();
+        },
+        complete: function () {
+            $(".loading-strength").hide();
+            $(".loading-chart").hide();
+            $("#doughnutChartCanvas").show();
+        },
+    });
+}
+
+function getStudentsPercentage(total, response, input) {
+    let percentage = ((response?.length / total) * 100).toFixed(2);
+    $(input).html(`${percentage}%`);
+}
+
+// get student performance
+
+function getStudentsPerformance(response, input) {
+    let struggling_list = response
+        ?.map((item, index) => {
+            const marks = (
+                (item?.total_obtained_marks / item?.total_max_marks) *
+                100
+            ).toFixed(2);
+            return `
+                    <section class="d-flex text-capitalize  align-items-center w-100 justify-content-between my-1">
                         <section class="d-flex gap-2 justify-content-between align-items-center mb-2">
                            <img width="40px" height="40px" class="rounded-circle object-contain border-purple"
                             src="${
@@ -2337,7 +2397,7 @@ function getStudentProgressData(batch_no, course_no) {
                                 <h6>${item.name || "Student Name"}</h6>
                                 <p class='fw-semibold'>Marks Percentage:
                                 <span class='${
-                                    marks > 40 ? "text-warning" : "text-danger"
+                                    marks > 40 ? "text-success" : "text-danger"
                                 }'>
                                 ${marks}%
                                 </span>
@@ -2350,18 +2410,9 @@ function getStudentProgressData(batch_no, course_no) {
                             </button>
                         </section>
     `;
-                })
-                .join(""); // Use join('') to convert the array to a single HTML string
-            $(".struggling-list").html(struggling_list);
-        },
-        error: function (xhr) {
-            console.log(xhr.statusText);
-            $(".loading-strength").hide();
-        },
-        complete: function () {
-            $(".loading-strength").hide();
-        },
-    });
+        })
+        .join(""); // Use join('') to convert the array to a single HTML string
+    $(input).html(struggling_list);
 }
 
 // get stuedents for attendace
@@ -2543,32 +2594,37 @@ $(document).ready(function () {
 
     // Check if attendance is already marked when loading the page or when batch/course is selected
     function checkAttendanceMarked(batch_no, course_name) {
-        $.ajax({
-            url: `/dashboard/teacher/check-attendance-marked/${user_id}`,
-            type: "GET",
-            data: {
-                batch_no: batch_no,
-                course_name: course_name,
-            },
-            success: function (response) {
-                if (response.attendance_marked) {
-                    // Disable the button if attendance has already been marked
-                    $(".att-mark-btn")
-                        .prop("disabled", true)
-                        .text("Attendance Already Marked")
-                        .addClass("btn-disabled");
-                } else {
-                    // Enable the button if no attendance is marked for today
-                    $(".att-mark-btn")
-                        .prop("disabled", false)
-                        .text("Submit Attendance")
-                        .removeClass("btn-disabled");
-                }
-            },
-            error: function (xhr) {
-                console.error("Error checking attendance:", xhr.statusText);
-            },
-        });
+        if (
+            window.location.pathname.split("/").includes("teacher") &&
+            window.location.pathname.split("/").includes("attendance") &&
+            window.location.pathname.split("/").includes("mark")
+        )
+            $.ajax({
+                url: `/dashboard/teacher/check-attendance-marked/${user_id}`,
+                type: "GET",
+                data: {
+                    batch_no: batch_no,
+                    course_name: course_name,
+                },
+                success: function (response) {
+                    if (response.attendance_marked) {
+                        // Disable the button if attendance has already been marked
+                        $(".att-mark-btn")
+                            .prop("disabled", true)
+                            .text("Attendance Already Marked")
+                            .addClass("btn-disabled");
+                    } else {
+                        // Enable the button if no attendance is marked for today
+                        $(".att-mark-btn")
+                            .prop("disabled", false)
+                            .text("Submit Attendance")
+                            .removeClass("btn-disabled");
+                    }
+                },
+                error: function (xhr) {
+                    console.error("Error checking attendance:", xhr.statusText);
+                },
+            });
     }
 
     // Example usage: Call the function when a batch or course is selected or on page load
@@ -3049,6 +3105,82 @@ function attendanceChartTeacher(user_id, batch_no, course_id) {
     });
 }
 
+// get students courses
+
+function getStudentCourses() {
+    const user_id = window.location.pathname.split("/").pop();
+    $.ajax({
+        url: `/dashboard/student/get-students-courses/${user_id}`,
+        type: "GET",
+        beforeSend: function () {
+            $(".loader-table").show();
+        },
+        success: function (response) {
+            let courses = response?.map((item, index) => {
+                return `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${item?.courses[index]?.course_name}</td>
+                        <td>Batch ${item?.batch_assigned}</td>
+                        <td>${item?.courses[index]?.course_duration}</td>
+                    </tr>
+                `;
+            });
+            $(".student-courses").html(courses);
+            $(".loader-table").hide();
+        },
+        error: function (xhr) {
+            showErrorMessages(xhr.responseJSON.errors);
+        },
+    });
+}
+
+// call getStudentsCourses
+
+$(document).ready(function () {
+    if (
+        window.location.pathname.split("/").includes("student") &&
+        window.location.pathname.split("/").includes("courses")
+    ) {
+        getStudentCourses();
+    }
+});
+
+function updateUserProfile() {
+    const user_id = window.location.pathname.split("/").pop();
+    const formData = new FormData();
+    const username = $("#username").val;
+    const password = $("#password").val;
+    const image = $("#image").files[0];
+
+    // Append data to FormData
+    if (username) formData.append("username", username);
+    if (password) formData.append("password", password);
+    if (image) formData.append("image", image);
+
+    $.ajax({
+        url: `/dashboard/student/profile/update/${user_id}`,
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            if (response.success) {
+                alert(response.message);
+                // Optionally, refresh user data on the page
+            } else {
+                alert("Update failed.");
+            }
+        },
+        error: function (error) {
+            alert("Error updating profile");
+            console.error(error);
+        },
+    });
+}
+
+$a;
+
 let pieChart;
 let doughnutChart;
 
@@ -3107,6 +3239,57 @@ function createCharts(presentsCount, absentsCount) {
         },
         options: {
             maintainAspectRatio: false,
+        },
+    });
+}
+
+let doughnutChart2;
+
+function updateCharts2(response) {
+    const { datasets, labels, options } = response;
+    const dataValues = datasets[0].values;
+    const backgroundColors = datasets[0].options.backgroundColor;
+
+    // Update the doughnut chart with the new data
+    if (doughnutChart2) {
+        doughnutChart2.data.labels = labels;
+        doughnutChart2.data.datasets[0].data = dataValues;
+        doughnutChart2.data.datasets[0].backgroundColor = backgroundColors;
+        doughnutChart2.update();
+    } else {
+        createCharts2(labels, dataValues, backgroundColors);
+    }
+}
+
+function createCharts2(labels, dataValues, backgroundColors) {
+    const ctxDoughnut = document
+        .getElementById("doughnutChartCanvas2")
+        .getContext("2d");
+
+    doughnutChart2 = new Chart(ctxDoughnut, {
+        type: "doughnut",
+        data: {
+            // labels: labels, // Labels array - won't display if datalabels are off
+            datasets: [
+                {
+                    data: dataValues,
+                    backgroundColor: backgroundColors,
+                },
+            ],
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false, // Hide legend labels
+                },
+                tooltip: {
+                    enabled: false, // Hide tooltips
+                },
+                datalabels: {
+                    display: false, // Hide data labels on the chart
+                },
+            },
         },
     });
 }

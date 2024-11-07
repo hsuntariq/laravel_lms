@@ -5,47 +5,28 @@
         <section class="col-xl-2 col-lg-3">
             @include('student.partials.admin-sidebar')
         </section>
-        <div class="col-xl-10 col-lg-9">
-            <div class="d-flex justify-content-between">
-                <div class="w-50" style="height:200px">
-
-                    {!! $pieChart->container() !!}
-                </div>
-                <div class="w-50" style="height:200px">
-
-                    {!! $doughnetChart->container() !!}
-                </div>
-
+        <div class="col-xl-10 col-lg-9 p-5">
+            <div class="max-width">
+                <h1>Registered Courses</h1>
+                <div class="underline"></div>
             </div>
-            <div class="table-responsive">
+            @include('student.partials.table-loader')
+            <div class="table-responsive my-3 ">
 
-                <table class="table text-capitalize">
+                <table class="table table-striped table-bordered table-sm  text-capitalize">
                     <thead>
                         <tr>
                             <td>#</td>
                             <td>Course name</td>
-                            <td>Batch #</td>
-                            <td>duration</td>
-                            <td>current classes</td>
-                            <td>Classes Remaining</td>
+                            <td>Batch </td>
+                            <td>Course duration</td>
                         </tr>
                     </thead>
-                    <tbody>
-                        @for ($i = 0; $i < 5; $i++)
-                            <tr>
-                                <td class="p-4">{{ $i + 1 }}</td>
-                                <td class="p-4">FSWD</td>
-                                <td class="p-4">16</td>
-                                <td class="p-4">6 months</td>
-                                <td class="p-4">72</td>
-                                <td class="p-4">30</td>
-                            </tr>
-                        @endfor
+                    <tbody class="student-courses">
+
                     </tbody>
                 </table>
             </div>
         </div>
     </main>
-    {!! $pieChart->script() !!}
-    {!! $doughnetChart->script() !!}
 </x-layout>

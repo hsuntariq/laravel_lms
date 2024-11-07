@@ -4,9 +4,10 @@
         Skill Profeciancy
     </h6>
     <section class="d-flex align-items-center gap-2">
-        <div class="graph w-50" style='height:150px'>
+        <div class="graph w-50 d-flex justify-content-center align-items-center" style='height:150px'>
+            <img width="150px" class=" loading-chart mx-auto" src="{{ asset('assets/images/loading.gif') }}" alt="Loading...">
             {{-- graph goes here --}}
-            {!! $doughnetChart->container() !!}
+            <canvas id="doughnutChartCanvas2" style="display: none;"></canvas>
         </div>
 
         <section class="profeciency-details">
@@ -16,25 +17,17 @@
                         <p class="text-sm">Advanced</p>
                         <div class="d-flex align-items-center gap-2">
                             <div class="dot bg-success rounded-circle"></div>
-                            <h6 class="m-0">50%</h6>
+                            <h6 class="m-0 excelling-percentage"></h6>
                         </div>
                     </div>
                 </div>
-                <div class="col-6">
-                    <div class="d-flex flex-column">
-                        <p class="text-sm">Intermediate</p>
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="dot bg-primary rounded-circle"></div>
-                            <h6 class="m-0">15%</h6>
-                        </div>
-                    </div>
-                </div>
+
                 <div class="col-6">
                     <div class="d-flex flex-column">
                         <p class="text-sm">Average</p>
                         <div class="d-flex align-items-center gap-2">
                             <div class="dot bg-warning rounded-circle"></div>
-                            <h6 class="m-0">50%</h6>
+                            <h6 class="m-0 average-percentage"></h6>
                         </div>
                     </div>
                 </div>
@@ -43,7 +36,7 @@
                         <p class="text-sm">Below avg</p>
                         <div class="d-flex align-items-center gap-2">
                             <div class="dot bg-danger rounded-circle"></div>
-                            <h6 class="m-0">50%</h6>
+                            <h6 class="m-0 struggling-percentage"></h6>
                         </div>
                     </div>
                 </div>

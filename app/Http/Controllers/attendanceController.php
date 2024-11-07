@@ -31,7 +31,7 @@ class attendanceController extends Controller
         $pieChart->dataset('Attendance', 'pie', [$presents, $absents])->options([
             'backgroundColor' => ['#03C03C', '#F70101']  // Soft green and pinkish red
         ]);
-        $doughnetChart->labels(['presents', 'absents']);
+        $doughnetChart->labels(['Presents', 'Absents']);
         $doughnetChart->dataset('presents', 'doughnut', [$presents, $absents])->options([
             'backgroundColor' => ['#03C03C', '#F70101']
         ]);

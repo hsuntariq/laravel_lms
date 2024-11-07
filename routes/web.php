@@ -34,7 +34,7 @@ Route::prefix('/dashboard/student')->middleware(['auth', 'student'])->group(func
 
     Route::get('/attendance/{id}', [attendanceController::class, 'makeCharts'])->name('student-attendance');
 
-    Route::get('/courses/{id}', [courseController::class, 'makeCharts'])->name('student-courses');
+    // Route::get('/courses/{id}', [courseController::class, 'makeCharts'])->name('student-courses');
 
     Route::get('/assignments-get/{id}/', [assignmentController::class, 'getAssignments'])->name('student-assignments-get');
 
@@ -49,6 +49,10 @@ Route::prefix('/dashboard/student')->middleware(['auth', 'student'])->group(func
     Route::get('get-data-count/{id}', [studentController::class, 'countData'])->name('count-stuudent-data');
 
     Route::get('get-attendance-record/{id}', [attendanceController::class, 'getStudentAttendace'])->name('get-attendace-record');
+
+    Route::get('/get-students-courses/{id}', [courseController::class, 'getStudentsCourse'])->name('get-courses-record');
+
+    Route::post('/profile/update/{id}', [courseController::class, 'updateProfile'])->name('updateProfile');
 });
 
 Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(function () {
@@ -68,7 +72,7 @@ Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(func
     Route::view('/settings/{id}', 'teacher.pages.attendance')->name('teacher-settings');
 
 
-    Route::get('/home/{id}', [teacherDashboardController::class, 'makeCharts'])->name('teacher-dashboard');
+    // Route::get('/home/{id}', [teacherDashboardController::class, 'makeCharts'])->name('teacher-dashboard');
 
     Route::get('/attendance/data/{id}', [attendanceController::class, 'makeCharts2'])->name('teacher-view-attendance2');
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Charts\teacherDashboardChart;
 use App\Models\Attendance;
 use App\Models\Batch;
 use App\Models\Marks;
@@ -73,11 +74,25 @@ class teacherController extends Controller
                 $strugglingStudents[] = $student;
             }
         }
+
+
+        // chart for performance
+
+        $doughnetChart = new teacherDashboardChart;
+
+        $doughnetChart->dataset('excelling', 'doughnut', [count($excellingStudents), count($averageStudents), count($strugglingStudents)])->options([
+            'backgroundColor' => ['green', 'yellow', 'red']
+        ]);
+
+
+
+
         return response()->json([
             'students' => $studentCount,
             'excelling_students' => $excellingStudents,
             'average_students' => $averageStudents,
             'struggling_students' => $strugglingStudents,
+            'doughnet_chart' => $doughnetChart,
         ]);
     }
 

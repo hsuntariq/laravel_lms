@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Charts\courseChart;
 use App\Models\Course;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -64,6 +65,11 @@ class courseController extends Controller
     public function getCourses()
     {
         $courses = Course::all();
+        return response()->json($courses);
+    }
+    public function getStudentsCourse()
+    {
+        $courses = User::where('id', auth()->user()->id)->with('courses')->get();
         return response()->json($courses);
     }
 }

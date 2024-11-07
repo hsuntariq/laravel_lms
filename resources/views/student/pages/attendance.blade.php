@@ -6,8 +6,11 @@
         <section class="col-xl-2 col-lg-3">
             @include('student.partials.admin-sidebar')
         </section>
-        <section class="col-xl-10 col-lg-9" style='height:90vh;overflow-y:scroll'>
-            <h2>Attendance</h2>
+        <section class="col-xl-10 col-lg-9 p-5" style='height:90vh;overflow-y:scroll'>
+            <div class="max-width">
+                <h1>Attendance</h1>
+                <div class="underline"></div>
+            </div>
             <div class="d-flex justify-content-center gap-3 align-items-center">
                 <div class="d-flex gap-2 align-items-center">
                     <div class='attendance-box bg-secondary'></div>

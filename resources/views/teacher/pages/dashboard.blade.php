@@ -15,6 +15,5 @@
         </div>
     </div>
 
-    {!! $doughnetChart->script() !!}
 
 </x-teacher-dashboard-layout>
