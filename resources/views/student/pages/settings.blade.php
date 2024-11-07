@@ -1,4 +1,5 @@
 <x-layout>
+
     <x-header />
     <hr class="my-1">
     <main class="row">

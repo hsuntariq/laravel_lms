@@ -52,7 +52,7 @@ Route::prefix('/dashboard/student')->middleware(['auth', 'student'])->group(func
 
     Route::get('/get-students-courses/{id}', [courseController::class, 'getStudentsCourse'])->name('get-courses-record');
 
-    Route::post('/profile/update/{id}', [courseController::class, 'updateProfile'])->name('updateProfile');
+    Route::post('/profile/update/{id}', [studentController::class, 'updateProfile'])->name('updateProfile');
 });
 
 Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(function () {

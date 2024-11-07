@@ -3149,12 +3149,12 @@ $(document).ready(function () {
 function updateUserProfile() {
     const user_id = window.location.pathname.split("/").pop();
     const formData = new FormData();
-    const username = $("#username").val;
-    const password = $("#password").val;
-    const image = $("#image").files[0];
+    const username = $("#username").val();
+    const password = $("#password").val();
+    const image = document.getElementById("image").files[0];
 
     // Append data to FormData
-    if (username) formData.append("username", username);
+    if (username) formData.append("name", username);
     if (password) formData.append("password", password);
     if (image) formData.append("image", image);
 
@@ -3166,20 +3166,58 @@ function updateUserProfile() {
         contentType: false,
         success: function (response) {
             if (response.success) {
-                alert(response.message);
+                showToast(
+                    "Profile Updated",
+                    "Profile updated successfully!",
+                    "success"
+                );
                 // Optionally, refresh user data on the page
             } else {
-                alert("Update failed.");
+                showToast("Error", "Updation failed", "error");
             }
         },
-        error: function (error) {
-            alert("Error updating profile");
+        error: function (xhr) {
+            showErrorMessages(xhr.responseJSON.errors);
             console.error(error);
         },
     });
 }
+$(document).ready(function () {
+    if (
+        window.location.pathname.split("/").includes("student") &&
+        window.location.pathname.split("/").includes("settings")
+    ) {
+        function checkFormCompletion() {
+            const username = $("#username").val();
+            const password = $("#password").val();
+            const image = document.getElementById("image").files[0];
 
-$a;
+            if (username && password && image) {
+                $(".update-profile-btn")
+                    .prop("disabled", false)
+                    .removeClass("btn-disabled");
+            } else {
+                $(".update-profile-btn")
+                    .prop("disabled", true)
+                    .addClass("btn-disabled");
+            }
+        }
+
+        // Run the check once on page load
+        checkFormCompletion();
+
+        // Add listeners to re-check on changes
+        $("#username, #password").on("input", checkFormCompletion);
+        $("#image").on("change", checkFormCompletion);
+    }
+});
+
+$(".update-profile-btn")
+    .off("click")
+    .on("click", function () {
+        console.log("slam");
+        updateUserProfile();
+    });
 
 let pieChart;
 let doughnutChart;

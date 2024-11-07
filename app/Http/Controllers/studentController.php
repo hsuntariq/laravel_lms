@@ -33,8 +33,8 @@ class studentController extends Controller
 
         // Validate the request
         $request->validate([
-            'username' => 'nullable|string|max:255',
-            'password' => 'nullable|string|min:8|confirmed',
+            'name' => 'nullable|string|max:255',
+            'password' => 'nullable|string|min:6',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 

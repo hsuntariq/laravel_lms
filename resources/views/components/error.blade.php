@@ -18,7 +18,7 @@
     </div>
 </div> -->
 
-<div class="underlay error  position-fixed top-0 justify-content-center align-items-center" style="height:100vh;width:100vw;">
+<div class="underlay error  position-fixed top-0 justify-content-center align-items-center" style="height:100vh;width:100vw;z-index:222222">
     <div class="message-box alert alert-danger position-fixed bg-white rounded-3 p-3" style=" box-shadow: 0 4px 15px rgba(255, 0, 0, 0.5),0 8px 30px rgba(255, 0, 0, 0.3);top:50%;left:50%;">
         <i class="bi bi-x-lg fs-2 position-absolute end-0 p-3 top-0" style="cursor:pointer" onclick="closeErrorMessages()"></i><br>
         <div class="d-flex align-items-center gap-3">
