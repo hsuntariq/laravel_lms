@@ -12,17 +12,19 @@
             <section class="row">
                 <div class="col-sm-6">
                     <img style="object-fit: contain;border:1px solid #8338eb;" width="200px" height="200px"
-                        class="rounded-circle d-block mx-auto "
-                        src="https://static.vecteezy.com/system/resources/thumbnails/005/545/335/small/user-sign-icon-person-symbol-human-avatar-isolated-on-white-backogrund-vector.jpg"
+                        class="rounded-circle user-image d-block mx-auto "
+                        src="{{auth()->user()->image ? '/storage/' . auth()->user()->image : "https://static.vecteezy.com/system/resources/thumbnails/005/545/335/small/user-sign-icon-person-symbol-human-avatar-isolated-on-white-backogrund-vector.jpg"}}"
                         alt="Assign Mate user image">
                 </div>
                 <div class="col-sm-6 d-flex flex-column gap-2">
-                    <h2>UserName</h2>
+                    <h2 class="user-name">
+                        {{auth()->user()->name}}
+                    </h2>
                     <p class="text-secondary fw-medium">
-                        Batch#16
+                        Batch #{{auth()->user()->batch_assigned }}
                     </p>
                     <p class="text-secondary">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi, unde!
+                        Email:{{auth()->user()->email}}<br>
                     </p>
                     @include('student.partials.update-modal')
                 </div>

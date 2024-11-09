@@ -6,17 +6,14 @@
     </section>
     <section class="center d-flex gap-3 justify-content-between align-items-center">
         <h5>Dashboard</h5>
-        <form action="" method="POST" class="form-control d-flex align-items-center rounded-pill gap-2">
-            <div class="bi bi-search" style="color:#8338EB"></div>
-            <input type="text" class="border-0 input-search" style="outline-width:0" placeholder="Seach here...">
-        </form>
+
     </section>
 
     <section class="info d-flex align-items-center gap-3">
         <i class="bi bi-bell border rounded-circle d-flex justify-content-ceneter align-items-center p-2"></i>
         <div class="d-flex gap-1 align-items-center">
             <div class="bi bi-person border rounded-circle d-flex justify-content-ceneter align-items-center p-2"></div>
-            <h6 class='m-0 text-capitalize text-purple'>
+            <h6 class='m-0 text-capitalize user-name text-purple'>
                 {{ auth()->user()->name }}
             </h6>
         </div>

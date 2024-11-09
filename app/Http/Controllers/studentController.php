@@ -39,25 +39,31 @@ class studentController extends Controller
         ]);
 
         // Update the username if provided
-        if ($request->filled('username')) {
-            $user->username = $request->username;
+        if ($request->filled('name')) {
+            $user->update([
+                "name" => $request->name
+            ]);
         }
 
         // Update the password if provided
         if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
+            $user->update([
+                "password" => Hash::make($request->password)
+            ]);
         }
 
         // Update the image if provided
         if ($request->hasFile('image')) {
             // Delete the old image if it exists
-            if ($user->image) {
-                Storage::delete($user->image);
-            }
+            // if ($user->image) {
+            //     Storage::delete($user->image);
+            // }
 
             // Store the new image
-            $path = $request->file('image')->store('user_images');
-            $user->image = $path;
+            $path = $request->file('image')->store('User_images', 'public');
+            $user->update([
+                "image" => $path
+            ]);
         }
 
         $user->save();

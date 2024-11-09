@@ -2313,6 +2313,8 @@ function getStudentProgressData(batch_no, course_no) {
             $(".excelling-strength").hide();
             $(".struggling-strength").hide();
             $("#doughnutChartCanvas").hide();
+            $("#doughnutChartCanvas2").hide();
+
             $(".loading-strength").show();
             $(".loading-chart").show();
         },
@@ -2326,6 +2328,7 @@ function getStudentProgressData(batch_no, course_no) {
             $(".loading-strength").hide();
             $(".loading-chart").hide();
             $("#doughnutChartCanvas").show();
+            $("#doughnutChartCanvas2").show();
 
             getStudentsPerformance(
                 response?.struggling_students,
@@ -3164,6 +3167,9 @@ function updateUserProfile() {
         data: formData,
         processData: false,
         contentType: false,
+        beforeSend: function () {
+            $(".update-profile-btn").text("Updating...");
+        },
         success: function (response) {
             if (response.success) {
                 showToast(
@@ -3171,17 +3177,35 @@ function updateUserProfile() {
                     "Profile updated successfully!",
                     "success"
                 );
+                // Reset form fields
+                $("#profileForm")[0].reset(); // Resets all form fields (if you have a form element)
+
+                // Optionally clear image preview
+                $("#image").val(""); // Clear the file input
+
+                // Close the modal (assuming you're using Bootstrap)
+                $(".updateProfileModal").modal("hide"); // Replace '#updateProfileModal' with your modal's ID
+
+                // update the user image & username
+                $(".user-name").html(response?.user?.name);
+                $(".user-image").attr(
+                    "src",
+                    `/storage/${response?.user?.image}`
+                );
+
                 // Optionally, refresh user data on the page
             } else {
                 showToast("Error", "Updation failed", "error");
             }
+            $(".update-profile-btn").text("Update");
         },
         error: function (xhr) {
             showErrorMessages(xhr.responseJSON.errors);
-            console.error(error);
+            $(".update-profile-btn").text("Update");
         },
     });
 }
+
 $(document).ready(function () {
     if (
         window.location.pathname.split("/").includes("student") &&
@@ -3303,6 +3327,8 @@ function createCharts2(labels, dataValues, backgroundColors) {
     const ctxDoughnut = document
         .getElementById("doughnutChartCanvas2")
         .getContext("2d");
+
+    console.log(ctxDoughnut);
 
     doughnutChart2 = new Chart(ctxDoughnut, {
         type: "doughnut",
