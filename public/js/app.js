@@ -139,11 +139,20 @@ $(document).ready(function () {
     // Function to display assignments based on the current filter
     function displayAssignment(assignments) {
         const userId = window.location.pathname.split("/").pop();
-        console.log(assignments);
 
-        const assignmentsHtml = assignments.assignments
+        // Filter assignments to include only those within the deadline
+        const filteredAssignments = assignments.assignments?.filter(
+            (assignment) => {
+                const currentDate = new Date(); // Get the current date
+                const deadlineDate = new Date(assignment?.deadline); // Get the assignment deadline
+                return currentDate <= deadlineDate; // Include only assignments before or on the deadline
+            }
+        );
+
+        const assignmentsHtml = filteredAssignments
             ?.map((assignment, index) => {
                 const createdAtDate = new Date(assignment.created_at);
+                const deadlineDate = new Date(assignment.deadline);
                 const options = {
                     timeZone: "Asia/Karachi",
                     month: "2-digit",
@@ -155,9 +164,15 @@ $(document).ready(function () {
                     "en-US",
                     options
                 );
+                const formattedDeadline = deadlineDate.toLocaleString(
+                    "en-US",
+                    options
+                );
 
-                // Check the corresponding status from the status array
-                const assignmentStatus = assignments.status[index]?.status; // Assuming it matches the index of the assignment
+                // Check the corresponding status from the assignments.status array
+                const assignmentStatus = assignments.status.find(
+                    (status) => status.assignment_id === assignment.id
+                )?.status; // Match status with assignment ID
                 const isSubmitted = assignmentStatus === "submitted"; // Check if the assignment is submitted
 
                 return `
@@ -166,7 +181,7 @@ $(document).ready(function () {
                 <td class="text-sm">${assignment.topic}</td>
                 <td class="text-sm">${assignment.max_marks}</td>
                 <td class="text-sm">${formattedCreatedAt}</td>
-                <td class="text-sm">${formattedCreatedAt}</td>
+                <td class="text-sm">${formattedDeadline}</td>
                 <td class="text-sm">${displayFile(assignment?.file)}</td>
                 ${
                     isSubmitted
@@ -213,7 +228,6 @@ $(document).ready(function () {
         // Filter buttons functionality
         $(".filter-button-student").on("click", function () {
             const filterType = $(this).data("status");
-
             // Remove active class from all buttons and add to the clicked one
             $(".filter-button-student").removeClass("btn-purple");
             $(this).addClass("btn-purple");

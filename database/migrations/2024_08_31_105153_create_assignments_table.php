@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('max_marks');
             $table->unsignedBigInteger('batch_no');
             $table->foreign('batch_no')->references('id')->on('batches')->onDelete('cascade');
-            $table->time('deadline');
+            $table->dateTime('deadline');
             $table->string('type');
             $table->string('file');
 

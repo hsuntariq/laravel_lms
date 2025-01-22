@@ -49,4 +49,9 @@
             </div>
         </section>
     </main>
+
+
+    <x-jquery/>
+
+
 </x-layout>

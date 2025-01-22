@@ -120,7 +120,7 @@
             </div>
             <div class="form-group">
                 <label for="name">Deadline</label>
-                <input type="time" name="deadline" placeholder="e.g. 15" class="form-control"
+                <input type="datetime-local" name="deadline" placeholder="e.g. 15" class="form-control"
                     style="background: #F9F9F9">
                 @error('deadline')
                 <p class="text-danger fw-medium m-0">

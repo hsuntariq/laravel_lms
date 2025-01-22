@@ -12,7 +12,11 @@
     <section class="info d-flex align-items-center gap-3">
         <i class="bi bi-bell border rounded-circle d-flex justify-content-ceneter align-items-center p-2"></i>
         <div class="d-flex gap-1 align-items-center">
-            <div class="bi bi-person border rounded-circle d-flex justify-content-ceneter align-items-center p-2"></div>
+            {!! auth()->user()->image 
+                ? "<img width='30px' height='30px' class='rounded-circle' src='" . asset('/storage/' . auth()->user()->image) . "' >" 
+                : "<div class='bi bi-person border rounded-circle d-flex justify-content-ceneter align-items-center p-2'></div>" 
+            !!}
+            
             <h6 class='m-0 text-capitalize user-name text-purple'>
                 {{ auth()->user()->name }}
             </h6>
