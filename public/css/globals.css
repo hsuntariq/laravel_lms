@@ -155,8 +155,6 @@ th {
     text-align: center;
 }
 
-
-
 .notificationCard {
     width: 220px;
     height: 280px;
@@ -379,33 +377,31 @@ th {
         background-color: #e0e0e0;
     }
 }
-thead th, thead td{
-     position: sticky !important;
+thead th,
+thead td {
+    position: sticky !important;
     top: 0 !important;
     z-index: 1 !important;
     background-color: var(--orange) !important;
     color: white !important;
 }
 
-input{
+input {
     /* height:30px !important; */
     /* font-size:1rem !important; */
 }
 
-option{
-
-    font-size:1rem !important;
+option {
+    font-size: 1rem !important;
 }
 
-.small-ph::placeholder{
+.small-ph::placeholder {
     font-size: 0.7rem !important;
 }
 
-
-.att-loading{
+.att-loading {
     display: none;
 }
-
 
 .toast {
     position: fixed;
@@ -431,7 +427,6 @@ option{
     padding: 10px;
 }
 
-
 #toast {
     display: none;
     color: white;
@@ -447,4 +442,40 @@ option{
 
 .toast-error {
     background-color: #dc3545 !important; /* Red */
+}
+
+.underlay {
+    pointer-events: none !important;
+}
+
+@media (max-width: 991px) {
+    .underlay {
+        background-color: rgba(0, 0, 0, 0.4);
+        z-index: -2;
+        pointer-events: auto !important;
+        transition: opacity 0.3s ease;
+        opacity: 0;
+    }
+
+    .underlay.show {
+        opacity: 1;
+    }
+
+    .my-sidebar {
+        position: fixed !important;
+        height: 100vh !important;
+        z-index: 444 !important;
+        background-color: white !important;
+        top: 0;
+        left: -100%;
+        transition: left 0.3s ease;
+    }
+
+    .my-sidebar.show {
+        left: 0;
+    }
+
+    .my-sidebar ul {
+        height: 100vh !important;
+    }
 }

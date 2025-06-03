@@ -125,6 +125,7 @@ $(document).ready(function () {
             success: function (response) {
                 allAssignment = response || []; // Store assignments globally
                 displayAssignment(allAssignment); // Initially display all assignments
+                console.log(allAssignment);
             },
             error: function (xhr) {
                 console.error("Error fetching assignments:", xhr.statusText);
@@ -228,48 +229,52 @@ $(document).ready(function () {
         // Filter buttons functionality
         $(".filter-button-student").on("click", function () {
             const filterType = $(this).data("status");
+
             // Remove active class from all buttons and add to the clicked one
             $(".filter-button-student").removeClass("btn-purple");
             $(this).addClass("btn-purple");
 
-            // Initialize filtered assignments based on the current state
-            let filteredAssignments = allAssignment.assignments; // Access the assignments array
-            let filteredStatus = allAssignment.status; // Access the status array
+            const assignments = allAssignment.assignments;
+            const status = allAssignment.status;
 
             // Filter assignments based on the selected filter type
+            let filteredAssignments = [];
+
             if (filterType === "submitted") {
-                filteredAssignments = allAssignment.assignments.filter(
-                    (assignment, index) => {
-                        return filteredStatus[index]?.status === "submitted"; // Check if the corresponding status is 'submitted'
-                    }
-                );
+                filteredAssignments = assignments.filter((assignment) => {
+                    const foundStatus = status.find(
+                        (s) => s.assignment_id === assignment.id
+                    );
+                    return foundStatus?.status === "submitted";
+                });
             } else if (filterType === "unsubmitted") {
-                filteredAssignments = allAssignment.assignments.filter(
-                    (assignment, index) => {
-                        return filteredStatus[index]?.status !== "submitted"; // Check if the corresponding status is not 'submitted'
-                    }
-                );
-            } else if (filterType === "all") {
-                // If the filter is "all", we simply use the original assignments
-                filteredAssignments = allAssignment.assignments;
-                filteredStatus = allAssignment.status; // Keep all statuses
+                filteredAssignments = assignments.filter((assignment) => {
+                    const foundStatus = status.find(
+                        (s) => s.assignment_id === assignment.id
+                    );
+                    return !foundStatus || foundStatus.status !== "submitted";
+                });
+            } else {
+                // "all" selected
+                filteredAssignments = assignments;
             }
 
-            // Create a new filtered object to pass to displayAssignment
+            // Build filtered status array that includes only those matching the filtered assignments
+            const filteredStatuses = filteredAssignments.map((assignment) => {
+                return (
+                    status.find((s) => s.assignment_id === assignment.id) || {
+                        assignment_id: assignment.id,
+                        status: null,
+                    }
+                );
+            });
+
+            // Create object and display
             const filteredAssignmentsObj = {
                 assignments: filteredAssignments,
-                status: filteredStatus.filter((_, index) => {
-                    return (
-                        (filterType === "submitted" &&
-                            filteredStatus[index]?.status === "submitted") ||
-                        (filterType === "unsubmitted" &&
-                            filteredStatus[index]?.status !== "submitted") ||
-                        filterType === "all"
-                    ); // Include all statuses if filter is "all"
-                }),
+                status: filteredStatuses,
             };
 
-            // Display filtered assignments
             displayAssignment(filteredAssignmentsObj);
         });
     });
@@ -2418,7 +2423,7 @@ function getStudentsPerformance(response, input) {
                                 }'>
                                 ${marks}%
                                 </span>
-                                 
+
                                  </p>
                             </div>
                             </section>
@@ -3371,3 +3376,27 @@ function createCharts2(labels, dataValues, backgroundColors) {
         },
     });
 }
+
+// sidebar toggler
+
+$(function () {
+    // Toggle sidebar and overlay
+    $("#sidebarToggle").on("click", function () {
+        $(".my-sidebar").toggleClass("show");
+        $(".underlay").toggleClass("show");
+    });
+
+    // Click outside to close
+    $(".underlay").on("click", function () {
+        $(".my-sidebar").removeClass("show");
+        $(".underlay").removeClass("show");
+    });
+
+    // Auto close on nav link click (optional for mobile)
+    $(".my-sidebar a").on("click", function () {
+        if ($(window).width() < 992) {
+            $(".my-sidebar").removeClass("show");
+            $(".underlay").removeClass("show");
+        }
+    });
+});

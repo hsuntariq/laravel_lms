@@ -2,7 +2,7 @@
         <x-header />
 
         <hr class="m-1">
-        <main class="row">
+        <main class="row px-2">
             <section class="col-xl-2 col-lg-3">
                 @include('staff.partials.staff-sidebar')
             </section>
@@ -10,5 +10,7 @@
                 {{ $slot }}
             </section>
         </main>
-
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous">
+        </script>
     </x-layout>

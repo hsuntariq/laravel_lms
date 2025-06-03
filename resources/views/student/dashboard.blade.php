@@ -5,7 +5,7 @@
     <hr class="m-1">
 
     <main class="row">
-        <section class="col-xl-2 col-lg-3">
+        <section class="col-xl-2 ps-0 col-lg-3 col-md-4 col-10 my-sidebar">
             <!-- Include admin sidebar -->
             @include('student.partials.admin-sidebar')
         </section>

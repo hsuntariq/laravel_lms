@@ -22,8 +22,7 @@
                     <div class="form-group">
                         <div class="d-flex form-control my-2 error-message">
                             <div class="bi text-purple bi-person"></div>
-                            <input type="text" name="email"
-                                placeholder="Enter username or email or phone number..."
+                            <input type="text" name="email" placeholder="Enter username or email or phone number..."
                                 class="w-100 border-0 outline-none text-purple email">
                         </div>
                         <div class="d-flex form-control my-2 error-message">

@@ -1,33 +1,41 @@
-<header class="d-flex justify-content-between align-items-center bg-white p-3 mt-4 rounded-3">
-    <section class="d-flex align-items-center">
+<header
+    class="d-flex  shadow flex-wrap justify-content-between align-items-center align-items-md-center justify-content-between bg-white p-3 mt-4 rounded-3 gap-3">
+    <!-- Logo and Title -->
+    <section class="d-flex align-items-center gap-2">
         <img width="30px" src="https://www.assignmentworkhelp.com/wp-content/uploads/2018/08/icon1.png"
             alt="assignmate imagelogo for assignmate">
-        <h5>AssignMate</h5>
+        <h5 class="mb-0">AssignMate</h5>
     </section>
+
+    <!-- Status Icons -->
     <section class="d-flex align-items-center gap-3">
-        <div class="d-flex">
+        <div class="d-flex align-items-center gap-1">
             <img src="https://cdn-icons-png.freepik.com/256/9905/9905558.png?semt=ais_hybrid" alt="assignmate image"
                 width="20px">
             <h6 class="m-0">15</h6>
         </div>
-        <div class="d-flex">
+        <div class="d-flex align-items-center gap-1">
             <img src="https://cdn-icons-png.freepik.com/256/15190/15190698.png?semt=ais_hybrid" alt="assignmate image"
                 width="20px">
             <h6 class="m-0">15</h6>
         </div>
-        <div class="d-flex">
+        <div class="d-flex align-items-center gap-1">
             <img src="https://cdn.iconscout.com/icon/premium/png-256-thumb/remaining-percentage-1-872688.png"
                 alt="assignmate image" width="20px">
             <h6 class="m-0">15</h6>
         </div>
     </section>
+
+    <!-- Pending Button -->
     <section>
-        <button class="btn text-dark fw-medium" style="background:#ECE5F4;">
-            <i class="bi bi-play  " style="color:#9C60EF"></i>
+        <button class="btn text-dark d-none d-sm-block btn-sm d-flex align-items-center gap-1 fw-medium w-100 w-md-auto"
+            style="background:#ECE5F4;">
+            <i class="bi bi-play" style="color:#9C60EF"></i>
             Pending
         </button>
     </section>
 </header>
+
 
 
 <!-- cards -->
