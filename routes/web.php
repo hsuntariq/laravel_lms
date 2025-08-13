@@ -6,6 +6,7 @@ use App\Http\Controllers\attendanceController;
 use App\Http\Controllers\batchController;
 use App\Http\Controllers\courseController;
 use App\Http\Controllers\marksController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\staffController;
 use App\Http\Controllers\studentController;
 use App\Http\Controllers\teacherController;
@@ -52,10 +53,20 @@ Route::prefix('/dashboard/student')->middleware(['auth', 'student'])->group(func
 
     Route::get('/get-students-courses/{id}', [courseController::class, 'getStudentsCourse'])->name('get-courses-record');
 
+    Route::get('/get-assignment-details', [assignmentController::class, 'getAssignmentDetails'])->name('get-assignment-details');
+
     Route::post('/profile/update/{id}', [studentController::class, 'updateProfile'])->name('updateProfile');
+
+    // routes/web.php
+    Route::get('/get-latest-assignments', [assignmentController::class, 'show'])
+        ->name('student.dashboard');
+
+    Route::get('/get-class-position/{user_id}', [studentController::class, 'getClassPosition'])->middleware('auth');
+
 });
 
 Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(function () {
+
     Route::view('/home/{id}', 'teacher.pages.dashboard')->name('teacher-dashboard');
 
     Route::view('/attendance/mark/{id}', 'teacher.pages.attendance')->name('teacher-attendance');
@@ -69,7 +80,25 @@ Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(func
     Route::view('/assignments/upload/{id}', 'teacher.pages.upload-assignment')->name('teacher-upload-assignments');
 
 
-    Route::view('/settings/{id}', 'teacher.pages.attendance')->name('teacher-settings');
+
+    Route::post('/get-all-students/{user_id}', [teacherController::class, 'getAllStudents'])->name('teacher.get-all-students');
+
+
+    Route::post('/mark-overdue-assignments', [teacherController::class, 'markOverdueAssignments'])->name('teacher.mark-overdue-assignments');
+
+
+    Route::post('/profile/update/{id}', [studentController::class, 'updateProfile'])->name('teacher-updateProfile');
+
+    Route::view('/settings/{id}', 'teacher.pages.settings')->name('teacher-settings');
+
+    Route::view('/all-assignments/{id}', 'teacher.pages.all-assignments')->name('teacher-view-all-assignments');
+
+    Route::get('/get-all-assignments/{user_id}', [teacherController::class, 'getAssignmentsByBatch']);
+
+    Route::post('/edit-assignment/{user_id}', [teacherController::class, 'editAssignment']);
+
+    Route::post('/delete-assignment/{user_id}', [teacherController::class, 'deleteAssignment']);
+
 
 
     // Route::get('/home/{id}', [teacherDashboardController::class, 'makeCharts'])->name('teacher-dashboard');
@@ -104,6 +133,17 @@ Route::prefix('/dashboard/teacher')->middleware(['auth', 'teacher'])->group(func
     Route::get('/student/attendance/{id}', [AttendanceController::class, 'showAttendance'])->name('attendance.show');
 
     Route::post('/student/attendance/update/{id}', [AttendanceController::class, 'updateStatus']);
+
+
+
+    Route::post('/mark-unsubmitted-assignments', [assignmentController::class, 'markUnsubmittedAssignments'])->name('assignments.mark-unsubmitted');
+
+    Route::post('/get-batch-schedule-days', [teacherController::class, 'getBatchScheduleDays'])->name('get-batch-schedule-days');
+
+
+    Route::post('/check-class-start', [teacherController::class, 'getBatchScheduleDays'])->name('get-batch-schedule');
+
+
 });
 
 
@@ -191,3 +231,8 @@ Route::prefix("/dashboard/staff/")->middleware(['auth', 'staff'])->group(functio
 
 Route::post('/sign-in', [UserController::class, 'signIn'])->name('sign-in');
 Route::post('/sign-out', [UserController::class, 'signOut'])->name('sign-out');
+
+Route::get('/forgot-password', [PasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update');

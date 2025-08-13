@@ -448,6 +448,41 @@ option {
     pointer-events: none !important;
 }
 
+.tooltip1 {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip1 .tooltiptext {
+    visibility: hidden;
+    background-color: rgba(19, 18, 18, 0.849);
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 10px;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -60px;
+    width: max-content;
+}
+
+.tooltip1 .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 30%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(19, 18, 18, 0.849) transparent transparent transparent;
+}
+
+.tooltip1:hover .tooltiptext {
+    visibility: visible;
+}
+
 @media (max-width: 991px) {
     .underlay {
         background-color: rgba(0, 0, 0, 0.4);
@@ -475,7 +510,7 @@ option {
         left: 0;
     }
 
-    .my-sidebar ul {
+    .my-sidebar ul:nth-last-of-type(1) {
         height: 100vh !important;
     }
 }

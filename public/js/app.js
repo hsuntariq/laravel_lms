@@ -137,83 +137,73 @@ $(document).ready(function () {
         });
     }
 
-    // Function to display assignments based on the current filter
-    function displayAssignment(assignments) {
-        const userId = window.location.pathname.split("/").pop();
+    // // Function to display assignments based on the current filter
+    // function displayAssignments(assignments) {
+    //     let assignmentsHtml = assignments
+    //         .map((assignment) => {
+    //             const createdAt = new Date(assignment.assignment?.created_at);
+    //             const options = {
+    //                 timeZone: "Asia/Karachi",
+    //                 month: "2-digit",
+    //                 day: "2-digit",
+    //                 hour: "2-digit",
+    //                 minute: "2-digit",
+    //             };
+    //             const formattedDate = createdAt.toLocaleString(
+    //                 "en-US",
+    //                 options
+    //             );
+    //             const day = getDay(createdAt.getDay());
 
-        // Filter assignments to include only those within the deadline
-        const filteredAssignments = assignments.assignments?.filter(
-            (assignment) => {
-                const currentDate = new Date(); // Get the current date
-                const deadlineDate = new Date(assignment?.deadline); // Get the assignment deadline
-                return currentDate <= deadlineDate; // Include only assignments before or on the deadline
-            }
-        );
+    //             const studentName = assignment?.user?.name || "N/A";
+    //             const topicName = assignment?.assignment?.topic || "N/A";
+    //             const batchName = assignment?.assignment?.batch_no || "N/A";
+    //             const answerFile = assignment?.answer_file
+    //                 ? displayFile(assignment.answer_file)
+    //                 : "No file";
+    //             const maxMarks = assignment?.assignment?.max_marks || "N/A";
+    //             const obtainedMarks =
+    //                 assignment?.marks !== null
+    //                     ? assignment.marks?.obt_marks
+    //                     : `<input type='number' name='obtainedMarks-${assignment.id}' class='p-0 form-control' placeholder='e.g. 25'>`;
+    //             const comments =
+    //                 assignment?.marks !== null
+    //                     ? assignment.marks?.comments || "No comments"
+    //                     : `<input type='text' name='comments-${assignment.id}' class='p-0 form-control' placeholder='Enter comments'>`;
 
-        const assignmentsHtml = filteredAssignments
-            ?.map((assignment, index) => {
-                const createdAtDate = new Date(assignment.created_at);
-                const deadlineDate = new Date(assignment.deadline);
-                const options = {
-                    timeZone: "Asia/Karachi",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                };
-                const formattedCreatedAt = createdAtDate.toLocaleString(
-                    "en-US",
-                    options
-                );
-                const formattedDeadline = deadlineDate.toLocaleString(
-                    "en-US",
-                    options
-                );
+    //             const button = $("<button/>", {
+    //                 class: `btn btn-purple btn-sm mark-assignment ${
+    //                     assignment.marks !== null ? "btn-disabled" : ""
+    //                 }`,
+    //                 text: assignment.marks !== null ? "Marked" : "Mark",
+    //                 disabled: assignment.marks !== null,
+    //                 "data-assignment_id": assignment.assignment_id,
+    //                 "data-user_id": assignment?.user?.id,
+    //                 "data-answer_id": assignment.id,
+    //                 "data-max_marks": assignment.assignment?.max_marks,
+    //                 "data-batch_no": assignment.user?.batch_assigned,
+    //                 "data-course_no": assignment.user?.course_assigned,
+    //             });
 
-                // Check the corresponding status from the assignments.status array
-                const assignmentStatus = assignments.status.find(
-                    (status) => status.assignment_id === assignment.id
-                )?.status; // Match status with assignment ID
-                const isSubmitted = assignmentStatus === "submitted"; // Check if the assignment is submitted
+    //             return `
+    //                 <tr>
+    //                     <td>${formattedDate}</td>
+    //                     <td>${day}</td>
+    //                     <td>${studentName}</td>
+    //                     <td>${topicName}</td>
+    //                     <td>Batch ${batchName}</td>
+    //                     <td>${assignment?.assignment?.deadline || "N/A"}</td>
+    //                     <td>${answerFile}</td>
+    //                     <td>${maxMarks}</td>
+    //                     <td class='error-marks small-ph'>${obtainedMarks}</td>
+    //                     <td class='error-marks small-ph'>${comments}</td> <!-- New column for comments -->
+    //                     <td>${button[0].outerHTML}</td>
+    //                 </tr>`;
+    //         })
+    //         .join("");
 
-                return `
-            <tr>
-                <td class="text-sm">${index + 1}</td>
-                <td class="text-sm">${assignment.topic}</td>
-                <td class="text-sm">${assignment.max_marks}</td>
-                <td class="text-sm">${formattedCreatedAt}</td>
-                <td class="text-sm">${formattedDeadline}</td>
-                <td class="text-sm">${displayFile(assignment?.file)}</td>
-                ${
-                    isSubmitted
-                        ? `<td colspan="5" class="text-center">
-                            <i class="bi bi-check-circle-fill text-success"></i> Submitted
-                        </td>`
-                        : `
-                        <td class="text-sm">pending...</td>
-                        <td class="text-sm">
-                            <form class="upload-form" enctype="multipart/form-data">
-                                <input name="assignment_id" type="hidden" value="${assignment.id}">
-                                <input name="user_id" type="hidden" value="${userId}">
-                                <div class="input-group input-group-sm">
-                                    <input name="answer_file" type="file" class="form-control file-input">
-                                    <div class="error-message text-danger" style="display: none;"></div>
-                                </div>
-                            </form>
-                        </td>
-                        <td>
-                            <button class="btn btn-purple border-0 btn-disabled p-1 px-2 btn-sm submit-btn" disabled>
-                                <img class="loading-submit d-none" src="/assets/images/loading.gif" width="15px" alt="loading">
-                                <span>Submit</span>
-                            </button>
-                        </td>`
-                }
-            </tr>`;
-            })
-            .join("");
-
-        $("#assignmentsTableBody").html(assignmentsHtml);
-    }
+    //     $(".submitted-assignments").html(assignmentsHtml);
+    // }
 
     // Event listener for filter buttons
     $(document).ready(function () {
@@ -428,21 +418,21 @@ $(document).ready(function () {
     // Get submitted assignments for teacher
     let allAssignments = []; // Store all assignments here
 
-    function getSubmittedAssignments() {
-        let user_id = window.location.pathname.split("/").pop();
-        // Assume this is your initial load function
-        $.ajax({
-            url: `/dashboard/teacher/submitted-assignment/${user_id}`,
-            type: "GET",
-            success: function (response) {
-                allAssignments = response; // Store the received data
-                displayAssignments(allAssignments); // Display all assignments initially
-            },
-            error: function (xhr) {
-                console.error("Error fetching assignments:", xhr.statusText);
-            },
-        });
-    }
+    // function getSubmittedAssignments() {
+    //     let user_id = window.location.pathname.split("/").pop();
+    //     // Assume this is your initial load function
+    //     $.ajax({
+    //         url: `/dashboard/teacher/submitted-assignment/${user_id}`,
+    //         type: "GET",
+    //         success: function (response) {
+    //             allAssignments = response; // Store the received data
+    //             displayAssignments(allAssignments); // Display all assignments initially
+    //         },
+    //         error: function (xhr) {
+    //             console.error("Error fetching assignments:", xhr.statusText);
+    //         },
+    //     });
+    // }
 
     function displayAssignments(assignments) {
         let assignmentsHtml = assignments
@@ -530,7 +520,6 @@ $(document).ready(function () {
             // Function to fetch and display assignments based on batch_no
             function getSubmittedAssignments(batch_no) {
                 $(".loader-table-teacher").show();
-
                 let user_id = window.location.pathname.split("/").pop();
                 $.ajax({
                     url: `/dashboard/teacher/submitted-assignment/${user_id}`,
@@ -590,7 +579,11 @@ $(document).ready(function () {
                         const obtainedMarks =
                             assignment?.marks !== null
                                 ? assignment.marks?.obt_marks
-                                : `<input type='number' name='obtainedMarks-${assignment.id}' class='p-0 form-control' placeholder='e.g. 25'>`;
+                                : `<input type='number' name='obtainedMarks-${assignment.id}' class='p-0 form-control p-1' placeholder='e.g. 25'>`;
+                        const comments =
+                            assignment?.marks !== null
+                                ? assignment.marks?.comments || "No comments"
+                                : `<input type='text' name='comments-${assignment.id}' class='p-0 form-control p-1' placeholder='Enter comments'>`;
 
                         const button = $("<button/>", {
                             class: `btn btn-purple btn-sm mark-assignment ${
@@ -607,20 +600,21 @@ $(document).ready(function () {
                         });
 
                         return `
-                        <tr>
-                            <td>${formattedDate}</td>
-                            <td>${day}</td>
-                            <td>${studentName}</td>
-                            <td>${topicName}</td>
-                            <td>Batch ${batchName}</td>
-                            <td>${
-                                assignment?.assignment?.deadline || "N/A"
-                            }</td>
-                            <td>${answerFile}</td>
-                            <td>${maxMarks}</td>
-                            <td class='error-marks small-ph'>${obtainedMarks}</td>
-                            <td>${button[0].outerHTML}</td>
-                        </tr>`;
+                            <tr>
+                                <td>${formattedDate}</td>
+                                <td>${day}</td>
+                                <td>${studentName}</td>
+                                <td>${topicName}</td>
+                                <td>Batch ${batchName}</td>
+                                <td>${
+                                    assignment?.assignment?.deadline || "N/A"
+                                }</td>
+                                <td>${answerFile}</td>
+                                <td>${maxMarks}</td>
+                                <td class='error-marks small-ph'>${obtainedMarks}</td>
+                                <td class='error-marks small-ph'>${comments}</td> <!-- Add Comments column -->
+                                <td>${button[0].outerHTML}</td>
+                            </tr>`;
                     })
                     .join("");
 
@@ -665,6 +659,8 @@ $(document).ready(function () {
                     const obtainedMarks = $(
                         `input[name="obtainedMarks-${answerId}"]`
                     ).val();
+                    const comments =
+                        $(`input[name="comments-${answerId}"]`).val() || ""; // Get comments from input field
 
                     let data = {
                         assignment_id: $button.data("assignment_id"),
@@ -672,7 +668,7 @@ $(document).ready(function () {
                         user_id: $button.data("user_id"),
                         obt_marks: obtainedMarks,
                         max_marks: $button.data("max_marks"),
-                        comments: "salam",
+                        comments: comments, // Use the entered comments
                         batch_no: $button.data("batch_no"),
                         course_no: $button.data("course_no"),
                     };
@@ -694,6 +690,9 @@ $(document).ready(function () {
                             $(`input[name="obtainedMarks-${answerId}"]`)
                                 .prop("disabled", true)
                                 .val("marking...");
+                            $(`input[name="comments-${answerId}"]`)
+                                .prop("disabled", true)
+                                .val("marking...");
                             $(`input[name="obtainedMarks-${answerId}"]`)
                                 .siblings(".alert-danger")
                                 .remove();
@@ -711,6 +710,9 @@ $(document).ready(function () {
                             $(`input[name="obtainedMarks-${answerId}"]`)
                                 .prop("disabled", true)
                                 .val("marked successfully");
+                            $(`input[name="comments-${answerId}"]`)
+                                .prop("disabled", true)
+                                .val(comments || "No comments");
                             $(`input[name="obtainedMarks-${answerId}"]`)
                                 .siblings(".alert-danger")
                                 .remove();
@@ -721,26 +723,20 @@ $(document).ready(function () {
                                 .html("Mark")
                                 .attr("disabled", false)
                                 .removeClass("btn-disabled");
-                            // Find the input field related to the current row and show the error message under it
                             const $inputField = $(
                                 `input[name="obtainedMarks-${answerId}"]`
                             );
-
-                            // Remove any existing error message to prevent duplicates
                             $inputField.attr("disabled", false);
+                            $(`input[name="comments-${answerId}"]`).attr(
+                                "disabled",
+                                false
+                            );
                             $inputField.siblings(".alert-danger").remove();
-
-                            // Add the error message directly under the input field
                             $inputField.after(`
-                        <p class="alert alert-danger text-sm mt-1">
-                            ${xhr.responseJSON?.message || xhr.statusText}
-                        </p>
-                    `);
-                        },
-                        complete: function () {
-                            // Restore button text and hide loader
-                            // $button.html('Marked').attr('disabled', true).removeClass('btn-disabled');
-                            // getSubmittedAssignments($('input[name="batch_no"]').val()); // Refresh assignments if necessary
+                            <p class="alert alert-danger text-sm mt-1">
+                                ${xhr.responseJSON?.message || xhr.statusText}
+                            </p>
+                        `);
                         },
                     });
                 });
@@ -849,6 +845,7 @@ $(document).ready(function () {
             <td class="text-sm">${day}</td>
             <td class="text-sm">${mark.student?.name || "N/A"}</td>
             <td class="text-sm">${time}</td>
+            <td class="text-sm">${mark?.comment}</td>
             <td class="text-sm">${displayFile(mark.answer?.answer_file)}</td>
             <td class="text-sm">${mark?.max_marks || "N/A"}</td>
             <td class="text-sm">${mark.obt_marks || "N/A"}</td>
@@ -1446,7 +1443,7 @@ $(document).ready(function () {
                     let batchOptions =
                         "<option disabled selected>Select Batch</option>";
                     response.batches.forEach(function (batch) {
-                        batchOptions += `<option value="${batch.batch_no}">${batch.batch_no}</option>`;
+                        batchOptions += `<option value="${batch.id}">${batch.batch_no}</option>`;
                     });
                     $("#batch_assigned").html(batchOptions);
                 },
@@ -2244,7 +2241,7 @@ $(document).ready(function () {
                     response?.batches
                         ?.map(
                             (item) =>
-                                `<option value="${item?.batch_no}">Batch ${item.batch_no}</option>`
+                                `<option value="${item?.id}">Batch ${item.batch_no}</option>`
                         )
                         .join("");
                 let courseOptions =
@@ -2537,6 +2534,7 @@ $(document).ready(function () {
             // Collect the attendance data for each student
             let attendanceData = [];
             let topic = $(`input[name="topic_name"]`).val();
+            let link = $(`input[name="lecture_link"]`).val();
             $("tbody.teacher-mark-attendace tr").each(function () {
                 let studentId = $(this)
                     .find('input[type="radio"][name^="attendance_"]')
@@ -3145,6 +3143,7 @@ function getStudentCourses() {
                         <td>${item?.courses[index]?.course_name}</td>
                         <td>Batch ${item?.batch_assigned}</td>
                         <td>${item?.courses[index]?.course_duration}</td>
+
                     </tr>
                 `;
             });
@@ -3224,6 +3223,62 @@ function updateUserProfile() {
         },
     });
 }
+function updateUserProfileTeacher() {
+    const user_id = window.location.pathname.split("/").pop();
+    const formData = new FormData();
+    const username = $("#username").val();
+    const password = $("#password").val();
+    const image = document.getElementById("image").files[0];
+
+    // Append data to FormData
+    if (username) formData.append("name", username);
+    if (password) formData.append("password", password);
+    if (image) formData.append("image", image);
+
+    $.ajax({
+        url: `/dashboard/teacher/profile/update/${user_id}`,
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        beforeSend: function () {
+            $(".update-profile-btn2").text("Updating...");
+        },
+        success: function (response) {
+            if (response.success) {
+                showToast(
+                    "Profile Updated",
+                    "Profile updated successfully!",
+                    "success"
+                );
+                // Reset form fields
+                $("#profileForm")[0].reset(); // Resets all form fields (if you have a form element)
+
+                // Optionally clear image preview
+                $("#image").val(""); // Clear the file input
+
+                // Close the modal (assuming you're using Bootstrap)
+                $(".updateProfileModal").modal("hide"); // Replace '#updateProfileModal' with your modal's ID
+
+                // update the user image & username
+                $(".user-name").html(response?.user?.name);
+                $(".user-image").attr(
+                    "src",
+                    `/storage/${response?.user?.image}`
+                );
+
+                // Optionally, refresh user data on the page
+            } else {
+                showToast("Error", "Updation failed", "error");
+            }
+            $(".update-profile-btn").text("Update");
+        },
+        error: function (xhr) {
+            showErrorMessages(xhr.responseJSON.errors);
+            $(".update-profile-btn").text("Update");
+        },
+    });
+}
 
 $(document).ready(function () {
     if (
@@ -3260,6 +3315,12 @@ $(".update-profile-btn")
     .on("click", function () {
         console.log("slam");
         updateUserProfile();
+    });
+$(".update-profile-btn2")
+    .off("click")
+    .on("click", function () {
+        // console.log("slam");
+        updateUserProfileTeacher();
     });
 
 let pieChart;

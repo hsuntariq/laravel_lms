@@ -21,10 +21,23 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
+                $user = Auth::guard($guard)->user();
+
+                // Redirect based on role
+                if ($user->role === 'student') {
+                    return redirect()->route('student-dashboard', ['id' => $user->id]);
+                } elseif ($user->role === 'teacher') {
+                    return redirect()->route('teacher-dashboard', ['id' => $user->id]);
+                } elseif ($user->role === 'staff') {
+                    return redirect()->route('staff-dashboard', ['id' => $user->id]);
+                }
+
+                // Default fallback
                 return redirect(RouteServiceProvider::HOME);
             }
         }
 
         return $next($request);
     }
+
 }

@@ -11,18 +11,20 @@
         <button id="sidebarToggle" class="btn btn-light d-lg-none d-block">
             <i class="bi bi-list fs-4"></i>
         </button>
-        <div class="d-flex gap-1 align-items-center">
+        <a href="{{ route('student-settings', ['id' => auth()->user()->id]) }}"
+            class="d-flex gap-1 text-decoration-none align-items-center">
             {!! auth()->user()->image
-            ? "<img width='30px' height='30px' class='rounded-circle' src='" . asset('/storage/' .
-                auth()->user()->image) . "' >"
-            : "<div class='bi bi-person border rounded-circle d-flex justify-content-center align-items-center p-2'>
-            </div>"
+            ? "<img width='30px' height='30px' style='object-fit:contain' class='rounded-circle' src='" . asset('
+                storage/' . auth()->user()->image) . "' >"
+            : "<div class='bi bi-person border rounded-circle d-flex justify-content-center align-items-center p-2'
+                style='width:30px; height:30px;'></div>"
             !!}
+
 
             <h6 class='m-0 text-capitalize user-name text-purple'>
                 {{ auth()->user()->name }}
             </h6>
-
+        </a>
     </section>
 
     <!-- Sidebar toggle button (visible on small screens) -->

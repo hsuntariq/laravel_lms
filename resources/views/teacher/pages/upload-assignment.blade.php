@@ -65,10 +65,8 @@
             </section>
         </div>
 
-        <form action="{{ route('upload-assignment') }}" method="POST" style="background:#FFF4DE;"
-            class="assignment-data p-4 shadow col-xl-5 col-lg-7 col-sm-9 mx-auto
-        my-3 rounded-3 "
-            enctype="multipart/form-data">
+        <form action="{{ route('upload-assignment') }}" method="POST" style="background:#FFF4DE;" class="assignment-data p-4 shadow col-xl-5 col-lg-7 col-sm-9 mx-auto
+        my-3 rounded-3 " enctype="multipart/form-data">
             @csrf
             <h2 class="text-secondary text-center">
                 Add an assignment/test
@@ -78,9 +76,9 @@
                 <input type="text" name="topic" placeholder="Enter name of the topic..." class="form-control"
                     style="background: #F9F9F9">
                 @error('topic')
-                <p class="text-danger fw-medium m-0">
-                    {{ $message }}
-                </p>
+                    <p class="text-danger fw-medium m-0">
+                        {{ $message }}
+                    </p>
                 @enderror
             </div>
             <div class="form-group">
@@ -88,9 +86,9 @@
                 <input type="text" name="description" placeholder="Enter description of the topic..."
                     class="form-control" style="background: #F9F9F9">
                 @error('description')
-                <p class="text-danger fw-medium m-0">
-                    {{ $message }}
-                </p>
+                    <p class="text-danger fw-medium m-0">
+                        {{ $message }}
+                    </p>
                 @enderror
             </div>
             <div class="form-group">
@@ -98,24 +96,24 @@
                 <input type="number" name="max_marks" placeholder="e.g. 15" class="form-control"
                     style="background: #F9F9F9">
                 @error('max_marks')
-                <p class="text-danger fw-medium m-0">
-                    {{ $message }}
-                </p>
+                    <p class="text-danger fw-medium m-0">
+                        {{ $message }}
+                    </p>
                 @enderror
             </div>
             <div class="form-group">
                 <label for="batch_no">Batch no.</label>
                 <select class="form-select" name="batch_no" id="">
-                    @for ($i = 0; $i < 5; $i++)
+                    <!-- @for ($i = 0; $i < 5; $i++)
                         <option value="{{ $i + 1 }}">
                         batch {{ $i + 1 }}
                         </option>
-                        @endfor
+                        @endfor -->
                 </select>
                 @error('batch_no')
-                <p class="text-danger fw-medium m-0">
-                    {{ $message }}
-                </p>
+                    <p class="text-danger fw-medium m-0">
+                        {{ $message }}
+                    </p>
                 @enderror
             </div>
             <div class="form-group">
@@ -123,9 +121,9 @@
                 <input type="datetime-local" name="deadline" placeholder="e.g. 15" class="form-control"
                     style="background: #F9F9F9">
                 @error('deadline')
-                <p class="text-danger fw-medium m-0">
-                    {{ $message }}
-                </p>
+                    <p class="text-danger fw-medium m-0">
+                        {{ $message }}
+                    </p>
                 @enderror
             </div>
             <div class="form-group">
@@ -142,19 +140,18 @@
                     </option>
                 </select>
                 @error('type')
-                <p class="text-danger fw-medium m-0">
-                    {{ $message }}
-                </p>
+                    <p class="text-danger fw-medium m-0">
+                        {{ $message }}
+                    </p>
                 @enderror
             </div>
             <div class="form-group">
                 <label for="file">Upload File</label>
-                <input type="file" name="file" placeholder="e.g. 15" class="form-control"
-                    style="background: #F9F9F9">
+                <input type="file" name="file" placeholder="e.g. 15" class="form-control" style="background: #F9F9F9">
                 @error('file')
-                <p class="text-danger fw-medium m-0">
-                    {{ $message }}
-                </p>
+                    <p class="text-danger fw-medium m-0">
+                        {{ $message }}
+                    </p>
                 @enderror
             </div>
             {{-- preview goes here --}}

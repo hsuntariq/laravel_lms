@@ -1,5 +1,5 @@
 <header
-    class="d-flex  shadow flex-wrap justify-content-between align-items-center align-items-md-center justify-content-between bg-white p-3 mt-4 rounded-3 gap-3">
+    class="d-flex col-11 mx-auto  shadow flex-wrap justify-content-between align-items-center align-items-md-center justify-content-between bg-white p-3 mt-4 rounded-3 gap-3">
     <!-- Logo and Title -->
     <section class="d-flex align-items-center gap-2">
         <img width="30px" src="https://www.assignmentworkhelp.com/wp-content/uploads/2018/08/icon1.png"
@@ -9,32 +9,37 @@
 
     <!-- Status Icons -->
     <section class="d-flex align-items-center gap-3">
-        <div class="d-flex align-items-center gap-1">
+        <div class="d-flex tooltip1 align-items-center gap-1">
             <img src="https://cdn-icons-png.freepik.com/256/9905/9905558.png?semt=ais_hybrid" alt="assignmate image"
                 width="20px">
-            <h6 class="m-0">15</h6>
+            <h6 class="m-0 total">0</h6> <!-- Will be updated to total count -->
+            <div class="tooltiptext">Total assignments </div>
         </div>
-        <div class="d-flex align-items-center gap-1">
+        <div class="d-flex tooltip1 align-items-center gap-1">
             <img src="https://cdn-icons-png.freepik.com/256/15190/15190698.png?semt=ais_hybrid" alt="assignmate image"
                 width="20px">
-            <h6 class="m-0">15</h6>
+            <h6 class="m-0 submitted">0</h6> <!-- Will be updated to submitted count -->
+            <div class="tooltiptext">Submitted assignments</div>
         </div>
-        <div class="d-flex align-items-center gap-1">
+        <div class="d-flex tooltip1 align-items-center gap-1">
             <img src="https://cdn.iconscout.com/icon/premium/png-256-thumb/remaining-percentage-1-872688.png"
                 alt="assignmate image" width="20px">
-            <h6 class="m-0">15</h6>
+            <h6 class="m-0 unsubmitted">0</h6> <!-- Will be updated to unsubmitted count -->
+            <div class="tooltiptext">Un submitted assignments </div>
         </div>
     </section>
-
     <!-- Pending Button -->
     <section>
-        <button class="btn text-dark d-none d-sm-block btn-sm d-flex align-items-center gap-1 fw-medium w-100 w-md-auto"
+        <a href="/dashboard/student/assignments/{{ auth()->user()->id }}"
+            class="btn text-dark d-none d-sm-block btn-sm d-flex align-items-center gap-1 fw-medium w-100 w-md-auto"
             style="background:#ECE5F4;">
             <i class="bi bi-play" style="color:#9C60EF"></i>
             Pending
-        </button>
+        </a>
     </section>
 </header>
+
+<x-small-navigation />
 
 
 
@@ -43,7 +48,7 @@
 <section class="card border-0 p-xl-5 p-3 shadow mt-4">
 
     <section class="row">
-        <div class="col-xl-4 col-lg-6">
+        <div class="col-xxl-4 col-lg-6 ">
             <section class="card d-flex flex-column gap-2 rounded-3 border-0 shadow p-xl-4 p-3 my-3"
                 style="background:#FFF4DE">
                 <section class="d-flex align-items-center justify-content-between">
@@ -70,7 +75,7 @@
                 </p>
             </section>
         </div>
-        <section class="col-xl-4 col-lg-6">
+        <section class="col-xxl-4 col-lg-6">
             <section class="card d-flex flex-column gap-2 rounded-3 border-0 shadow p-xl-4 p-3 my-3"
                 style="background:#FFE2E6">
                 <div class="d-flex align-items-center justify-content-between">
@@ -97,7 +102,7 @@
                 </p>
             </section>
         </section>
-        <section class="col-xl-4 col-lg-12">
+        <section class="col-xxl-4 col-lg-12">
             <section class="card d-flex flex-column gap-2 rounded-3 border-0 shadow p-xl-4 p-3 my-3"
                 style="background:#DCFCE7">
                 <div class="d-flex align-items-center justify-content-between">
@@ -138,143 +143,122 @@
         <h2>My Courses</h2>
     </div>
 
-    <section class="table-responsive">
+    @include('student.partials.table-loader')
+    <div class="table-responsive my-3 ">
 
-        <table class="table mt-2  w-100">
+        <table class="table table-striped table-bordered table-sm  text-capitalize">
             <thead>
-                <tr class=" text-capitalize">
-                    <th class="text-secondary">#</th>
-                    <th class="text-secondary">Course name</th>
-                    <th class="text-secondary">completed</th>
-                    <th class="text-secondary">status</th>
+                <tr>
+                    <td class="text-white">#</td>
+                    <td class="text-white">Course name</td>
+                    <td class="text-white">Batch </td>
+                    <td class="text-white">Course duration</td>
+                    <td class="text-white">Status</td>
                 </tr>
             </thead>
-            <tbody class="text-capitalize">
-                <tr>
-                    <td style="vertical-align: middle;width:25%;">
-                        <img src="https://images.crunchbase.com/image/upload/c_pad,h_256,w_256,f_auto,q_auto:eco,dpr_1/98ed46075ea1e87904a0"
-                            width="60px" height="60px" class="rounded-3" alt="assignmate image">
-                    </td>
-                    <td style="vertical-align: middle;width:25%;">full stack web development</td>
-                    <td style="vertical-align: middle;width:25%;">
-                        <div class="progress rounded-pill" style="height:4px">
-                            <div class="progress-bar" style="width:50%;background:#8338EB"></div>
-                        </div>
-                    </td>
-                    <td style="vertical-align: middle;width:25%;">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="d-flex">
-                                <img src="https://cdn-icons-png.freepik.com/256/9905/9905558.png?semt=ais_hybrid"
-                                    alt="assignmate image" width="20px">
-                                <h6 class="m-0">15</h6>
-                            </div>
-                            <div class="d-flex">
-                                <img src="https://cdn-icons-png.freepik.com/256/15190/15190698.png?semt=ais_hybrid"
-                                    alt="assignmate image" width="20px">
-                                <h6 class="m-0">15</h6>
-                            </div>
-                            <div class="d-flex">
-                                <img src="https://cdn.iconscout.com/icon/premium/png-256-thumb/remaining-percentage-1-872688.png"
-                                    alt="assignmate image" width="20px">
-                                <h6 class="m-0">15</h6>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="vertical-align: middle;width:25%;">
-                        <img src="https://images.crunchbase.com/image/upload/c_pad,h_256,w_256,f_auto,q_auto:eco,dpr_1/98ed46075ea1e87904a0"
-                            width="60px" height="60px" class="rounded-3" alt="assignmate image">
-                    </td>
-                    <td style="vertical-align: middle;width:25%;">full stack web development</td>
-                    <td style="vertical-align: middle;width:25%;">
-                        <div class="progress rounded-pill" style="height:4px">
-                            <div class="progress-bar" style="width:50%;background:#8338EB"></div>
-                        </div>
-                    </td>
-                    <td style="vertical-align: middle;width:25%;">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="d-flex">
-                                <img src="https://cdn-icons-png.freepik.com/256/9905/9905558.png?semt=ais_hybrid"
-                                    alt="assignmate image" width="20px">
-                                <h6 class="m-0">15</h6>
-                            </div>
-                            <div class="d-flex">
-                                <img src="https://cdn-icons-png.freepik.com/256/15190/15190698.png?semt=ais_hybrid"
-                                    alt="assignmate image" width="20px">
-                                <h6 class="m-0">15</h6>
-                            </div>
-                            <div class="d-flex">
-                                <img src="https://cdn.iconscout.com/icon/premium/png-256-thumb/remaining-percentage-1-872688.png"
-                                    alt="assignmate image" width="20px">
-                                <h6 class="m-0">15</h6>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="vertical-align: middle;width:25%;">
-                        <img src="https://images.crunchbase.com/image/upload/c_pad,h_256,w_256,f_auto,q_auto:eco,dpr_1/98ed46075ea1e87904a0"
-                            width="60px" height="60px" class="rounded-3" alt="assignmate image">
-                    </td>
-                    <td style="vertical-align: middle;width:25%;">full stack web development</td>
-                    <td style="vertical-align: middle;width:25%;">
-                        <div class="progress rounded-pill" style="height:4px">
-                            <div class="progress-bar" style="width:50%;background:#8338EB"></div>
-                        </div>
-                    </td>
-                    <td style="vertical-align: middle;width:25%;">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="d-flex">
-                                <img src="https://cdn-icons-png.freepik.com/256/9905/9905558.png?semt=ais_hybrid"
-                                    alt="assignmate image" width="20px">
-                                <h6 class="m-0">15</h6>
-                            </div>
-                            <div class="d-flex">
-                                <img src="https://cdn-icons-png.freepik.com/256/15190/15190698.png?semt=ais_hybrid"
-                                    alt="assignmate image" width="20px">
-                                <h6 class="m-0">15</h6>
-                            </div>
-                            <div class="d-flex">
-                                <img src="https://cdn.iconscout.com/icon/premium/png-256-thumb/remaining-percentage-1-872688.png"
-                                    alt="assignmate image" width="20px">
-                                <h6 class="m-0">15</h6>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="vertical-align: middle;width:25%;">
-                        <img src="https://images.crunchbase.com/image/upload/c_pad,h_256,w_256,f_auto,q_auto:eco,dpr_1/98ed46075ea1e87904a0"
-                            width="60px" height="60px" class="rounded-3" alt="assignmate image">
-                    </td>
-                    <td style="vertical-align: middle;width:25%;">full stack web development</td>
-                    <td style="vertical-align: middle;width:25%;">
-                        <div class="progress rounded-pill" style="height:4px">
-                            <div class="progress-bar" style="width:50%;background:#8338EB"></div>
-                        </div>
-                    </td>
-                    <td style="vertical-align: middle;width:25%;">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="d-flex">
-                                <img src="https://cdn-icons-png.freepik.com/256/9905/9905558.png?semt=ais_hybrid"
-                                    alt="assignmate image" width="20px">
-                                <h6 class="m-0">15</h6>
-                            </div>
-                            <div class="d-flex">
-                                <img src="https://cdn-icons-png.freepik.com/256/15190/15190698.png?semt=ais_hybrid"
-                                    alt="assignmate image" width="20px">
-                                <h6 class="m-0">15</h6>
-                            </div>
-                            <div class="d-flex">
-                                <img src="https://cdn.iconscout.com/icon/premium/png-256-thumb/remaining-percentage-1-872688.png"
-                                    alt="assignmate image" width="20px">
-                                <h6 class="m-0">15</h6>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
+            <tbody class="student-courses">
+
             </tbody>
         </table>
-    </section>
+    </div>
 </section>
+
+<x-jquery />
+
+<script>
+$(document).ready(function() {
+    const userId = window.location.pathname.split("/").pop();
+
+    $.ajax({
+        url: `/dashboard/student/assignments-get/${userId}`,
+        type: "GET",
+        beforeSend: function() {
+            $('.total').html(
+                `<img src='/assets/images/loading.gif' width='20px' height='20px'>`
+            ); // Total assignments
+            $('.submitted').html(
+                `<img src='/assets/images/loading.gif' width='20px' height='20px'>`
+            ); // Total assignments
+            $('.unsubmitted').html(
+                `<img src='/assets/images/loading.gif' width='20px' height='20px'>`
+            ); // Total assignments
+
+        },
+        success: function(response) {
+            const assignments = response?.assignments || [];
+
+            // Calculate counts
+            const totalCount = assignments.length;
+            const submittedCount = assignments.filter(assignment =>
+                assignment?.answer && assignment.answer.length > 0
+            ).length;
+            const unsubmittedCount = totalCount - submittedCount;
+            // Update the numbers in the UI
+            $('.total').text(totalCount); // Total assignments
+            $('.submitted').text(submittedCount); // Submitted
+            $('.unsubmitted').text(unsubmittedCount); // Unsubmitted
+        },
+        error: function(xhr) {
+            console.error("Error fetching assignments:", xhr.statusText);
+        },
+    });
+
+
+
+
+
+
+});
+
+
+function getStudentCourses() {
+    const user_id = window.location.pathname.split("/").pop();
+    $.ajax({
+        url: `/dashboard/student/get-students-courses/${user_id}`,
+        type: "GET",
+        beforeSend: function() {
+            $(".loader-table").show();
+        },
+        success: function(response) {
+            let courses = response?.map((item, index) => {
+                return `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${item?.courses[index]?.course_name}</td>
+                        <td>Batch ${item?.batch_assigned}</td>
+                        <td>${item?.courses[index]?.course_duration}</td>
+                        <td class='d-flex align-items-center gap-3 justify-content-center' style="vertical-align: middle;text-align:center">
+
+                                    <div class="d-flex justify-content-center mx-auto w-100 tooltip1 align-items-center gap-1">
+                                        <img src="https://cdn-icons-png.freepik.com/256/9905/9905558.png?semt=ais_hybrid" alt="assignmate image"
+                                            width="20px">
+                                        <h6 class="m-0 total">0</h6> <!-- Will be updated to total count -->
+                                        <div class="tooltiptext">Total assignments </div>
+                                    </div>
+                                    <div class="d-flex justify-content-center mx-auto w-100 tooltip1 align-items-center gap-1">
+                                        <img src="https://cdn-icons-png.freepik.com/256/15190/15190698.png?semt=ais_hybrid" alt="assignmate image"
+                                            width="20px">
+                                        <h6 class="m-0 submitted">0</h6> <!-- Will be updated to submitted count -->
+                                        <div class="tooltiptext">Submitted assignments</div>
+                                    </div>
+                                    <div class="d-flex justify-content-center mx-auto w-100 tooltip1 align-items-center gap-1">
+                                        <img src="https://cdn.iconscout.com/icon/premium/png-256-thumb/remaining-percentage-1-872688.png"
+                                            alt="assignmate image" width="20px">
+                                        <h6 class="m-0 unsubmitted">0</h6> <!-- Will be updated to unsubmitted count -->
+                                        <div class="tooltiptext">Un submitted assignments </div>
+                                    </div>
+                    </td>
+                    </tr>
+                `;
+            });
+            $(".student-courses").html(courses);
+            $(".loader-table").hide();
+        },
+        error: function(xhr) {
+            showErrorMessages(xhr.responseJSON.errors);
+        },
+    });
+}
+
+getStudentCourses()
+</script>

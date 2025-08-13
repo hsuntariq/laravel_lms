@@ -7,6 +7,8 @@
         </div>
         <input type="text" class="border-0 w-100 input-search" name="topic_name" style="outline-width:0"
             placeholder="Topic name">
+        <input type="text" class="border-0 w-100 input-search" name="lecture_link" style="outline-width:0"
+            placeholder="Lecture Link">
 </section>
 
 <section class="table-responsive" style="height:80vh;overflow-y:scroll">

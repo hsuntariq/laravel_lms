@@ -37,12 +37,8 @@ class userController extends Controller
     public function signOut(Request $req)
     {
         auth()->logout();
-        $req->session()->regenerateToken();
-
-        // Return success response
-        return response()->json([
-            'message' => 'Successfully logged out'
-        ]);
+        session()->invalidate();
+        return redirect('/');
     }
 
     public function signIn(Request $req)

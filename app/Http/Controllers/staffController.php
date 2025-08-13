@@ -67,7 +67,7 @@ class staffController extends Controller
             'password' => 'required|string|min:6',
             'whatsapp' => 'nullable|string',
             'course_assigned' => 'required|exists:courses,id',
-            'batch_assigned' => 'required|exists:batches,id',
+            'batch_assigned' => 'required',
             'gender' => 'required|in:male,female',
             'image' => 'nullable|image|max:2048',
         ]);

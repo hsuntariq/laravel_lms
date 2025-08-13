@@ -5,7 +5,8 @@
     </h6>
     <section class="d-flex align-items-center gap-2">
         <div class="graph w-50 d-flex justify-content-center align-items-center" style='height:150px'>
-            <img width="150px" class=" loading-chart mx-auto" src="{{ asset('assets/images/loading.gif') }}" alt="Loading...">
+            <img width="150px" class=" loading-chart mx-auto" src="{{ asset('assets/images/loading.gif') }}"
+                alt="Loading...">
             {{-- graph goes here --}}
             <canvas id="doughnutChartCanvas2" style="display: none;"></canvas>
         </div>
@@ -44,3 +45,6 @@
         </section>
 
     </section>
+    @include('teacher.partials.top-students')
+
+</aside>

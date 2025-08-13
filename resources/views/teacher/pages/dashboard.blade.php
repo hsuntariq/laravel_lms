@@ -8,12 +8,10 @@
 
         <div class="col-lg-6">
             @include('teacher.partials.performance')
-            @include('teacher.partials.top-students')
-
+            @include('teacher.partials.schedule')
 
 
         </div>
-    </div>
 
 
 </x-teacher-dashboard-layout>
