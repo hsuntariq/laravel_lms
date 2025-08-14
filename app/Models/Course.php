@@ -9,9 +9,24 @@ class Course extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'title',
+        'category',
+        'level',
+        'language',
+        'visibility',
+        'short_description',
+        'price',
+        'thumbnail',
+        'description',
+        'featured',
+        'learning',
+        'requirements'
+    ];
+
     public function batches()
     {
-        return $this->hasMany(Batch::class, 'course_assigned');
+        return $this->hasMany(Batch::class, 'course_id');
     }
 
 

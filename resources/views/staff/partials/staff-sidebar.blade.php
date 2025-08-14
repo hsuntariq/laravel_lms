@@ -1,4 +1,4 @@
-<ul class="d-flex flex-column bg-white p-4 gap-2" style="height:90vh;">
+<ul class="d-flex flex-column  p-4 gap-2" style="height:90vh;">
     <li class="d-flex {{ collect(request()->segments())->contains(function ($segment) {
     return strpos($segment, 'home') !== false;
 })

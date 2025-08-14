@@ -1559,31 +1559,6 @@ $(document).ready(function () {
     }
 
     // Fetch courses and teachers with loading text in bold
-    function fetchCourses() {
-        $.ajax({
-            url: "/dashboard/staff/get-courses",
-            type: "GET",
-            beforeSend: function () {
-                $("select[name='course_name']").html(
-                    "<option><b>Loading...</b></option>"
-                );
-            },
-            success: function (response) {
-                let courseOptions =
-                    "<option disabled selected>Select Course</option>" +
-                    response
-                        .map(
-                            (course) =>
-                                `<option value="${course.id}">${course.course_name}</option>`
-                        )
-                        .join("");
-                $("select[name='course_name']").html(courseOptions);
-            },
-            error: function (xhr) {
-                console.error(xhr.statusText);
-            },
-        });
-    }
 
     // Fetch teachers after selecting a course
     $("select[name='course_name']").change(function () {

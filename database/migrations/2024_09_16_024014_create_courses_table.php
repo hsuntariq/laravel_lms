@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,9 +12,18 @@ return new class extends Migration
     {
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
-            $table->string('course_name')->unique();
-            $table->integer('course_duration');
-            $table->integer('course_fee');
+            $table->string('title')->unique();
+            $table->string('category');
+            $table->string('level');
+            $table->string('language');
+            $table->string('visibility');
+            $table->string('short_description')->nullable();
+            $table->decimal('price', 10, 2);
+            $table->string('thumbnail')->nullable();
+            $table->text('description')->nullable();
+            $table->boolean('featured')->default(false);
+            $table->json('learning')->nullable();
+            $table->json('requirements')->nullable();
             $table->timestamps();
         });
     }

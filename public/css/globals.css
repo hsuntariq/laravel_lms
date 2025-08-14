@@ -5,6 +5,10 @@
     --border-purple-2: 2px solid var(--orange);
 }
 
+body {
+    background-color: #f2f4f7 !important;
+}
+
 /* .attendance-table td:nth-child(even){
         background-color: var(--orange)!important;
     } */
@@ -86,9 +90,27 @@ body {
     color: white;
 }
 
+.btn-outline-purple {
+    border: 1px solid var(--orange);
+    color: var(--orange);
+    font-weight: normal;
+    transition: all 0.4s;
+}
+
+.btn-outline-purple:hover {
+    background-color: var(--orange);
+    color: white !important;
+}
+
 .attendance-box {
     width: 10px;
     height: 10px;
+}
+
+.feature-course {
+    /* background-color: var(--orange) !important;
+    color: white !important;
+    border: none !important; */
 }
 
 .text-sm {
@@ -382,8 +404,8 @@ thead td {
     position: sticky !important;
     top: 0 !important;
     z-index: 1 !important;
-    background-color: var(--orange) !important;
-    color: white !important;
+    background-color: var(--orange);
+    color: white;
 }
 
 input {
@@ -500,7 +522,7 @@ option {
         position: fixed !important;
         height: 100vh !important;
         z-index: 444 !important;
-        background-color: white !important;
+        /* background-color:  !important; */
         top: 0;
         left: -100%;
         transition: left 0.3s ease;

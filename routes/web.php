@@ -223,6 +223,18 @@ Route::prefix("/dashboard/staff/")->middleware(['auth', 'staff'])->group(functio
     Route::get('/get-student/{id}', [StaffController::class, 'editUser'])->name('staff.editUser');
 
     Route::get('/get-batches/{courseId}', [batchController::class, 'getBatches']);
+
+    // Add Course
+    Route::post('/add-course', [courseController::class, 'addCourse'])->name('add-course');
+    // Get Courses (paginated)
+    Route::get('/get-courses', [courseController::class, 'getCourses'])->name('get-courses');
+    // Update Course
+    Route::post('/update-course/{id}', [courseController::class, 'updateCourse'])->name('update-course');
+    // Delete Course
+    Route::delete('/delete-course/{id}', [courseController::class, 'deleteCourse'])->name('delete-course');
+    // Edit Course (view or modal)
+
+
 })->middleware(['auth', 'staff']);
 
 

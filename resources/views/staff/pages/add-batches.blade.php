@@ -157,7 +157,7 @@ body {
 <x-staff-dashboard-layout>
     <x-flash />
     <x-error />
-    <form action="" class="course-form col-xl-7 col-md-10 mx-auto  p-3 rounded-3 shadow">
+    <form action="" class="course-form col-xl-10 bg-white col-md-10 mx-auto  p-3 rounded-3 shadow">
         @csrf
         <h6 class="form-header my-4 text-start fs-5"> <i class="bi bi-calendar"></i> Create New Batch Assignment</h6>
         <div class="form-section">

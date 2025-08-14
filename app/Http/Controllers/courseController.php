@@ -31,9 +31,18 @@ class courseController extends Controller
     public function addCourse(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            "course_name" => 'required',
-            "course_duration" => 'required',
-            "course_fee" => 'required',
+            "title" => 'required|string|unique:courses,title',
+            "category" => 'required|string',
+            "level" => 'required|string',
+            "language" => 'required|string',
+            "visibility" => 'required|string',
+            "short_description" => 'nullable|string',
+            "price" => 'required|numeric',
+            "thumbnail" => 'nullable|image',
+            "description" => 'nullable|string',
+            "featured" => 'nullable|boolean',
+            "learning" => 'nullable|array',
+            "requirements" => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
@@ -41,35 +50,77 @@ class courseController extends Controller
                 'status' => 'error',
                 'errors' => $validator->errors()
             ], 422);
-        };
-
-        // check existing course
-        $checkExisting = Course::where('course_name', $request->input('course_name'))->first();
-
-        if ($checkExisting) {
-            return response()->json([
-                'status' => 'already present',
-                'message' => 'Course already present'
-            ], 400);
-        } else {
-
-            $formFields = $request->except('_token');
-
-            $course = Course::create($formFields);
-            return response()->json($course);
         }
+
+        $data = $request->except('_token');
+        if ($request->hasFile('thumbnail')) {
+            $data['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
+        }
+        $data['featured'] = $request->has('featured') ? 1 : 0;
+        $data['learning'] = json_encode($request->input('learning', []));
+        $data['requirements'] = json_encode($request->input('requirements', []));
+
+        $course = Course::create($data);
+
+        return response()->json(['status' => 'success', 'course' => $course]);
     }
 
 
 
-    public function getCourses()
+    public function getCourses(Request $request)
     {
-        $courses = Course::all();
+        $perPage = $request->input('per_page', 10);
+        $courses = Course::paginate($perPage);
         return response()->json($courses);
     }
     public function getStudentsCourse()
     {
         $courses = User::where('id', auth()->user()->id)->with('courses')->get();
         return response()->json($courses);
+    }
+    public function deleteCourse($id)
+    {
+        $course = Course::findOrFail($id);
+        $course->delete();
+        return response()->json(['status' => 'success']);
+    }
+
+    public function updateCourse(Request $request, $id)
+    {
+        $course = Course::findOrFail($id);
+
+        $validator = Validator::make($request->all(), [
+            "title" => 'required|string|unique:courses,title,' . $id,
+            "category" => 'required|string',
+            "level" => 'required|string',
+            "language" => 'required|string',
+            "visibility" => 'required|string',
+            "short_description" => 'nullable|string',
+            "price" => 'required|numeric',
+            "thumbnail" => 'nullable|image',
+            "description" => 'nullable|string',
+            "featured" => 'nullable|boolean',
+            "learning" => 'nullable|array',
+            "requirements" => 'nullable|array',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $data = $request->except('_token');
+        if ($request->hasFile('thumbnail')) {
+            $data['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
+        }
+        $data['featured'] = $request->has('featured') ? 1 : 0;
+        $data['learning'] = json_encode($request->input('learning', []));
+        $data['requirements'] = json_encode($request->input('requirements', []));
+
+        $course->update($data);
+
+        return response()->json(['status' => 'success', 'course' => $course]);
     }
 }

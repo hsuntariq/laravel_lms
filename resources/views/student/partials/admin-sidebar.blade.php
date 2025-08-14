@@ -1,4 +1,4 @@
-<ul class="d-flex flex-column bg-white px-4 py-2 gap-2" style="height:90vh;">
+<ul class="d-flex flex-column  px-4 py-2 gap-2" style="height:90vh;">
     <li
         class="d-flex {{ collect(request()->segments())->contains(fn($segment) => strpos($segment, 'home') !== false) ? 'active' : 'text-dark' }} rounded-3 p-3 gap-3 align-items-center">
         <img src="{{ asset('images/icons/dashboard.png') }}" alt="Dashboard" width="24" height="24">
