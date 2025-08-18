@@ -20,10 +20,16 @@ class User extends Authenticatable
 
 
 
+    // public function courses()
+    // {
+    //     return $this->hasMany(Course::class, 'id', 'course_assigned');
+    // }
+
     public function courses()
     {
-        return $this->hasMany(Course::class, 'id', 'course_assigned');
+        return $this->belongsToMany(Course::class, 'course_user');
     }
+
 
 
     public function batches()

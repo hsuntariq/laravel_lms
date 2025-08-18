@@ -98,6 +98,7 @@ class teacherController extends Controller
 
     public function markOverdueAssignments(Request $request)
     {
+
         $debugInfo = [];
         $markedAssignments = 0;
         $skippedAssignments = 0;
@@ -274,13 +275,18 @@ class teacherController extends Controller
 
         // Get students count based on the batch number
         $studentCount = User::where('role', 'student')
-            ->where('batch_assigned', $batch_no)->where('course_assigned', $course_no)
+            ->where('batch_assigned', $batch_no)
+            ->whereHas('courses', function ($q) use ($course_no) {
+                $q->where('courses.id', $course_no);
+            })
             ->count();
 
         $students = DB::table('marks')
             ->join('users', 'marks.user_id', '=', 'users.id')
+            ->join('course_user', 'users.id', '=', 'course_user.user_id') // pivot
+            ->join('courses', 'course_user.course_id', '=', 'courses.id') // courses
             ->where('users.batch_assigned', $batch_no)
-            ->where('users.course_assigned', $course_no)
+            ->where('courses.id', $course_no)
             ->where('users.role', 'student')
             ->select(
                 'marks.user_id',
@@ -290,8 +296,9 @@ class teacherController extends Controller
                 DB::raw('SUM(marks.obt_marks) as total_obtained_marks'),
                 DB::raw('SUM(marks.max_marks) as total_max_marks')
             )
-            ->groupBy('marks.user_id', 'users.name', 'users.email', 'users.image') // Include users.image here
+            ->groupBy('marks.user_id', 'users.name', 'users.email', 'users.image')
             ->get();
+
 
         // Categorize students
         $excellingStudents = [];

@@ -69,8 +69,7 @@ class courseController extends Controller
 
     public function getCourses(Request $request)
     {
-        $perPage = $request->input('per_page', 10);
-        $courses = Course::paginate($perPage);
+        $courses = Course::all();
         return response()->json($courses);
     }
     public function getStudentsCourse()

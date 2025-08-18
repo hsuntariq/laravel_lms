@@ -43,11 +43,20 @@ class staffController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'whatsapp' => $request->whatsapp,
-            'course_assigned' => $request->course_assigned,
             'gender' => $request->gender,
             'image' => $imagePath,
-            'role' => 'teacher', // Fixed role as 'teacher'
+            'role' => 'teacher',
+            'biography' => $request->biography ?? null,
+            'expertise' => $request->expertise ? json_encode($request->expertise) : null,
+            'social' => $request->social ? json_encode($request->social) : null,
+
         ]);
+
+        // attach multiple courses (pivot)
+        if ($request->course_assigned) {
+            $courseIds = explode(',', $request->course_assigned);
+            $instructor->courses()->attach($courseIds);
+        }
 
         // Return success response
         return response()->json([

@@ -1598,6 +1598,38 @@ $(document).ready(function () {
 
     // Initial course and teacher load
 
+    function fetchCourses(selectedCourseId = null, selectedBatchId = null) {
+        $.ajax({
+            url: "/dashboard/staff/get-courses", // Adjust the URL as necessary
+            type: "GET",
+            beforeSend: function () {
+                $(".courses-select").html(
+                    `<option>Loading courses...</option>`
+                );
+            },
+            success: function (response) {
+                let coursesHtml =
+                    "<option disabled selected>Select Course</option>";
+                response.forEach((course) => {
+                    coursesHtml += `<option value="${course.id}" ${
+                        selectedCourseId === course.id ? "selected" : ""
+                    }>${course.course_name}</option>`;
+                });
+                $("#edit_course").html(coursesHtml);
+                $(".courses-select").html(coursesHtml);
+                // Fetch batches based on the selected course
+                $("#edit_course").on("change", function () {
+                    fetchBatches(selectedCourseId, selectedBatchId);
+                });
+            },
+            error: function () {
+                $("#edit_course").html(
+                    "<option>Error loading courses</option>"
+                );
+            },
+        });
+    }
+
     $(document).ready(function () {
         if (window.location.pathname.split("/").includes("staff")) {
             fetchCourses();
